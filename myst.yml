@@ -3,6 +3,7 @@ version: 1
 project:
   id: 3baef407-2763-41f9-88fe-85d7edc3aa34
   title: FEniCS 2026 - Advanced Tutorial Sessions 
+  execute: true
   # description:
   # keywords: []
   # authors: []
