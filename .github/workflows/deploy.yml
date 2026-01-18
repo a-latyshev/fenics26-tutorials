@@ -45,6 +45,10 @@ jobs:
           TOKEN="$(jupyter server list 2>/dev/null | sed -n 's/.*token=\([^& ]*\).*/\1/p' | head -n1)"
           export TOKEN
           echo "$TOKEN"
+      - name: Export Jupyter Base URL
+        run: |
+          export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
+          echo "JUPYTER_BASE_URL=$JUPYTER_BASE_URL"
       # - name: Start JupyterLab server
       #   run: |
       #     jupyter lab --port=3000 --ip=0.0.0.0 --no-browser --allow-root &
