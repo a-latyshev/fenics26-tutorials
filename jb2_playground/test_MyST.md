@@ -1,4 +1,8 @@
 ---
+kernelspec:
+  name: python3
+  display_name: 'Python 3'
+  language: python
 jupytext:
   cell_metadata_filter: -all
   custom_cell_magics: kql
