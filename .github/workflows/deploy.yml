@@ -30,7 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/fenics/dolfinx/lab:v0.10.0
     env:
-      # JUPYTER_EXTENSION_ENABLED: true
       HOST: "127.0.0.1"
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +40,11 @@ jobs:
           node-version: 18.x
       - name: Install Jupyter Book (via myst)
         run: npm install -g jupyter-book
+      - name: Get Jupyter Token
+        run: |
+          TOKEN="$(jupyter server list 2>/dev/null | sed -n 's/.*token=\([^& ]*\).*/\1/p' | head -n1)"
+          export TOKEN
+          echo "$TOKEN"
       # - name: Start JupyterLab server
       #   run: |
       #     jupyter lab --port=3000 --ip=0.0.0.0 --no-browser --allow-root &
