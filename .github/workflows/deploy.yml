@@ -40,22 +40,25 @@ jobs:
           node-version: 18.x
       - name: Install Jupyter Book (via myst)
         run: npm install -g jupyter-book
-      - name: Get Jupyter Token
-        run: |
-          TOKEN="$(jupyter server list 2>/dev/null | sed -n 's/.*token=\([^& ]*\).*/\1/p' | head -n1)"
-          export TOKEN
-          echo "$TOKEN"
-      - name: Export Jupyter Base URL
-        run: |
-          export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
-          echo "JUPYTER_BASE_URL=$JUPYTER_BASE_URL"
-      # - name: Start JupyterLab server
+      # - name: Get Jupyter Token
       #   run: |
-      #     jupyter lab --port=3000 --ip=0.0.0.0 --no-browser --allow-root &
-      #     sleep 10
-      #     echo "JupyterLab server started on port 3000"
+      #     export TOKEN="$(jupyter server list 2>/dev/null | sed -n 's/.*token=\([^& ]*\).*/\1/p' | head -n1)"
+      #     export TOKEN
+      #     echo "TOKEN=$TOKEN"
+      # - name: Export Jupyter Base URL
+      #   run: |
+      #     export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
+      #     # echo "JUPYTER_BASE_URL=$JUPYTER_BASE_URL"
+      - name: Start JupyterLab server
+        run: |
+          export JUPYTER_BASE_URL="http://localhost:8888/"
+          export JUPYTER_TOKEN="my-jupyter-token"
+          jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}" --ServerApp.port="8888" &
       - name: Build HTML Assets
         run: jupyter-book build --html --execute
+      - name: Stop JupyterLab server
+        run: |
+          pkill -f jupyter
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
