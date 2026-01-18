@@ -54,11 +54,14 @@ jobs:
           export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
           export JUPYTER_TOKEN="my-jupyter-token"
           echo "JUPYTER_TOKEN=$JUPYTER_TOKEN"
-          jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}"
-          --ServerApp.port="8888" --allow-root &
+          jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}" --ServerApp.port="8888" --allow-root &
           jupyter-book build --html --execute
       # - name: Build HTML Assets
-        # run: jupyter-book build --html --execute
+      #   run: |
+      #     export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
+      #     export JUPYTER_TOKEN="$(jupyter server list 2>/dev/null | sed -n 's/.*token=\([^& ]*\).*/\1/p' | head -n1)"
+      #     echo "JUPYTER_TOKEN=$JUPYTER_TOKEN"
+      #     jupyter-book build --html --execute
       - name: Stop JupyterLab server
         run: |
           pkill -f jupyter
