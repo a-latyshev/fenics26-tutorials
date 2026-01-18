@@ -40,24 +40,15 @@ jobs:
           node-version: 18.x
       - name: Install Jupyter Book (via myst)
         run: npm install -g jupyter-book
-      # - name: Build HTML Assets
-      #   run: |
-      #     export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
-      #     export JUPYTER_TOKEN="my-jupyter-token"
-      #     echo "JUPYTER_TOKEN=$JUPYTER_TOKEN"
-      #     jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}" --ServerApp.port="8888" --allow-root &
-      #     jupyter-book build --html --execute
-      #     pkill -f jupyter
-
       - name: Build HTML Assets
         run: |
-          jupyter server list
-          export JUPYTER_BASE_URL="http://0.0.0.0:8888/"
-          export JUPYTER_TOKEN="$(jupyter server list 2>/dev/null | sed -n 's/.*token=\([^& ]*\).*/\1/p' | head -n1)"
+          export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
+          export JUPYTER_TOKEN="my-jupyter-token"
           echo "JUPYTER_TOKEN=$JUPYTER_TOKEN"
+          jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}"
+          --ServerApp.port="8888" --allow-root &
+          jupyter server list  
           jupyter-book build --html --execute
-      - name: Stop JupyterLab server
-        run: |
           pkill -f jupyter
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
