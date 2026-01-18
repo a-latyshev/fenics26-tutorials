@@ -1,1 +1,1 @@
-# fenics26-tutorials
+# FEniCS 2026 - Advanced Tutorial Sessions 

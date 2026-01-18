@@ -1,1 +1,1 @@
-# index
+# FEniCS 2026 - Advanced Tutorial Sessions 
