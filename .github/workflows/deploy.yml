@@ -40,15 +40,6 @@ jobs:
           node-version: 18.x
       - name: Install Jupyter Book (via myst)
         run: npm install -g jupyter-book
-      # - name: Get Jupyter Token
-      #   run: |
-      #     export TOKEN="$(jupyter server list 2>/dev/null | sed -n 's/.*token=\([^& ]*\).*/\1/p' | head -n1)"
-      #     export TOKEN
-      #     echo "TOKEN=$TOKEN"
-      # - name: Export Jupyter Base URL
-      #   run: |
-      #     export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
-      #     # echo "JUPYTER_BASE_URL=$JUPYTER_BASE_URL"
       # - name: Build HTML Assets
       #   run: |
       #     export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
@@ -56,9 +47,12 @@ jobs:
       #     echo "JUPYTER_TOKEN=$JUPYTER_TOKEN"
       #     jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}" --ServerApp.port="8888" --allow-root &
       #     jupyter-book build --html --execute
+      #     pkill -f jupyter
+
       - name: Build HTML Assets
         run: |
-          export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
+          jupyter server list
+          export JUPYTER_BASE_URL="http://0.0.0.0:8888/"
           export JUPYTER_TOKEN="$(jupyter server list 2>/dev/null | sed -n 's/.*token=\([^& ]*\).*/\1/p' | head -n1)"
           echo "JUPYTER_TOKEN=$JUPYTER_TOKEN"
           jupyter-book build --html --execute
