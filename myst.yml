@@ -13,6 +13,7 @@ project:
     - file: index.md
     - title: Jupyter 2 playground
       children:
+        - file: jb2_playground/test_MyST.ipynb
         - file: jb2_playground/test_MyST.md
     - title: Session 1
       children:
