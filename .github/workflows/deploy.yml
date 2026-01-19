@@ -32,10 +32,8 @@ jobs:
     env:
       HOST: "127.0.0.1"
       PYVISTA_OFF_SCREEN: false
-      PYVISTA_JUPYTER_BACKEND: "static"
+      PYVISTA_JUPYTER_BACKEND: static
       JUPYTER_EXTENSION_ENABLED: true
-      LIBGL_ALWAYS_SOFTWARE: 1
-      DISPLAY: ":99.0"
     steps:
       - uses: actions/checkout@v4
       - name: Setup Pages
@@ -43,23 +41,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18.x
-      - name: Check server status
-        run: |
-          jupyter server list
       - name: Install Jupyter Book (via myst)
         run: npm install -g jupyter-book
-      # - name: Install apt dependencies and upgrade pip
-      #   shell: bash -el {0}
-      #   run: |
-      #     apt-get update && apt-get install -y libxrender1 libgl1-mesa-dev mesa-utils gzip
-          # export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
-          # export JUPYTER_TOKEN="my-jupyter-token"
-          # jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}" --ServerApp.port="8888" --allow-root &
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Build HTML Assets
         run: |
-          jupyter book build --html --execute
+          export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
+          export JUPYTER_TOKEN="my-jupyter-token"
+          jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}" --ServerApp.port="8888" --allow-root &
+          jupyter-book build --html --execute
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
