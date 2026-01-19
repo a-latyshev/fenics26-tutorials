@@ -55,7 +55,20 @@ jupytext --from py --to md:myst example.py
 ```
 
 To preserve version control, AL suggests to continue working with jupytext `.py`
-files and then convert them to MyST Markdown.
+files and then convert them to MyST Markdown. Don't forget to add the
+corresponding `.md` files to [myst.yml](./myst.yml).
 
 Authors are encouraged to take a look at [Jupyter Book 2 playground](./jb2_playground.md) to see how
 demos look like.
+
+:::{tip}
+If you lunch the jupyter book as a website via `jupyter book start --execute`,
+then once you edit sources, the website will be updated automatically, you will
+need just to refresh it.
+:::
+
+More about jupyter book execution: https://jupyterbook.org/stable/execution/execution/.
+
+:::{danger}
+There are issues when the site is statically hosted: https://github.com/orgs/jupyter-book/projects/1/views/1?pane=issue&itemId=122114744&issue=jupyter-book%7Cmystmd%7C2000
+:::
