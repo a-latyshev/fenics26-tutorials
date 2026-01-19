@@ -1,2 +1,5 @@
 # MyST build outputs
 _build
+
+*.pyc
+.DS_Store
