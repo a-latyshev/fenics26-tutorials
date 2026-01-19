@@ -18,9 +18,9 @@ can find a schedule:
 | Time    | Segment                                   |
 | ------- | ----------------------------------------- |
 | 8:45 - 9:20 | Arrival/Registration of participants |
-| 9:20 - 10:10 | Practice session 1                |
+| 9:20 - 10:10 | [Practice session 1](./session1/)                |
 | 10:10 - 10:40 | Coffee break                              |
-| 10:40 - 11:30 | Practice session 2          |
+| 10:40 - 11:30 | [Practice session 2](./session2/)          |
 | 11:30 - 12:00 | Open QA session.      |
 | 1h20   | Free lunch                                |
 

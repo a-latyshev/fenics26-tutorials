@@ -15,7 +15,7 @@ kernelspec:
 
 Author: Jørgen Schartum Dokken
 
-This implementation is an adaptation of the work in {cite}`fundamentals-FenicsTutorial` to DOLFINx.
+This implementation is an adaptation of the work in {cite}`Langtangen_Mardal_FEM_2019` to DOLFINx.
 
 In this section, you will learn:
 - How to use the built-in meshes in DOLFINx
@@ -183,7 +183,7 @@ In FEniCSx, we do not specify boundary conditions as part of the function space,
 so it is sufficient to use a common space for the trial and test function.
 
 We use the {py:mod}`Unified Form Language<ufl>` (UFL) to specify the varitional formulations.
-See {cite}`fundamentals-ufl2014` for more details.
+See {cite}`ufl2014` for more details.
 
 ```{code-cell}
 import ufl
