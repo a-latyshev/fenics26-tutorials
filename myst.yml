@@ -5,7 +5,7 @@ project:
   title: FEniCS 2026 - Advanced Tutorial Sessions 
   # description:
   keywords: [FEniCSx, finite element method]
-  authors: [Andrey Latyshev, J\xF8rgen S. Dokken, Jack S. Hale]
+  authors: [Andrey Latyshev, Jorgen S. Dokken, Jack S. Hale]
   github: https://github.com/a-latyshev/fenics26-tutorials
   # To autogenerate a Table of Contents, run "jupyter book init --write-toc"
   
