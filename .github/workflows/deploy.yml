@@ -33,6 +33,8 @@ jobs:
       HOST: "127.0.0.1"
       PYVISTA_OFF_SCREEN: false
       PYVISTA_JUPYTER_BACKEND: html
+      JUPYTER_EXTENSION_ENABLED: true
+      LIBGL_ALWAYS_SOFTWARE: 1
     steps:
       - uses: actions/checkout@v4
       - name: Setup Pages
