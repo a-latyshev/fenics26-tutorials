@@ -51,7 +51,7 @@ jobs:
           export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
           export JUPYTER_TOKEN="my-jupyter-token"
           jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}" --ServerApp.port="8888" --allow-root &
-          jupyter-book build --html --execute
+          jupyter book build --html --execute
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
