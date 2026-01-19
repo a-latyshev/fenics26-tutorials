@@ -40,6 +40,8 @@ jobs:
           node-version: 18.x
       - name: Install Jupyter Book (via myst)
         run: npm install -g jupyter-book
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
       - name: Build HTML Assets
         run: |
           export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
