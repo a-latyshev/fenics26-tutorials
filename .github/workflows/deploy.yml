@@ -32,7 +32,7 @@ jobs:
     env:
       HOST: "127.0.0.1"
       PYVISTA_OFF_SCREEN: false
-      PYVISTA_JUPYTER_BACKEND: html
+      PYVISTA_JUPYTER_BACKEND: trame
       JUPYTER_EXTENSION_ENABLED: true
       LIBGL_ALWAYS_SOFTWARE: 1
     steps:
