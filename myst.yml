@@ -15,6 +15,8 @@ project:
       children:
         - file: jb2_playground/test2_MyST.ipynb
         - file: jb2_playground/test_MyST.md
+        - file: jb2_playground/demo_nonlinear_heat_equation_part1.md
+        - file: jb2_playground/demo_plasticity_von_mises.ipynb
     - title: Session 1
       children:
         - file: session1/session1.md
@@ -23,6 +25,6 @@ project:
         - file: session2/session2.md
 site:
   template: book-theme
-  # options:
-  #   favicon: favicon.ico
-  #   logo: site_logo.png
+  options:
+    favicon: favicon.ico
+    logo: fenics_logo.png
