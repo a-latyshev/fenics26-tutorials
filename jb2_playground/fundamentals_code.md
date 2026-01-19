@@ -1,6 +1,6 @@
 ---
 authors:
-- name: "Jorgen Schartum Dokken"
+- name: "J\xF8rgen Schartum Dokken"
   affiliation: Simula
 jupytext:
   text_representation:
