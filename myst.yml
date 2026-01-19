@@ -32,3 +32,4 @@ site:
   options:
     favicon: favicon.ico
     logo: fenics_banner.png
+    hide_authors: false

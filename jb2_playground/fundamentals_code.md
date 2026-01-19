@@ -1,10 +1,14 @@
 ---
+authors:
+- name: "Jorgen Schartum Dokken"
+  affiliation: Simula
 jupytext:
   text_representation:
     extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.18.1
+  root_level_metadata_filter: -authors
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python

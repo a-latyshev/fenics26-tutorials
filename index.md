@@ -53,3 +53,6 @@ jupytext --from py --to md:myst example.py
 
 To preserve version control, AL suggests to continue working with jupytext `.py`
 files and then convert them to MyST Markdown.
+
+Authors are encouraged to take a look at [Jupyter Book 2 playground](./jb2_playground.md) to see how
+demos look like.
