@@ -3,3 +3,8 @@ _build
 
 *.pyc
 .DS_Store
+*.h5
+*.xdmf
+*.0
+*.json
+*.idx
