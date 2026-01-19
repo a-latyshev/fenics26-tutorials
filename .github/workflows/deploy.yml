@@ -54,6 +54,8 @@ jobs:
         run: pip install -r requirements.txt
       - name: Build HTML Assets
         run: |
+          export DISPLAY=:99
+          export PYVISTA_OFF_SCREEN=true
           export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
           export JUPYTER_TOKEN="my-jupyter-token"
           jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}" --ServerApp.port="8888" --allow-root &
