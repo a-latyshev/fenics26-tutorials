@@ -43,6 +43,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18.x
+      - name: Check server status
+        run: |
+          jupyter server list
       - name: Install Jupyter Book (via myst)
         run: npm install -g jupyter-book
       # - name: Install apt dependencies and upgrade pip
