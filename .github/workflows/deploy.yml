@@ -44,6 +44,10 @@ jobs:
           node-version: 18.x
       - name: Install Jupyter Book (via myst)
         run: npm install -g jupyter-book
+      - name: Install apt dependencies and upgrade pip
+        shell: bash -el {0}
+        run: |
+          apt-get update && apt-get install -y libxrender1 libgl1-mesa-dev mesa-utils gzip
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Build HTML Assets
