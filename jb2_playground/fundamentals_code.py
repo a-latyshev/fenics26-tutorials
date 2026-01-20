@@ -11,8 +11,9 @@
 #     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
-# authors:
-#   - name: Jørgen Schartum Dokken
+#   authors:
+#     - name: Jørgen Schartum Dokken
+#       affiliation: Simula Research Laboratory
 # ---
 
 # # Implementation

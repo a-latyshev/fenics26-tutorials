@@ -28,6 +28,12 @@ Make sure that you installed Jupyter Book 2
 ```shell
 pip install "jupyter-book>=2.0.0"
 ```
+
+Convert Jupytext .py files to MyST Markdown
+```shell
+find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
+```
+
 If you build from a docker container, make sure that you have a running Jupyter
 server
 
@@ -49,14 +55,13 @@ workflow a bit less straightforward.
 
 Jupyter Book 2 supports only notebooks `.ipynb` and MyST Markdown `.md` files.
 
-Convert jupytext files to MyST Markdown:
+Convert all Jupytext .py files to Jupyter notebook:
 ```bash
-jupytext --from py --to md:myst example.py
+find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
 ```
-
 To preserve version control, AL suggests to continue working with jupytext `.py`
-files and then convert them to MyST Markdown. Don't forget to add the
-corresponding `.md` files to [myst.yml](./myst.yml).
+files and then convert them to Jupyter notebook. Don't forget to add the
+corresponding `.ipynb` files to [myst.yml](./myst.yml).
 
 Authors are encouraged to take a look at [Jupyter Book 2 playground](./jb2_playground.md) to see how
 demos look like.

@@ -19,8 +19,8 @@ project:
       file: jb2_playground.md
       children:
         - file: jb2_playground/test_MyST.md
-        - file: jb2_playground/demo_plasticity_von_mises.md
-        - file: jb2_playground/fundamentals_code.md
+        - file: jb2_playground/demo_plasticity_von_mises.ipynb
+        - file: jb2_playground/fundamentals_code.ipynb
     - title: Session 1
       children:
         - file: session1/session1.md

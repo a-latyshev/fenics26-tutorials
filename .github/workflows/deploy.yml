@@ -45,10 +45,9 @@ jobs:
         run: npm install -g jupyter-book
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-      - name: Convert .py to MyST Markdown
+      - name: Convert Jupytext .py files to MyST Markdown
         run: |
-          ls
-          find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to md:myst "{}"
+          find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
       - name: Build HTML Assets
         run: |
           export JUPYTER_BASE_URL="http://127.0.0.1:8888/"

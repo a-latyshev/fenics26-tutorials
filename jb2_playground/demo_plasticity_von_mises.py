@@ -12,6 +12,11 @@
 #     display_name: dolfinx-env (3.12.3)
 #     language: python
 #     name: python3
+#   authors:
+#     - name: Andrey Latyshev
+#       affiliation: University of Luxembourg
+#     - name: Jack S. Hale
+#       affiliation: University of Luxembourg
 # ---
 
 # %% [markdown]
