@@ -32,7 +32,7 @@ jobs:
     env:
       HOST: "127.0.0.1"
       PYVISTA_OFF_SCREEN: false
-      PYVISTA_JUPYTER_BACKEND: static
+      PYVISTA_JUPYTER_BACKEND: html
       JUPYTER_EXTENSION_ENABLED: true
     steps:
       - uses: actions/checkout@v4
