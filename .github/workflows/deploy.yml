@@ -47,9 +47,8 @@ jobs:
         run: pip install -r requirements.txt
       - name: Convert .py to MyST Markdown
         run: |
-          find . -type f -name "*.py" -print0 | while IFS= read -r -d '' file; do
-            jupytext --from py --to md:myst "$file"
-          done
+          ls
+          find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to md:myst "{}"
       - name: Build HTML Assets
         run: |
           export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
