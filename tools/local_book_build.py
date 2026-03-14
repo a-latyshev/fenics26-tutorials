@@ -25,7 +25,6 @@ import argparse
 import json
 import os
 import shutil
-import signal
 import socket
 import subprocess
 import sys
@@ -191,14 +190,19 @@ def stop_process(proc: subprocess.Popen[str]) -> None:
 
 def build_book(*, root: Path, host: str, port: int, token: str, execute: bool) -> None:
     env = os.environ.copy()
-    env.setdefault("HOST", host)
+    # MyST/jupyter-book starts a local web server and then fetches pages.
+    # On some systems, `localhost` resolves to IPv6 (::1) first, which can
+    # cause fetch failures if the server only listens on IPv4.
+    env["HOST"] = host
+    # Ensure node prefers IPv4 when resolving `localhost`.
+    env.setdefault("NODE_OPTIONS", "--dns-result-order=ipv4first")
     env.setdefault("PYVISTA_OFF_SCREEN", "true")
     env.setdefault("PYVISTA_JUPYTER_BACKEND", "html")
     env.setdefault("JUPYTER_EXTENSION_ENABLED", "true")
     env["JUPYTER_BASE_URL"] = f"http://{host}:{port}/"
     env["JUPYTER_TOKEN"] = token
 
-    cmd = ["jupyter", "book", "build", "--html", "--ci"]
+    cmd = ["jupyter", "book", "build", "--html", "--ci", "--keep-host"]
     if execute:
         cmd.append("--execute")
 
@@ -240,6 +244,18 @@ def copy_pyvista_html_exports(*, root: Path) -> None:
     print(f"Copied {copied} HTML export(s) into {dest}")
 
 
+def serve_built_site(*, root: Path, host: str, port: int) -> None:
+    build_html = root / "_build" / "html"
+    if not build_html.exists():
+        raise FileNotFoundError(f"Build output not found: {build_html}")
+
+    url = f"http://{host}:{port}/"
+    print(f"\nServing built site from {build_html}")
+    print(f"Open: {url}")
+    print("Press Ctrl-C to stop.\n")
+    subprocess.run(["python", "-m", "http.server", str(port), "--bind", host], cwd=str(build_html), check=True)
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=REPO_ROOT, help="Repository root (default: repo root)")
@@ -255,12 +271,19 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--no-convert", action="store_true", help="Skip converting .py to .ipynb")
     parser.add_argument("--no-execute", action="store_true", help="Build without executing notebooks")
     parser.add_argument("--server-timeout", type=float, default=30.0, help="Seconds to wait for server")
+    parser.add_argument(
+        "--serve",
+        action="store_true",
+        help="After building, serve the static site from _build/html using python -m http.server",
+    )
+    parser.add_argument("--serve-port", type=int, default=8000, help="Port for --serve (default: 8000)")
 
     args = parser.parse_args(argv)
     root: Path = args.root.resolve()
 
     env = os.environ.copy()
-    env.setdefault("HOST", args.host)
+    env["HOST"] = args.host
+    env.setdefault("NODE_OPTIONS", "--dns-result-order=ipv4first")
     env.setdefault("PYVISTA_OFF_SCREEN", "true")
     env.setdefault("PYVISTA_JUPYTER_BACKEND", "html")
     env.setdefault("JUPYTER_EXTENSION_ENABLED", "true")
@@ -276,6 +299,12 @@ def main(argv: list[str]) -> int:
 
         build_book(root=root, host=args.host, port=port, token=args.token, execute=not args.no_execute)
         copy_pyvista_html_exports(root=root)
+
+        print("\nBuild finished.")
+        print("Note: the transient MyST build server port (e.g. :3004/:3005) stops when the build ends.")
+        print(f"Static site output: {root / '_build' / 'html'}")
+        if args.serve:
+            serve_built_site(root=root, host=args.host, port=args.serve_port)
 
         return 0
     except subprocess.CalledProcessError as e:
