@@ -317,10 +317,8 @@ if domain.comm.rank == 0:  # Only print the error on one process
 
 # +
 import pyvista
-from pathlib import Path
-import os
 
-pyvista.set_jupyter_backend('html')
+# pyvista.set_jupyter_backend('html')
 print(pyvista.global_theme.jupyter_backend)
 
 # +
@@ -342,10 +340,7 @@ grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 plotter = pyvista.Plotter()
 plotter.add_mesh(grid, show_edges=True)
 plotter.view_xy()
-repo_root = Path(os.environ.get("GITHUB_WORKSPACE", Path.cwd()))
-export_dir = repo_root / "site_exports" / "pyvista"
-export_dir.mkdir(parents=True, exist_ok=True)
-mesh_html = export_dir / "fundamentals_mesh.html"
+mesh_html = "fundamentals_mesh.html"
 plotter.export_html(mesh_html)
 if not pyvista.OFF_SCREEN:
     plotter.show()
@@ -376,7 +371,7 @@ u_grid.set_active_scalars("u")
 u_plotter = pyvista.Plotter()
 u_plotter.add_mesh(u_grid, show_edges=True)
 u_plotter.view_xy()
-u_html = export_dir / "fundamentals_solution.html"
+u_html = "fundamentals_solution.html"
 u_plotter.export_html(u_html)
 if not pyvista.OFF_SCREEN:
     u_plotter.show()
@@ -393,7 +388,7 @@ if not pyvista.OFF_SCREEN:
 warped = u_grid.warp_by_scalar()
 plotter2 = pyvista.Plotter()
 plotter2.add_mesh(warped, show_edges=True, show_scalar_bar=True)
-warped_html = export_dir / "fundamentals_solution_warped.html"
+warped_html = "fundamentals_solution_warped.html"
 plotter2.export_html(warped_html)
 if not pyvista.OFF_SCREEN:
     plotter2.show()

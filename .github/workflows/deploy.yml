@@ -63,12 +63,37 @@ jobs:
           # Start the Jupyter server under Xvfb so executed kernels inherit DISPLAY.
           xvfb-run -a sh -c "jupyter server --IdentityProvider.token='${JUPYTER_TOKEN}' --ServerApp.port='8888' --allow-root & jupyter-book build --html --execute"
       - name: Copy PyVista HTML exports into site
+        shell: bash
         run: |
           mkdir -p _build/html/pyvista
-          # Copy any HTML exports created during notebook execution
-          if [ -d site_exports/pyvista ]; then
-            cp -v site_exports/pyvista/*.html _build/html/pyvista/ || true
-          fi
+          # Copy standalone HTML exports created during notebook execution.
+          # Tutorial code exports plain filenames (no fixed export directory),
+          # so we gather any *.html files from the source tree while excluding
+          # the built site itself.
+          copy_htmls_flat() {
+            local search_root="$1"
+            if [ -e "$search_root" ]; then
+              while IFS= read -r -d '' f; do
+                cp -v "$f" "_build/html/pyvista/$(basename "$f")" || true
+              done < <(find "$search_root" -type f -name "*.html" -print0)
+            fi
+          }
+
+          # 1) Source tree (exclude _build/ entirely to avoid copying the built site)
+          while IFS= read -r -d '' f; do
+            cp -v "$f" "_build/html/pyvista/$(basename "$f")" || true
+          done < <(
+            find . -type f -name "*.html" \
+              -not -path "./_build/*" \
+              -not -path "./.git/*" \
+              -not -path "./site_exports/*" \
+              -print0
+          )
+
+          # 2) Execution/cache dirs (if present)
+          # These locations vary between jupyter-book/myst versions.
+          copy_htmls_flat "_build/execute"
+          copy_htmls_flat "_build/jupyter_execute"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -15,7 +15,8 @@ This keeps the interactivity (rotate/zoom/pan, UI widgets shipped in the HTML) w
 ## Minimal embedding
 
 This page embeds a standalone HTML file that is deployed as a static asset.
-In this repo, we keep the source HTML under `site_exports/pyvista/` and copy it into the built site during CI.
+In this repo, the tutorial code exports plain HTML filenames (e.g. `pyvista_scene.html`).
+During deployment, CI gathers these exported HTML files and copies them into the built site (e.g. under `/pyvista/`).
 
 :::{iframe} ../pyvista/pyvista_scene.html
 :width: 100%
@@ -27,7 +28,7 @@ Fallback link (also helps ensure the file is included in the static build):
 
 ## How to generate `pyvista_scene.html`
 
-Run something like the following **locally** (or in CI) and commit the generated HTML under `site_exports/pyvista/`.
+Run something like the following **locally** (or in CI) to generate the standalone HTML file.
 
 ```python
 import pyvista as pv
@@ -35,7 +36,7 @@ import pyvista as pv
 plotter = pv.Plotter()
 plotter.add_mesh(pv.Sphere(), color="lightgray")
 plotter.add_axes()
-plotter.export_html("site_exports/pyvista/pyvista_scene.html")
+plotter.export_html("pyvista_scene.html")
 ```
 
 Notes:
