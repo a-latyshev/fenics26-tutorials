@@ -342,8 +342,6 @@ plotter.add_mesh(grid, show_edges=True)
 plotter.view_xy()
 mesh_html = "fundamentals_mesh.html"
 plotter.export_html(mesh_html)
-if not pyvista.OFF_SCREEN:
-    plotter.show()
 
 # Embed the exported HTML (works on static GitHub Pages)
 #
@@ -373,8 +371,6 @@ u_plotter.add_mesh(u_grid, show_edges=True)
 u_plotter.view_xy()
 u_html = "fundamentals_solution.html"
 u_plotter.export_html(u_html)
-if not pyvista.OFF_SCREEN:
-    u_plotter.show()
 
 # :::{iframe} ../pyvista/fundamentals_solution.html
 # :width: 100%
@@ -390,8 +386,6 @@ plotter2 = pyvista.Plotter()
 plotter2.add_mesh(warped, show_edges=True, show_scalar_bar=True)
 warped_html = "fundamentals_solution_warped.html"
 plotter2.export_html(warped_html)
-if not pyvista.OFF_SCREEN:
-    plotter2.show()
 
 # :::{iframe} ../pyvista/fundamentals_solution_warped.html
 # :width: 100%
