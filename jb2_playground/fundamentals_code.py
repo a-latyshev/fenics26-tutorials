@@ -389,7 +389,7 @@ u_plotter.export_html(u_html)
 # :title: Fundamentals solution
 # :::
 #
-# [Open the exported scene in a new tab](../pyvista/fundamentals_solution.html)
+# [Open the exported scene in a new tab](/pyvista/fundamentals_solution.html)
 
 # We can also warp the mesh by scalar to make use of the 3D plotting.
 
