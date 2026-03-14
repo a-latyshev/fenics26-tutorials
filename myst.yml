@@ -16,7 +16,7 @@ project:
   toc:
     - file: index.md
     - title: Jupyter 2 playground
-      file: jb2_playground.md
+      file: jb2_playground/jb2_playground.md
       children:
         - file: jb2_playground/test_MyST.md
         - file: jb2_playground/pyvista_export_embed.md

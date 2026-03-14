@@ -318,7 +318,7 @@ if domain.comm.rank == 0:  # Only print the error on one process
 # +
 import pyvista
 
-# pyvista.set_jupyter_backend('html')
+pyvista.set_jupyter_backend('html')
 print(pyvista.global_theme.jupyter_backend)
 
 # +
@@ -336,6 +336,18 @@ grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 # We can now use the `pyvista.Plotter` to visualize the mesh. We visualize it by showing it in 2D and warped in 3D.
 # In the jupyter notebook environment, we use the default setting of `pyvista.OFF_SCREEN=False`,
 # which will render plots directly in the notebook.
+
+def plot_pyvista():
+    pyvista.set_jupyter_backend("static")
+    plotter = pyvista.Plotter()
+    plotter.add_mesh(grid, show_edges=True)
+    plotter.view_xy()
+    plotter.show()
+    plotter.close()
+    plotter.deep_clean()
+plot_pyvista()
+
+pyvista.set_jupyter_backend("html")
 
 plotter = pyvista.Plotter()
 plotter.add_mesh(grid, show_edges=True)
@@ -377,7 +389,7 @@ u_plotter.export_html(u_html)
 # :title: Fundamentals solution
 # :::
 #
-# [Open the exported scene in a new tab](/pyvista/fundamentals_solution.html)
+# [Open the exported scene in a new tab](../pyvista/fundamentals_solution.html)
 
 # We can also warp the mesh by scalar to make use of the 3D plotting.
 
@@ -414,7 +426,7 @@ with io.XDMFFile(domain.comm, filename.with_suffix(".xdmf"), "w") as xdmf:
 # -
 
 # ```{bibliography}
-#    :filter: cited
-#    :labelprefix:
-#    :keyprefix: fundamentals-
+# :filter: cited
+# :labelprefix:
+# :keyprefix: fundamentals-
 # ```

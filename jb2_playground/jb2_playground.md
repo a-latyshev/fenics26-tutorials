@@ -1,3 +1,10 @@
+---
+authors:
+- name: "Andrey Latyshev"
+  affiliation: University of Luxembourg
+  email: andrey.latyshev@uni.lu
+---
+
 # Jupyter 2 playground
 
 Here authors may find some examples of FEniCSx demos migrated from JB1 to JB2.

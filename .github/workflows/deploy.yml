@@ -47,8 +47,6 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
-          # Needed for `pyvista.Plotter.export_html()`
-          pip install pyvista trame trame-vtk
       - name: Install system dependencies for headless rendering
         run: |
           apt-get update
