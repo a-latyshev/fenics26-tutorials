@@ -58,10 +58,10 @@ jobs:
           find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
       - name: Build HTML Assets
         run: |
-          export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
-          export JUPYTER_TOKEN="my-jupyter-token"
+          # export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
+          # export JUPYTER_TOKEN="my-jupyter-token"
           # Start the Jupyter server under Xvfb so executed kernels inherit DISPLAY.
-          xvfb-run -a sh -c "jupyter server --IdentityProvider.token='${JUPYTER_TOKEN}' --ServerApp.port='8888' --allow-root & jupyter-book build --html --execute"
+          jupyter-book build --html --execute
       - name: Copy PyVista HTML exports into site
         shell: bash
         run: |
