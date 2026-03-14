@@ -357,7 +357,7 @@ if not pyvista.OFF_SCREEN:
 # :title: Fundamentals mesh
 # :::
 #
-# [Open the exported scene in a new tab](fundamentals_mesh.html)
+# [Open the exported scene in a new tab](../pyvista/fundamentals_mesh.html)
 
 # ## Plotting a function using pyvista
 # We want to plot the solution `uh`.
@@ -386,7 +386,7 @@ if not pyvista.OFF_SCREEN:
 # :title: Fundamentals solution
 # :::
 #
-# [Open the exported scene in a new tab](fundamentals_solution.html)
+# [Open the exported scene in a new tab](../pyvista/fundamentals_solution.html)
 
 # We can also warp the mesh by scalar to make use of the 3D plotting.
 
@@ -403,7 +403,7 @@ if not pyvista.OFF_SCREEN:
 # :title: Fundamentals solution (warped)
 # :::
 #
-# [Open the exported scene in a new tab](fundamentals_solution_warped.html)
+# [Open the exported scene in a new tab](../pyvista/fundamentals_solution_warped.html)
 
 # ## External post-processing
 # For post-processing outside the python code, it is suggested to save the solution to file using either
