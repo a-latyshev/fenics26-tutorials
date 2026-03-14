@@ -348,9 +348,10 @@ if not pyvista.OFF_SCREEN:
 
 # Embed the exported HTML (works on static GitHub Pages)
 #
-# ```{raw} html
-# <iframe src="fundamentals_mesh.html" style="width: 100%; height: 520px; border: 0;" loading="lazy"></iframe>
-# ```
+# :::{iframe} fundamentals_mesh.html
+# :width: 100%
+# :title: Fundamentals mesh
+# :::
 #
 # [Open the exported scene in a new tab](fundamentals_mesh.html)
 
@@ -376,9 +377,10 @@ u_plotter.export_html(u_html)
 if not pyvista.OFF_SCREEN:
     u_plotter.show()
 
-# ```{raw} html
-# <iframe src="fundamentals_solution.html" style="width: 100%; height: 520px; border: 0;" loading="lazy"></iframe>
-# ```
+# :::{iframe} fundamentals_solution.html
+# :width: 100%
+# :title: Fundamentals solution
+# :::
 #
 # [Open the exported scene in a new tab](fundamentals_solution.html)
 
@@ -392,9 +394,10 @@ plotter2.export_html(warped_html)
 if not pyvista.OFF_SCREEN:
     plotter2.show()
 
-# ```{raw} html
-# <iframe src="fundamentals_solution_warped.html" style="width: 100%; height: 520px; border: 0;" loading="lazy"></iframe>
-# ```
+# :::{iframe} fundamentals_solution_warped.html
+# :width: 100%
+# :title: Fundamentals solution (warped)
+# :::
 #
 # [Open the exported scene in a new tab](fundamentals_solution_warped.html)
 

@@ -16,13 +16,10 @@ This keeps the interactivity (rotate/zoom/pan, UI widgets shipped in the HTML) w
 
 This page embeds a local HTML file living next to it: `pyvista_scene.html`.
 
-```{raw} html
-<iframe
-  src="pyvista_scene.html"
-  style="width: 100%; height: 520px; border: 0;"
-  loading="lazy"
-></iframe>
-```
+:::{iframe} pyvista_scene.html
+:width: 100%
+:title: PyVista exported scene
+:::
 
 Fallback link (also helps ensure the file is included in the static build):
 [Open the exported scene in a new tab](pyvista_scene.html).
