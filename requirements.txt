@@ -1,3 +1,1 @@
 dolfinx-external-operator>=0.10.0
-jupytext
-jupyterlab_myst
