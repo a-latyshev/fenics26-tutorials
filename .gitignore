@@ -12,4 +12,4 @@ _build
 *.png
 
 # PyVista HTML exports (generated during CI execution)
-jb2_playground/fundamentals_*.html
+site_exports/

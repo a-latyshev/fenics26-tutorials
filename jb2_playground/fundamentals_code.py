@@ -89,7 +89,7 @@
 # ## Generating  simple meshes
 # The next step is to define the discrete domain, _the mesh_.
 # We do this by importing one of the built-in mesh generators.
-# We will build a {py:func}`unit square mesh<dolfinx.mesh.create_unit_square>`, i.e. a mesh spanning $[0,1]\times[0,1]$.
+# We will build a `unit square mesh<dolfinx.mesh.create_unit_square>`, i.e. a mesh spanning $[0,1]\times[0,1]$.
 # It can consist of either triangles or quadrilaterals.
 
 # +
@@ -103,14 +103,14 @@ domain = mesh.create_unit_square(MPI.COMM_WORLD, 8, 8, mesh.CellType.quadrilater
 # Note that in addition to give how many elements we would like to have in each direction.
 # We also have to supply the _MPI-communicator_.
 # This is to specify how we would like the program to behave in parallel.
-# If we supply {py:data}`MPI.COMM_WORLD<mpi4py.MPI.COMM_WORLD>` we create a single mesh,
+# If we supply `MPI.COMM_WORLD<mpi4py.MPI.COMM_WORLD>` we create a single mesh,
 # whose data is distributed over the number of processors we would like to use.
 # We can for instance run the program in  parallel on two processors by using `mpirun`, as:
 # ``` bash
 #  mpirun -n 2 python3 t1.py
 # ```
 # However, if we would like to create a separate mesh on each processor,
-# we can use {py:data}`MPI.COMM_SELF<mpi4py.MPI.COMM_SELF>`.
+# we can use `MPI.COMM_SELF<mpi4py.MPI.COMM_SELF>`.
 # This is for instance  useful if we run a small problem, and would like to run it with multiple parameters.
 #
 # ## Defining the finite element function space
@@ -129,7 +129,7 @@ from dolfinx import fem
 V = fem.functionspace(domain, ("Lagrange", 1))
 # -
 
-# Further details about specification/customization of this tuple, see {py:class}`dolfinx.fem.ElementMetaData`.
+# Further details about specification/customization of this tuple, see `dolfinx.fem.ElementMetaData`.
 
 # ##  Dirichlet boundary conditions
 # Next, we create a function that will hold the Dirichlet boundary data, and use interpolation to
@@ -143,9 +143,9 @@ uD.interpolate(lambda x: 1 + x[0] ** 2 + 2 * x[1] ** 2)
 # Next we would like to apply the boundary values to all degrees of freedom that are on the
 # boundary of the discrete domain.
 # We start by identifying the facets (line-segments) representing the outer boundary,
-# using {py:func}`dolfinx.mesh.exterior_facet_indices`.
+# using `dolfinx.mesh.exterior_facet_indices`.
 # We start by creating the facet to cell connectivity required to determine boundary facets by
-# calling {py:meth}`dolfinx.mesh.Topology.create_connectivity`.
+# calling `dolfinx.mesh.Topology.create_connectivity`.
 
 tdim = domain.topology.dim
 fdim = tdim - 1
@@ -155,15 +155,15 @@ boundary_facets = mesh.exterior_facet_indices(domain.topology)
 # For the current problem, as we are using the first order Lagrange function space,
 # the degrees of freedom are located at the vertices of each cell, thus each facet contains two degrees of freedom.
 #
-# To find the local indices of these degrees of freedom, we use {py:func}`dolfinx.fem.locate_dofs_topological`
+# To find the local indices of these degrees of freedom, we use `dolfinx.fem.locate_dofs_topological`
 # which takes in the function space, the dimension of entities in the mesh we would like to identify and the local entities.
 # ```{admonition} Local ordering of degrees of freedom and mesh vertices
 # Many people expect there to be a 1-1 correspondence between the mesh coordinates and the coordinates of the degrees of freedom.
 # However, this is only true in the case of `Lagrange` 1 elements on a first order mesh.
 # Therefore, in DOLFINx we use separate local numbering for the mesh coordinates and the dof coordinates.
 # To obtain the local dof coordinates we can use
-# {py:meth}`V.tabulate_dof_coordinates()<dolfinx.fem.FunctionSpace.tabulate_dof_coordinates>`,
-# while the ordering of the local vertices can be obtained by {py:attr}`mesh.geometry.x<dolfinx.mesh.Geometry.x>`.
+# `V.tabulate_dof_coordinates()<dolfinx.fem.FunctionSpace.tabulate_dof_coordinates>`,
+# while the ordering of the local vertices can be obtained by `mesh.geometry.x<dolfinx.mesh.Geometry.x>`.
 # ```
 # With this data at hand, we can create the Dirichlet boundary condition
 
@@ -178,7 +178,7 @@ bc = fem.dirichletbc(uD, boundary_dofs)
 # In FEniCSx, we do not specify boundary conditions as part of the function space,
 # so it is sufficient to use a common space for the trial and test function.
 #
-# We use the {py:mod}`Unified Form Language<ufl>` (UFL) to specify the varitional formulations.
+# We use the `Unified Form Language<ufl>` (UFL) to specify the varitional formulations.
 # See {cite}`ufl2014` for more details.
 
 
@@ -190,7 +190,7 @@ v = ufl.TestFunction(V)
 # -
 
 # ## Defining the source term
-# As the source term is constant over the domain, we use {py:class}`dolfinx.fem.Constant`
+# As the source term is constant over the domain, we use `dolfinx.fem.Constant`
 
 # +
 from dolfinx import default_scalar_type
@@ -199,10 +199,10 @@ f = fem.Constant(domain, default_scalar_type(-6))
 # -
 
 # ```{admonition} Compilation speed-up
-# Instead of wrapping $-6$ in a {py:class}`dolfinx.fem.Constant`, we could simply define $f$ as `f=-6`.
+# Instead of wrapping $-6$ in a `dolfinx.fem.Constant`, we could simply define $f$ as `f=-6`.
 # However, if we would like to change this parameter later in the simulation,
 # we would have to redefine our variational formulation.
-# The {py:attr}`dolfinx.fem.Constant.value` allows us to update the value in $f$ by using `f.value=5`.
+# The `dolfinx.fem.Constant.value` allows us to update the value in $f$ by using `f.value=5`.
 # Additionally, by indicating that $f$ is a constant, we speed of compilation of the variational
 # formulations required for the created linear system.
 # ```
@@ -215,8 +215,8 @@ L = f * v * ufl.dx
 
 # Note that there is a very close correspondence between the Python syntax and the mathematical syntax
 # $\int_{\Omega} \nabla u \cdot \nabla v ~\mathrm{d} x$ and $\int_{\Omega}fv~\mathrm{d} x$.
-# The integration over the domain $\Omega$ is defined by using {py:func}`ufl.dx`, an integration
-# {py:class}`measure<ufl.Measure>` over all cells of the mesh.
+# The integration over the domain $\Omega$ is defined by using `ufl.dx`, an integration
+# `measure<ufl.Measure>` over all cells of the mesh.
 #
 # This is the key strength of FEniCSx:
 # the formulas in the variational formulation translate directly to very similar Python code,
@@ -225,18 +225,18 @@ L = f * v * ufl.dx
 # ## Expressing inner products
 # The inner product $\int_\Omega \nabla u \cdot \nabla v ~\mathrm{d} x$ can be expressed in various ways in UFL.
 # We have used the notation `ufl.dot(ufl.grad(u), ufl.grad(v))*ufl.dx`.
-# The {py:func}`dot<ufl.dot>` product in UFL computes the sum (contraction) over the last index
+# The `dot<ufl.dot>` product in UFL computes the sum (contraction) over the last index
 # of the first factor and first index of the second factor.
 # In this case, both factors are tensors of rank one (vectors) and so the sum is just over
 # the single index of both $\nabla u$ and $\nabla v$.
 # To compute an inner product of matrices (with two indices),
-# one must use the function {py:func}`ufl.inner` instead of {py:func}`ufl.dot`.
-# For real-valued vectors, {py:func}`ufl.dot` and {py:func}`ufl.inner` are equivalent.
+# one must use the function `ufl.inner` instead of `ufl.dot`.
+# For real-valued vectors, `ufl.dot` and `ufl.inner` are equivalent.
 #
 # ```{admonition} Complex numbers
 # In DOLFINx, one can solve complex number problems by using an installation of PETSc using complex numbers.
-# For variational formulations with complex numbers, one cannot use {py:func}`ufl.dot` to compute inner products.
-# One has to use {py:func}`ufl.inner`, with the test-function as the second input argument for {py:func}`ufl.inner`.
+# For variational formulations with complex numbers, one cannot use `ufl.dot` to compute inner products.
+# One has to use `ufl.inner`, with the test-function as the second input argument for `ufl.inner`.
 # See [Running DOLFINx in complex mode](./complex_mode) for more information.
 # ```
 #
@@ -244,12 +244,12 @@ L = f * v * ufl.dx
 # ## Forming and solving the linear system
 #
 # Having defined the finite element variational problem and boundary condition,
-# we can create our {py:class}`LinearProblem<dolfinx.fem.petsc.LinearProblem>` to solve the variational problem:
+# we can create our `LinearProblem<dolfinx.fem.petsc.LinearProblem>` to solve the variational problem:
 # Find $u_h\in V$ such that $a(u_h, v)==L(v) \quad \forall v \in \hat{V}$.
-# We will use {py:mod}`PETSc<petsc4py.PETSc>` as our linear algebra backend, using a direct solver (LU-factorization).
+# We will use `PETSc<petsc4py.PETSc>` as our linear algebra backend, using a direct solver (LU-factorization).
 # See the [PETSc-documentation](https://petsc.org/main/docs/manual/ksp/?highlight=ksp#ksp-linear-system-solvers) of the method for more information.
 # PETSc is not a required dependency of DOLFINx, and therefore we explicitly import the DOLFINx wrapper for interfacing with PETSc.
-# To ensure that the options passed to the {py:class}`LinearProblem<dolfinx.fem.petsc.LinearProblem>`
+# To ensure that the options passed to the `LinearProblem<dolfinx.fem.petsc.LinearProblem>`
 # is only used for the given KSP solver, we pass a **unique** option prefix as well.
 
 # +
@@ -265,8 +265,8 @@ problem = LinearProblem(
 uh = problem.solve()
 # -
 
-# Using {py:meth}`problem.solve()<dolfinx.fem.petsc.LinearProblem.solve>` we solve the linear system of equations and
-# return a {py:class}`Function<dolfinx.fem.Function>` containing the solution.
+# Using `problem.solve()<dolfinx.fem.petsc.LinearProblem.solve>` we solve the linear system of equations and
+# return a `Function<dolfinx.fem.Function>` containing the solution.
 #
 # (error-norm)=
 # ## Computing the error
@@ -280,12 +280,12 @@ uex.interpolate(lambda x: 1 + x[0] ** 2 + 2 * x[1] ** 2)
 
 # We compute the error in two different ways.
 # First, we compute the $L^2$-norm of the error, defined by $E=\sqrt{\int_\Omega (u_D-u_h)^2\mathrm{d} x}$.
-# We use UFL to express the $L^2$-error, and use {py:func}`dolfinx.fem.assemble_scalar` to compute the scalar value.
-# In DOLFINx, {py:func}`assemble_scalar<dolfinx.fem.assemble_scalar>`
+# We use UFL to express the $L^2$-error, and use `dolfinx.fem.assemble_scalar` to compute the scalar value.
+# In DOLFINx, `assemble_scalar<dolfinx.fem.assemble_scalar>`
 # only assembles over the cells on the local process.
 # This means that if we use 2 processes to solve our problem,
 # we need to accumulate the local contributions to get the global error (on one or all processes).
-# We can do this with the {py:meth}`Comm.allreduce<mpi4py.MPI.Comm.allreduce>` function.
+# We can do this with the `Comm.allreduce<mpi4py.MPI.Comm.allreduce>` function.
 
 L2_error = fem.form(ufl.inner(uh - uex, uh - uex) * ufl.dx)
 error_local = fem.assemble_scalar(L2_error)
@@ -294,7 +294,7 @@ error_L2 = numpy.sqrt(domain.comm.allreduce(error_local, op=MPI.SUM))
 # Secondly, we compute the maximum error at any degree of freedom.
 # As the finite element function $u$ can be expressed as a linear combination of basis functions $\phi_j$,
 # spanning the space $V$: $ u = \sum_{j=1}^N U_j\phi_j.$
-# By writing {py:meth}`problem.solve()<dolfinx.fem.petsc.LinearProblem.sovle>`
+# By writing `problem.solve()<dolfinx.fem.petsc.LinearProblem.sovle>`
 # we compute all the coefficients $U_1,\dots, U_N$.
 # These values are known as the _degrees of freedom_ (dofs).
 # We can access the degrees of freedom by accessing the underlying vector in `uh`.
@@ -310,14 +310,15 @@ if domain.comm.rank == 0:  # Only print the error on one process
 
 # ## Plotting the mesh using pyvista
 # We will visualizing the mesh using [pyvista](https://docs.pyvista.org/), an interface to the VTK toolkit.
-# We start by converting the mesh to a format that can be used with {py:mod}`pyvista`.
-# To do this we use the function {py:func}`dolfinx.plot.vtk_mesh`.
-# It creates the data required to create a {py:class}`pyvista.UnstructuredGrid`.
-# You can print the current backend and change it with {py:func}`pyvista.set_jupyter_backend`.
+# We start by converting the mesh to a format that can be used with `pyvista`.
+# To do this we use the function `dolfinx.plot.vtk_mesh`.
+# It creates the data required to create a `pyvista.UnstructuredGrid`.
+# You can print the current backend and change it with `pyvista.set_jupyter_backend`.
 
 # +
 import pyvista
 from pathlib import Path
+import os
 
 pyvista.set_jupyter_backend('html')
 print(pyvista.global_theme.jupyter_backend)
@@ -334,21 +335,24 @@ grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 # See the [pyvista documentation](https://docs.pyvista.org/user-guide/jupyter/index.html#state-of-3d-interactive-jupyterlab-plotting)
 # for more information and installation details.
 
-# We can now use the {py:class}`pyvista.Plotter` to visualize the mesh. We visualize it by showing it in 2D and warped in 3D.
+# We can now use the `pyvista.Plotter` to visualize the mesh. We visualize it by showing it in 2D and warped in 3D.
 # In the jupyter notebook environment, we use the default setting of `pyvista.OFF_SCREEN=False`,
 # which will render plots directly in the notebook.
 
 plotter = pyvista.Plotter()
 plotter.add_mesh(grid, show_edges=True)
 plotter.view_xy()
-mesh_html = Path("jb2_playground") / "fundamentals_mesh.html"
+repo_root = Path(os.environ.get("GITHUB_WORKSPACE", Path.cwd()))
+export_dir = repo_root / "site_exports" / "pyvista"
+export_dir.mkdir(parents=True, exist_ok=True)
+mesh_html = export_dir / "fundamentals_mesh.html"
 plotter.export_html(mesh_html)
 if not pyvista.OFF_SCREEN:
     plotter.show()
 
 # Embed the exported HTML (works on static GitHub Pages)
 #
-# :::{iframe} fundamentals_mesh.html
+# :::{iframe} /pyvista/fundamentals_mesh.html
 # :width: 100%
 # :title: Fundamentals mesh
 # :::
@@ -359,12 +363,12 @@ if not pyvista.OFF_SCREEN:
 # We want to plot the solution `uh`.
 # As the function space used to defined the mesh is decoupled from the representation of the mesh,
 # we create a mesh based on the dof coordinates for the function space `V`.
-# We use {py:func}`dolfinx.plot.vtk_mesh` with the function space as input to create a mesh with
+# We use `dolfinx.plot.vtk_mesh` with the function space as input to create a mesh with
 # mesh geometry based on the dof coordinates.
 
 u_topology, u_cell_types, u_geometry = plot.vtk_mesh(V)
 
-# Next, we create the {py:class}`pyvista.UnstructuredGrid` and add the dof-values to the mesh.
+# Next, we create the `pyvista.UnstructuredGrid` and add the dof-values to the mesh.
 
 u_grid = pyvista.UnstructuredGrid(u_topology, u_cell_types, u_geometry)
 u_grid.point_data["u"] = uh.x.array.real
@@ -372,12 +376,12 @@ u_grid.set_active_scalars("u")
 u_plotter = pyvista.Plotter()
 u_plotter.add_mesh(u_grid, show_edges=True)
 u_plotter.view_xy()
-u_html = Path("jb2_playground") / "fundamentals_solution.html"
+u_html = export_dir / "fundamentals_solution.html"
 u_plotter.export_html(u_html)
 if not pyvista.OFF_SCREEN:
     u_plotter.show()
 
-# :::{iframe} fundamentals_solution.html
+# :::{iframe} /pyvista/fundamentals_solution.html
 # :width: 100%
 # :title: Fundamentals solution
 # :::
@@ -389,12 +393,12 @@ if not pyvista.OFF_SCREEN:
 warped = u_grid.warp_by_scalar()
 plotter2 = pyvista.Plotter()
 plotter2.add_mesh(warped, show_edges=True, show_scalar_bar=True)
-warped_html = Path("jb2_playground") / "fundamentals_solution_warped.html"
+warped_html = export_dir / "fundamentals_solution_warped.html"
 plotter2.export_html(warped_html)
 if not pyvista.OFF_SCREEN:
     plotter2.show()
 
-# :::{iframe} fundamentals_solution_warped.html
+# :::{iframe} /pyvista/fundamentals_solution_warped.html
 # :width: 100%
 # :title: Fundamentals solution (warped)
 # :::
@@ -403,7 +407,7 @@ if not pyvista.OFF_SCREEN:
 
 # ## External post-processing
 # For post-processing outside the python code, it is suggested to save the solution to file using either
-# {py:class}`dolfinx.io.VTXWriter` or {py:class}`dolfinx.io.XDMFFile` and using [Paraview](https://www.paraview.org/).
+# `dolfinx.io.VTXWriter` or `dolfinx.io.XDMFFile` and using [Paraview](https://www.paraview.org/).
 # This is especially suggested for 3D visualization.
 
 # +
