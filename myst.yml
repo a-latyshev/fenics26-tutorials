@@ -19,6 +19,7 @@ project:
       file: jb2_playground.md
       children:
         - file: jb2_playground/test_MyST.md
+        - file: jb2_playground/pyvista_export_embed.md
         - file: jb2_playground/demo_plasticity_von_mises.ipynb
         - file: jb2_playground/fundamentals_code.ipynb
     - title: Session 1
