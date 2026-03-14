@@ -317,6 +317,7 @@ if domain.comm.rank == 0:  # Only print the error on one process
 
 # +
 import pyvista
+from pathlib import Path
 
 pyvista.set_jupyter_backend('html')
 print(pyvista.global_theme.jupyter_backend)
@@ -340,10 +341,18 @@ grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 plotter = pyvista.Plotter()
 plotter.add_mesh(grid, show_edges=True)
 plotter.view_xy()
+mesh_html = Path("jb2_playground") / "fundamentals_mesh.html"
+plotter.export_html(mesh_html)
 if not pyvista.OFF_SCREEN:
     plotter.show()
-else:
-    figure = plotter.screenshot("fundamentals_mesh.png")
+
+# Embed the exported HTML (works on static GitHub Pages)
+#
+# ```{raw} html
+# <iframe src="fundamentals_mesh.html" style="width: 100%; height: 520px; border: 0;" loading="lazy"></iframe>
+# ```
+#
+# [Open the exported scene in a new tab](fundamentals_mesh.html)
 
 # ## Plotting a function using pyvista
 # We want to plot the solution `uh`.
@@ -362,16 +371,32 @@ u_grid.set_active_scalars("u")
 u_plotter = pyvista.Plotter()
 u_plotter.add_mesh(u_grid, show_edges=True)
 u_plotter.view_xy()
+u_html = Path("jb2_playground") / "fundamentals_solution.html"
+u_plotter.export_html(u_html)
 if not pyvista.OFF_SCREEN:
     u_plotter.show()
+
+# ```{raw} html
+# <iframe src="fundamentals_solution.html" style="width: 100%; height: 520px; border: 0;" loading="lazy"></iframe>
+# ```
+#
+# [Open the exported scene in a new tab](fundamentals_solution.html)
 
 # We can also warp the mesh by scalar to make use of the 3D plotting.
 
 warped = u_grid.warp_by_scalar()
 plotter2 = pyvista.Plotter()
 plotter2.add_mesh(warped, show_edges=True, show_scalar_bar=True)
+warped_html = Path("jb2_playground") / "fundamentals_solution_warped.html"
+plotter2.export_html(warped_html)
 if not pyvista.OFF_SCREEN:
     plotter2.show()
+
+# ```{raw} html
+# <iframe src="fundamentals_solution_warped.html" style="width: 100%; height: 520px; border: 0;" loading="lazy"></iframe>
+# ```
+#
+# [Open the exported scene in a new tab](fundamentals_solution_warped.html)
 
 # ## External post-processing
 # For post-processing outside the python code, it is suggested to save the solution to file using either

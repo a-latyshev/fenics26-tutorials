@@ -10,3 +10,6 @@ _build
 *.idx
 *.ipynb
 *.png
+
+# PyVista HTML exports (generated during CI execution)
+jb2_playground/fundamentals_*.html
