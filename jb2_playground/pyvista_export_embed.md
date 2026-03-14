@@ -17,13 +17,13 @@ This keeps the interactivity (rotate/zoom/pan, UI widgets shipped in the HTML) w
 This page embeds a standalone HTML file that is deployed as a static asset.
 In this repo, we keep the source HTML under `site_exports/pyvista/` and copy it into the built site during CI.
 
-:::{iframe} ../pyvista/pyvista_scene.html
+:::{iframe} /pyvista/pyvista_scene.html
 :width: 100%
 :title: PyVista exported scene
 :::
 
 Fallback link (also helps ensure the file is included in the static build):
-[Open the exported scene in a new tab](../pyvista/pyvista_scene.html).
+[Open the exported scene in a new tab](/pyvista/pyvista_scene.html).
 
 ## How to generate `pyvista_scene.html`
 

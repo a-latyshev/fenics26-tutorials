@@ -352,12 +352,12 @@ if not pyvista.OFF_SCREEN:
 
 # Embed the exported HTML (works on static GitHub Pages)
 #
-# :::{iframe} ../pyvista/fundamentals_mesh.html
+# :::{iframe} /pyvista/fundamentals_mesh.html
 # :width: 100%
 # :title: Fundamentals mesh
 # :::
 #
-# [Open the exported scene in a new tab](../pyvista/fundamentals_mesh.html)
+# [Open the exported scene in a new tab](/pyvista/fundamentals_mesh.html)
 
 # ## Plotting a function using pyvista
 # We want to plot the solution `uh`.
@@ -381,12 +381,12 @@ u_plotter.export_html(u_html)
 if not pyvista.OFF_SCREEN:
     u_plotter.show()
 
-# :::{iframe} ../pyvista/fundamentals_solution.html
+# :::{iframe} /pyvista/fundamentals_solution.html
 # :width: 100%
 # :title: Fundamentals solution
 # :::
 #
-# [Open the exported scene in a new tab](../pyvista/fundamentals_solution.html)
+# [Open the exported scene in a new tab](/pyvista/fundamentals_solution.html)
 
 # We can also warp the mesh by scalar to make use of the 3D plotting.
 
@@ -398,12 +398,12 @@ plotter2.export_html(warped_html)
 if not pyvista.OFF_SCREEN:
     plotter2.show()
 
-# :::{iframe} ../pyvista/fundamentals_solution_warped.html
+# :::{iframe} /pyvista/fundamentals_solution_warped.html
 # :width: 100%
 # :title: Fundamentals solution (warped)
 # :::
 #
-# [Open the exported scene in a new tab](../pyvista/fundamentals_solution_warped.html)
+# [Open the exported scene in a new tab](/pyvista/fundamentals_solution_warped.html)
 
 # ## External post-processing
 # For post-processing outside the python code, it is suggested to save the solution to file using either
