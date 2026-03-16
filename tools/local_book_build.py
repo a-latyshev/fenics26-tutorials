@@ -24,6 +24,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
+import urllib.request
+from urllib.parse import urlsplit
 import shutil
 import socket
 import subprocess
@@ -38,6 +41,14 @@ DEFAULT_TOKEN = "my-jupyter-token"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8888
 
+# PyVista (via trame-vtk) exports HTML that references a VTK.js viewer bundle at
+# absolute paths like `/vtk-js/assets/app.<hash>.js`. Those files won't exist on
+# a typical local Jupyter Book site, causing the iframe to render blank.
+#
+# We post-process the copied HTML exports to load the viewer assets from the
+# official VTK.js GitHub Pages site, which serves ES modules with permissive CORS.
+DEFAULT_VTKJS_BASE_URL = "https://kitware.github.io/vtk-js"
+
 
 JUPYTEXT_EXTRA_KEYS = (
     # Keys that trigger MyST warnings when present in notebook metadata.
@@ -50,6 +61,81 @@ JUPYTEXT_EXTRA_KEYS = (
 def _run(cmd: list[str], *, cwd: Path, env: dict[str, str] | None = None) -> None:
     print(f"\n$ {' '.join(cmd)}", flush=True)
     subprocess.run(cmd, cwd=str(cwd), env=env, check=True)
+
+
+def _fetch_url_text(url: str, *, timeout_s: float = 30.0) -> str:
+    req = urllib.request.Request(url, headers={"User-Agent": "local_book_build.py"})
+    with urllib.request.urlopen(req, timeout=timeout_s) as resp:
+        return resp.read().decode("utf-8", errors="replace")
+
+
+def _discover_vtkjs_app_bundle(*, vtkjs_base_url: str) -> str:
+    """Return full URL to the current vtk-js app bundle, e.g. .../assets/app.X.js."""
+
+    index_url = vtkjs_base_url.rstrip("/") + "/"
+    html = _fetch_url_text(index_url)
+
+    origin = f"{urlsplit(index_url).scheme}://{urlsplit(index_url).netloc}"
+
+    # Typical: <script type="module" src="/vtk-js/assets/app.CMgV8hKz.js"></script>
+    m = re.search(r'<script\s+type="module"\s+src="(?P<src>/vtk-js/assets/app\.[^"]+\.js)"', html)
+    if not m:
+        raise RuntimeError(f"Could not find vtk-js app bundle in {index_url}")
+
+    src = m.group("src")
+    if src.startswith("/"):
+        return origin + src
+    return src
+
+
+def _patch_trame_vtk_export_html(
+    *,
+    html_path: Path,
+    vtkjs_base_url: str,
+    vtkjs_app_bundle_url: str,
+) -> bool:
+    """Patch a trame-vtk static export so its viewer assets resolve."""
+
+    try:
+        text = html_path.read_text(encoding="utf-8")
+    except Exception:
+        return False
+
+    # Only touch files that look like trame-vtk vtksz2html output.
+    if "OfflineLocalView.load" not in text and "/vtk-js/assets/app." not in text:
+        return False
+
+    patched = text
+
+    # 1) Point /vtk-js/... assets at the public vtk-js site.
+    # Use a conservative rewrite on href/src attributes.
+    patched = re.sub(
+        r'(?P<attr>\b(?:href|src)=")/vtk-js/',
+        rf'\g<attr>{vtkjs_base_url.rstrip("/")}/',
+        patched,
+    )
+    patched = re.sub(
+        r"(?P<attr>\b(?:href|src)=')/vtk-js/",
+        rf"\g<attr>{vtkjs_base_url.rstrip('/')}/",
+        patched,
+    )
+
+    # 2) Update stale hashed app bundle name to the current one.
+    vtkjs_base_prefix = re.escape(vtkjs_base_url.rstrip("/"))
+    patched = re.sub(
+        rf"{vtkjs_base_prefix}/assets/app\.[^\"']+\.js",
+        vtkjs_app_bundle_url,
+        patched,
+    )
+
+    if patched == text:
+        return False
+
+    try:
+        html_path.write_text(patched, encoding="utf-8")
+        return True
+    except Exception:
+        return False
 
 
 def _iter_files_by_globs(root: Path, globs: Iterable[str]) -> list[Path]:
@@ -209,6 +295,30 @@ def build_book(*, root: Path, host: str, port: int, token: str, execute: bool) -
     _run(cmd, cwd=root, env=env)
 
 
+def clear_myst_execute_cache(*, root: Path) -> None:
+    """Remove the MyST execution cache.
+
+    MyST can reuse cached notebook outputs even when `--execute` is set.
+    That skips code execution and therefore skips side-effects like
+    PyVista's `export_html(...)` writing files to disk.
+    """
+
+    # MyST v1 stores executed notebook artifacts under `_build/execute/`.
+    # Some older setups may also use `_build/cache/execute/`.
+    cache_dirs = [
+        root / "_build" / "execute",
+        root / "_build" / "cache" / "execute",
+    ]
+    cleared_any = False
+    for cache_dir in cache_dirs:
+        if cache_dir.exists():
+            shutil.rmtree(cache_dir)
+            print(f"Cleared MyST execute cache: {cache_dir}")
+            cleared_any = True
+    if not cleared_any:
+        print("No MyST execute cache directories found to clear.")
+
+
 def copy_pyvista_html_exports(*, root: Path) -> None:
     build_html = root / "_build" / "html"
     dest = build_html / "pyvista"
@@ -244,10 +354,38 @@ def copy_pyvista_html_exports(*, root: Path) -> None:
     print(f"Copied {copied} HTML export(s) into {dest}")
 
 
+def patch_copied_pyvista_exports(*, root: Path, vtkjs_base_url: str) -> None:
+    """Fix copied PyVista exports so their vtk-js assets load locally."""
+
+    dest = root / "_build" / "html" / "pyvista"
+    if not dest.exists():
+        return
+
+    try:
+        vtkjs_app_bundle_url = _discover_vtkjs_app_bundle(vtkjs_base_url=vtkjs_base_url)
+    except Exception as e:
+        print(f"WARNING: Could not discover vtk-js app bundle ({e}). PyVista HTML exports may render blank.")
+        return
+
+    patched_count = 0
+    for html in sorted(dest.glob("*.html")):
+        if _patch_trame_vtk_export_html(
+            html_path=html,
+            vtkjs_base_url=vtkjs_base_url,
+            vtkjs_app_bundle_url=vtkjs_app_bundle_url,
+        ):
+            patched_count += 1
+
+    if patched_count:
+        print(f"Patched {patched_count} PyVista HTML export(s) to load vtk-js assets from {vtkjs_base_url}")
+
+
 def serve_built_site(*, root: Path, host: str, port: int) -> None:
     build_html = root / "_build" / "html"
     if not build_html.exists():
         raise FileNotFoundError(f"Build output not found: {build_html}")
+
+    port = _find_free_port(host, port)
 
     url = f"http://{host}:{port}/"
     print(f"\nServing built site from {build_html}")
@@ -268,15 +406,29 @@ def main(argv: list[str]) -> int:
         default=["jb2_playground/**/*.py"],
         help="Glob (relative to --root) of .py files to convert; can be provided multiple times",
     )
-    parser.add_argument("--no-convert", action="store_true", help="Skip converting .py to .ipynb")
     parser.add_argument("--no-execute", action="store_true", help="Build without executing notebooks")
     parser.add_argument("--server-timeout", type=float, default=30.0, help="Seconds to wait for server")
+    parser.add_argument(
+        "--keep-cache",
+        action="store_true",
+        help="Keep MyST execution cache (by default we clear it to ensure side-effects like PyVista export_html run)",
+    )
     parser.add_argument(
         "--serve",
         action="store_true",
         help="After building, serve the static site from _build/html using python -m http.server",
     )
     parser.add_argument("--serve-port", type=int, default=8000, help="Port for --serve (default: 8000)")
+    parser.add_argument(
+        "--vtkjs-base-url",
+        default=DEFAULT_VTKJS_BASE_URL,
+        help="Base URL used to load vtk-js assets for PyVista HTML exports",
+    )
+    parser.add_argument(
+        "--no-patch-pyvista-exports",
+        action="store_true",
+        help="Do not rewrite copied PyVista HTML exports to load vtk-js assets",
+    )
 
     args = parser.parse_args(argv)
     root: Path = args.root.resolve()
@@ -290,8 +442,10 @@ def main(argv: list[str]) -> int:
 
     server_proc: subprocess.Popen[str] | None = None
     try:
-        if not args.no_convert:
-            convert_py_to_ipynb(root=root, py_globs=args.py_glob)
+        convert_py_to_ipynb(root=root, py_globs=args.py_glob)
+
+        if not args.no_execute and not args.keep_cache:
+            clear_myst_execute_cache(root=root)
 
         port = _find_free_port(args.host, args.port)
         port, server_proc = start_jupyter_server(root=root, host=args.host, port=port, token=args.token, env=env)
@@ -299,6 +453,8 @@ def main(argv: list[str]) -> int:
 
         build_book(root=root, host=args.host, port=port, token=args.token, execute=not args.no_execute)
         copy_pyvista_html_exports(root=root)
+        if not args.no_patch_pyvista_exports:
+            patch_copied_pyvista_exports(root=root, vtkjs_base_url=args.vtkjs_base_url)
 
         print("\nBuild finished.")
         print("Note: the transient MyST build server port (e.g. :3004/:3005) stops when the build ends.")
