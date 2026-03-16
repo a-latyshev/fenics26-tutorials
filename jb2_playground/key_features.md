@@ -18,7 +18,7 @@ This page embeds a standalone HTML file that is deployed as a static asset.
 In this repo, the tutorial code exports plain HTML filenames (e.g. `pyvista_scene.html`).
 During deployment, CI gathers these exported HTML files and copies them into the built site (e.g. under `/pyvista/`).
 
-:::{iframe} ../pyvista/pyvista_scene.html
+:::{iframe} ../pyvista/fundamentals_solution.html
 :width: 100%
 :title: PyVista exported scene
 :::

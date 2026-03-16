@@ -20,7 +20,7 @@ The Advanced Tutorial Session is tailored for FEniCS 2026 participants and is sc
 | 11:30 - 12:00 | Open QA session.      |
 | 1h20   | Free lunch                                |
 
-The conference officially starts at 13:20, see the conference schedule.
+The conference officially starts at 13:20, see the [conference schedule](https://fenicsproject.org/fenics-2026/).
 
 ## Building the book and running code
 
@@ -34,17 +34,20 @@ Convert Jupytext .py files to MyST Markdown
 find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
 ```
 
-If you build from a docker container, make sure that you have a running Jupyter
-server
-
+Make sure that you have a running Jupyter server:
 ```shell
 export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
 export JUPYTER_TOKEN="my-jupyter-token"
 jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}" --ServerApp.port="8888" --allow-root &
-jupyter book start --execute
+jupyter book build --build --ci --keep-host
 ```
 
-TODO
+TODO: copy htmls...
+
+Alternatively, you can use the wrapper:
+```shell
+python tools/local_book_build.py
+``
 
 ## For authors
 

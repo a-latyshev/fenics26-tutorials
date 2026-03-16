@@ -9,9 +9,9 @@ authors:
 
 Here authors may find some examples of FEniCSx demos migrated from JB1 to JB2.
 
-* [Simple MyST executable](test_MyST.md)
+* [Highlight of important features](key_features.md)
 
-* [Embed PyVista via export_html](pyvista_export_embed.md)
+Existing FEniCSx tutorials converted to JB2:
 
 * [Solving the Poisson equation](fundamentals_code.ipynb)
   ([Source](https://jsdokken.com/dolfinx-tutorial/chapter1/fundamentals_code.html))
