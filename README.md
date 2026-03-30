@@ -20,63 +20,57 @@ The Advanced Tutorial Session is tailored for FEniCS 2026 participants and is sc
 | 11:30 - 12:00 | Open QA session.      |
 | 1h20   | Free lunch                                |
 
-The conference officially starts at 13:20, see the [conference schedule](https://fenicsproject.org/fenics-2026/).
+The conference officially starts at 13:20, see the conference schedule.
 
-## Building the book and running code
+## Requirements
 
 Make sure that you installed Jupyter Book 2
 ```shell
 pip install "jupyter-book>=2.0.0"
 ```
 
-Convert Jupytext .py files to MyST Markdown
-```shell
-find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
-```
-
-Make sure that you have a running Jupyter server:
-```shell
-export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
-export JUPYTER_TOKEN="my-jupyter-token"
-jupyter server --IdentityProvider.token="${JUPYTER_TOKEN}" --ServerApp.port="8888" --allow-root &
-jupyter book build --build --ci --keep-host
-```
-
-TODO: copy htmls...
-
-Alternatively, you can use the wrapper:
-```shell
-python tools/local_book_build.py
-``
+TODO
 
 ## For authors
 
-:::{tip} Summary
-Basically MyST markdown files replace jupytext `.py` files, which makes the
-workflow a bit less straightforward.
-:::
+:::{tip} Summary 
 
-Jupyter Book 2 supports only notebooks `.ipynb` and MyST Markdown `.md` files.
-
-Convert all Jupytext .py files to Jupyter notebook:
-```bash
-find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
-```
-To preserve version control, AL suggests to continue working with jupytext `.py`
-files and then convert them to Jupyter notebook. Don't forget to add the
+Jupyter Book 2 (JB2) is based on MyST markdown files and replaces jupytext `.py`
+files. JB2's pages are based on either `.ipynb` or `.md` files, which makes the
+workflow a bit less straightforward compared to Jupyter Book 1. To preserve
+version control, continue working with `.py` files. The current workflow
+generates `.ipynb` notebooks automatically. Don't forget to add the
 corresponding `.ipynb` files to [myst.yml](./myst.yml).
 
-Authors are encouraged to take a look at [Jupyter Book 2 playground](./jb2_playground.md) to see how
-demos look like.
-
-:::{tip}
-If you lunch the jupyter book as a website via `jupyter book start --execute`,
-then once you edit sources, the website will be updated automatically, you will
-need just to refresh it.
 :::
+
+**Instructions for the authors**:
+
+1. In the appropriate `session` folder add your `.md` or `.py` files.
+2. Add the corresponding JB page to `myst.yml`. **NOTE:** In `myst.yml`, your
+   files with the `.py` extension must be replaced with the `.ipynb` extension.
+3. Github CI will automatically convert all `.py` files into their `.ipynb`
+   counterparts via `jupytext`.
+
+To test your site locally, use the following supplementary function:
+
+```shell
+python tools/local_book_build.py --serve
+```
+which converts jupytext files into notebooks, launches a jupyter server, build
+the book and serves site from `\html`. Launching the jupyter server is required
+to **build** the notebook, because `a-latyshev` did not find another way to do
+it.
+
+Authors are encouraged to take a look at [Jupyter Book 2
+playground](./key_features.md) to see main features of JB2 and JB2-based
+standard FEniCSx demos look like.
 
 More about jupyter book execution: https://jupyterbook.org/stable/execution/execution/.
 
-:::{danger}
-There are issues when the site is statically hosted: https://github.com/orgs/jupyter-book/projects/1/views/1?pane=issue&itemId=122114744&issue=jupyter-book%7Cmystmd%7C2000
-:::
+There are issues when the site is statically hosted:
+https://github.com/orgs/jupyter-book/projects/1/views/1?pane=issue&itemId=122114744&issue=jupyter-book%7Cmystmd%7C2000.
+
+## License
+
+Which one?
