@@ -1,9 +1,10 @@
 ---
-# title: Embed PyVista via export_html
 authors:
-- name: "Andrey Latyshev"
-  affiliation: University of Luxembourg
-  email: andrey.latyshev@uni.lu
+  - name: "Andrey Latyshev"
+    email: andrey.latyshev@uni.lu
+    corresponding: true
+    url: https://www.uni.lu/fstm-en/people/andrey-latyshev/
+    affiliations: University of Luxembourg
 ---
 
 # Jupyter Book 2 - key features
@@ -72,7 +73,7 @@ Here authors may find some examples of FEniCSx demos migrated from JB1 to JB2.
 
 * [Solving von Mises Plasticity via Numba](demo_plasticity_von_mises.ipynb) ([Source](https://a-latyshev.github.io/dolfinx-external-operator/demo/demo_plasticity_von_mises.html))
 
-## MyST Markdown feature
+## MyST Markdown features
 
 MyST Markdown provides fancy-looking features, try them out:
 

@@ -1,16 +1,19 @@
 # ---
 # jupyter:
 #   kernelspec:
-#     display_name: dolfinx-env (3.12.3)
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 #   authors:
 #     - name: Andrey Latyshev
 #       affiliation: University of Luxembourg
 #       email: andrey.latyshev@uni.lu
+#       orcid: 0009-0002-7512-0413
+#       url: https://www.uni.lu/fstm-en/people/andrey-latyshev/
 #     - name: Jack S. Hale
 #       affiliation: University of Luxembourg
 #       email: jack.hale@uni.lu
+#       url: https://www.jackhale.co.uk/
 # ---
 
 # %% [markdown]

@@ -57,13 +57,17 @@ To test your site locally, use the following supplementary function:
 ```shell
 python tools/local_book_build.py --serve
 ```
-which converts jupytext files into notebooks, launches a jupyter server, build
-the book and serves site from `\html`. Launching the jupyter server is required
-to **build** the notebook, because `a-latyshev` did not find another way to do
-it.
+and access via (port `8000` is default):
+```
+http://127.0.0.1:8000/
+```
+The script `local_book_build.py` converts jupytext files into notebooks,
+launches a jupyter server, build the book and serves site from `\html`.
+Launching the jupyter server is required to **build** the notebook, because
+`a-latyshev` did not find another way to do it.
 
 Authors are encouraged to take a look at [Jupyter Book 2
-playground](./key_features.md) to see main features of JB2 and JB2-based
+playground](./jb2_key_features.md) to see main features of JB2 and JB2-based
 standard FEniCSx demos look like.
 
 More about jupyter book execution: https://jupyterbook.org/stable/execution/execution/.

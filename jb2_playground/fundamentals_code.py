@@ -8,6 +8,7 @@
 #     - name: Jørgen Schartum Dokken
 #       affiliation: Simula Research Laboratory
 #       email: dokken@simula.no
+#       url: https://jsdokken.com/
 # ---
 
 # # Poisson equation
