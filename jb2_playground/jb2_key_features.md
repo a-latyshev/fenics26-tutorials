@@ -42,6 +42,8 @@ tutorial](fundamentals_code.ipynb)
 Run something like the following **locally** (or in CI) to generate the standalone HTML file.
 
 ```python
+import pyvista
+
 def plot_pyvista():
     pyvista.set_jupyter_backend("static")
     plotter = pyvista.Plotter()
@@ -52,6 +54,7 @@ def plot_pyvista():
     plotter.deep_clean()
 plot_pyvista()
 
+# setting the backend to `html` again
 pyvista.set_jupyter_backend("html")
 
 plotter = pyvista.Plotter()
@@ -69,8 +72,9 @@ Here authors may find some examples of FEniCSx demos migrated from JB1 to JB2.
 
 * [Solving the Poisson equation](fundamentals_code.ipynb)
   ([Source](https://jsdokken.com/dolfinx-tutorial/chapter1/fundamentals_code.html))
-
-* [Solving von Mises Plasticity via Numba](demo_plasticity_von_mises.ipynb) ([Source](https://a-latyshev.github.io/dolfinx-external-operator/demo/demo_plasticity_von_mises.html))
+* [Solving von Mises Plasticity via Numba](demo_plasticity_von_mises.ipynb)
+  ([Source](https://a-latyshev.github.io/dolfinx-external-operator/demo/demo_plasticity_von_mises.html))
+* https://dolfiny.uni.lu/
 
 ## MyST Markdown features
 
