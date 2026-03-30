@@ -2,4 +2,4 @@ dolfinx-external-operator>=0.10.0
 jupytext
 jupyter-server
 jupyter-book
-"pyvista[jupyter]"
+pyvista[jupyter]

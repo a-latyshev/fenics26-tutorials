@@ -32,9 +32,9 @@ apt update
 apt install npm -y
 ```
 
-Install python dependencies
+Install Python dependencies
 ```shell
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 OR
 ```shell
