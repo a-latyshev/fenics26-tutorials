@@ -1,7 +1,7 @@
 # ---
 # jupyter:
 #   kernelspec:
-#     display_name: Python 3 (ipykernel)
+#     display_name: dolfinx-env (3.12.3)
 #     language: python
 #     name: python3
 #   authors:
