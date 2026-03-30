@@ -44,9 +44,13 @@ def plasticity_von_mises_pure_ufl(verbose=True):
     deg_u = 2
     deg_stress = 2
     V = fem.functionspace(mesh, ("Lagrange", deg_u, (2,)))
-    W_element = basix.ufl.quadrature_element(mesh.topology.cell_name(), degree=deg_stress, value_shape=(4,))
+    W_element = basix.ufl.quadrature_element(
+        mesh.topology.cell_name(), degree=deg_stress, value_shape=(4,)
+    )
     W = fem.functionspace(mesh, W_element)
-    P_element = basix.ufl.quadrature_element(mesh.topology.cell_name(), degree=deg_stress, value_shape=())
+    P_element = basix.ufl.quadrature_element(
+        mesh.topology.cell_name(), degree=deg_stress, value_shape=()
+    )
     W0 = fem.functionspace(mesh, P_element)
 
     sig = fem.Function(W, name="Stress_vector")
@@ -61,11 +65,19 @@ def plasticity_von_mises_pure_ufl(verbose=True):
     bottom_facets = facet_tags.find(facet_tags_labels["Lx"])
     left_facets = facet_tags.find(facet_tags_labels["Ly"])
 
-    bottom_dofs_y = fem.locate_dofs_topological(V.sub(1), mesh.topology.dim - 1, bottom_facets)
-    left_dofs_x = fem.locate_dofs_topological(V.sub(0), mesh.topology.dim - 1, left_facets)
+    bottom_dofs_y = fem.locate_dofs_topological(
+        V.sub(1), mesh.topology.dim - 1, bottom_facets
+    )
+    left_dofs_x = fem.locate_dofs_topological(
+        V.sub(0), mesh.topology.dim - 1, left_facets
+    )
 
-    sym_bottom = fem.dirichletbc(np.array(0.0, dtype=PETSc.ScalarType), bottom_dofs_y, V.sub(1))
-    sym_left = fem.dirichletbc(np.array(0.0, dtype=PETSc.ScalarType), left_dofs_x, V.sub(0))
+    sym_bottom = fem.dirichletbc(
+        np.array(0.0, dtype=PETSc.ScalarType), bottom_dofs_y, V.sub(1)
+    )
+    sym_left = fem.dirichletbc(
+        np.array(0.0, dtype=PETSc.ScalarType), left_dofs_x, V.sub(0)
+    )
 
     bcs = [sym_bottom, sym_left]
 
@@ -121,11 +133,17 @@ def plasticity_von_mises_pure_ufl(verbose=True):
         beta = 3 * mu_ * dp / sig_eq
         new_sig = sig_elas - beta * s
         deps_p = 3.0 / 2.0 * s / sig_eq * dp
-        return ufl.as_vector([new_sig[0, 0], new_sig[1, 1], new_sig[2, 2], new_sig[0, 1]]), dp, deps_p
+        return (
+            ufl.as_vector([new_sig[0, 0], new_sig[1, 1], new_sig[2, 2], new_sig[0, 1]]),
+            dp,
+            deps_p,
+        )
 
     sig_, dp_, deps_p = von_mises_expressions(Du, sig, p)
 
-    residual = ufl.inner(as_3D_tensor(sig) + sigma(eps(Du) - deps_p), eps(v)) * dx - F_ext(v)
+    residual = ufl.inner(
+        as_3D_tensor(sig) + sigma(eps(Du) - deps_p), eps(v)
+    ) * dx - F_ext(v)
     J = ufl.derivative(ufl.inner(sigma(eps(Du) - deps_p), eps(v)) * dx, Du, v_)
 
     petsc_options = {
@@ -141,7 +159,12 @@ def plasticity_von_mises_pure_ufl(verbose=True):
     }
 
     von_mises_problem = NonlinearProblem(
-        residual, Du, J=J, bcs=bcs, petsc_options_prefix="von_mises_pure_ufl_", petsc_options=petsc_options
+        residual,
+        Du,
+        J=J,
+        bcs=bcs,
+        petsc_options_prefix="von_mises_pure_ufl_",
+        petsc_options=petsc_options,
     )
 
     x_point = np.array([[R_i, 0, 0]])

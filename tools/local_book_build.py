@@ -78,7 +78,9 @@ def _discover_vtkjs_app_bundle(*, vtkjs_base_url: str) -> str:
     origin = f"{urlsplit(index_url).scheme}://{urlsplit(index_url).netloc}"
 
     # Typical: <script type="module" src="/vtk-js/assets/app.CMgV8hKz.js"></script>
-    m = re.search(r'<script\s+type="module"\s+src="(?P<src>/vtk-js/assets/app\.[^"]+\.js)"', html)
+    m = re.search(
+        r'<script\s+type="module"\s+src="(?P<src>/vtk-js/assets/app\.[^"]+\.js)"', html
+    )
     if not m:
         raise RuntimeError(f"Could not find vtk-js app bundle in {index_url}")
 
@@ -111,7 +113,7 @@ def _patch_trame_vtk_export_html(
     # Use a conservative rewrite on href/src attributes.
     patched = re.sub(
         r'(?P<attr>\b(?:href|src)=")/vtk-js/',
-        rf'\g<attr>{vtkjs_base_url.rstrip("/")}/',
+        rf"\g<attr>{vtkjs_base_url.rstrip('/')}/",
         patched,
     )
     patched = re.sub(
@@ -177,7 +179,9 @@ def _strip_jupytext_extra_keys(ipynb_file: Path) -> bool:
 
     if changed:
         # Keep a stable, readable formatting.
-        ipynb_file.write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+        ipynb_file.write_text(
+            json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
     return changed
 
 
@@ -209,11 +213,22 @@ def convert_py_to_ipynb(*, root: Path, py_globs: list[str]) -> None:
     for py_file in py_files:
         # Skip obvious virtualenv / build / git metadata.
         parts = set(py_file.parts)
-        if {".git", "_build", "site_exports", ".venv", "venv", "__pycache__", "tools"} & parts:
+        if {
+            ".git",
+            "_build",
+            "site_exports",
+            ".venv",
+            "venv",
+            "__pycache__",
+            "tools",
+        } & parts:
             continue
         if not py_file.is_file():
             continue
-        _run(["jupytext", "--from", "py", "--to", "ipynb", "--update", str(py_file)], cwd=root)
+        _run(
+            ["jupytext", "--from", "py", "--to", "ipynb", "--update", str(py_file)],
+            cwd=root,
+        )
 
         ipynb_file = py_file.with_suffix(".ipynb")
         if ipynb_file.exists():
@@ -364,7 +379,9 @@ def patch_copied_pyvista_exports(*, root: Path, vtkjs_base_url: str) -> None:
     try:
         vtkjs_app_bundle_url = _discover_vtkjs_app_bundle(vtkjs_base_url=vtkjs_base_url)
     except Exception as e:
-        print(f"WARNING: Could not discover vtk-js app bundle ({e}). PyVista HTML exports may render blank.")
+        print(
+            f"WARNING: Could not discover vtk-js app bundle ({e}). PyVista HTML exports may render blank."
+        )
         return
 
     patched_count = 0
@@ -377,7 +394,9 @@ def patch_copied_pyvista_exports(*, root: Path, vtkjs_base_url: str) -> None:
             patched_count += 1
 
     if patched_count:
-        print(f"Patched {patched_count} PyVista HTML export(s) to load vtk-js assets from {vtkjs_base_url}")
+        print(
+            f"Patched {patched_count} PyVista HTML export(s) to load vtk-js assets from {vtkjs_base_url}"
+        )
 
 
 def serve_built_site(*, root: Path, host: str, port: int) -> None:
@@ -391,12 +410,21 @@ def serve_built_site(*, root: Path, host: str, port: int) -> None:
     print(f"\nServing built site from {build_html}")
     print(f"Open: {url}")
     print("Press Ctrl-C to stop.\n")
-    subprocess.run(["python", "-m", "http.server", str(port), "--bind", host], cwd=str(build_html), check=True)
+    subprocess.run(
+        ["python", "-m", "http.server", str(port), "--bind", host],
+        cwd=str(build_html),
+        check=True,
+    )
 
 
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=REPO_ROOT, help="Repository root (default: repo root)")
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=REPO_ROOT,
+        help="Repository root (default: repo root)",
+    )
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     parser.add_argument("--token", default=DEFAULT_TOKEN)
@@ -406,8 +434,12 @@ def main(argv: list[str]) -> int:
         default=["jb2_playground/**/*.py"],
         help="Glob (relative to --root) of .py files to convert; can be provided multiple times",
     )
-    parser.add_argument("--no-execute", action="store_true", help="Build without executing notebooks")
-    parser.add_argument("--server-timeout", type=float, default=30.0, help="Seconds to wait for server")
+    parser.add_argument(
+        "--no-execute", action="store_true", help="Build without executing notebooks"
+    )
+    parser.add_argument(
+        "--server-timeout", type=float, default=30.0, help="Seconds to wait for server"
+    )
     parser.add_argument(
         "--keep-cache",
         action="store_true",
@@ -418,7 +450,9 @@ def main(argv: list[str]) -> int:
         action="store_true",
         help="After building, serve the static site from _build/html using python -m http.server",
     )
-    parser.add_argument("--serve-port", type=int, default=8000, help="Port for --serve (default: 8000)")
+    parser.add_argument(
+        "--serve-port", type=int, default=8000, help="Port for --serve (default: 8000)"
+    )
     parser.add_argument(
         "--vtkjs-base-url",
         default=DEFAULT_VTKJS_BASE_URL,
@@ -448,16 +482,26 @@ def main(argv: list[str]) -> int:
             clear_myst_execute_cache(root=root)
 
         port = _find_free_port(args.host, args.port)
-        port, server_proc = start_jupyter_server(root=root, host=args.host, port=port, token=args.token, env=env)
+        port, server_proc = start_jupyter_server(
+            root=root, host=args.host, port=port, token=args.token, env=env
+        )
         _wait_for_server(args.host, port, args.server_timeout)
 
-        build_book(root=root, host=args.host, port=port, token=args.token, execute=not args.no_execute)
+        build_book(
+            root=root,
+            host=args.host,
+            port=port,
+            token=args.token,
+            execute=not args.no_execute,
+        )
         copy_pyvista_html_exports(root=root)
         if not args.no_patch_pyvista_exports:
             patch_copied_pyvista_exports(root=root, vtkjs_base_url=args.vtkjs_base_url)
 
         print("\nBuild finished.")
-        print("Note: the transient MyST build server port (e.g. :3004/:3005) stops when the build ends.")
+        print(
+            "Note: the transient MyST build server port (e.g. :3004/:3005) stops when the build ends."
+        )
         print(f"Static site output: {root / '_build' / 'html'}")
         if args.serve:
             serve_built_site(root=root, host=args.host, port=args.serve_port)

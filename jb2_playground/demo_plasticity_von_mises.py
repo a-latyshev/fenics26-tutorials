@@ -215,10 +215,14 @@ V = fem.functionspace(mesh, ("Lagrange", k_u, (mesh.geometry.dim,)))
 bottom_facets = facet_tags.find(facet_tags_labels["Lx"])
 left_facets = facet_tags.find(facet_tags_labels["Ly"])
 
-bottom_dofs_y = fem.locate_dofs_topological(V.sub(1), mesh.topology.dim - 1, bottom_facets)
+bottom_dofs_y = fem.locate_dofs_topological(
+    V.sub(1), mesh.topology.dim - 1, bottom_facets
+)
 left_dofs_x = fem.locate_dofs_topological(V.sub(0), mesh.topology.dim - 1, left_facets)
 
-sym_bottom = fem.dirichletbc(np.array(0.0, dtype=PETSc.ScalarType), bottom_dofs_y, V.sub(1))
+sym_bottom = fem.dirichletbc(
+    np.array(0.0, dtype=PETSc.ScalarType), bottom_dofs_y, V.sub(1)
+)
 sym_left = fem.dirichletbc(np.array(0.0, dtype=PETSc.ScalarType), left_dofs_x, V.sub(0))
 
 bcs = [sym_bottom, sym_left]
@@ -226,7 +230,14 @@ bcs = [sym_bottom, sym_left]
 
 def epsilon(v):
     grad_v = ufl.grad(v)
-    return ufl.as_vector([grad_v[0, 0], grad_v[1, 1], 0, np.sqrt(2.0) * 0.5 * (grad_v[0, 1] + grad_v[1, 0])])
+    return ufl.as_vector(
+        [
+            grad_v[0, 0],
+            grad_v[1, 1],
+            0,
+            np.sqrt(2.0) * 0.5 * (grad_v[0, 1] + grad_v[1, 0]),
+        ]
+    )
 
 
 k_stress = 2 * (k_u - 1)
@@ -244,7 +255,9 @@ dx = ufl.Measure(
 )
 
 Du = fem.Function(V, name="displacement_increment")
-S_element = basix.ufl.quadrature_element(mesh.topology.cell_name(), degree=k_stress, value_shape=(4,))
+S_element = basix.ufl.quadrature_element(
+    mesh.topology.cell_name(), degree=k_stress, value_shape=(4,)
+)
 S = fem.functionspace(mesh, S_element)
 sigma = FEMExternalOperator(epsilon(Du), function_space=S)
 
@@ -252,7 +265,9 @@ n = ufl.FacetNormal(mesh)
 loading = fem.Constant(mesh, PETSc.ScalarType(0.0))
 
 v = ufl.TestFunction(V)
-F = ufl.inner(sigma, epsilon(v)) * dx - ufl.inner(loading * -n, v) * ds(facet_tags_labels["inner"])
+F = ufl.inner(sigma, epsilon(v)) * dx - ufl.inner(loading * -n, v) * ds(
+    facet_tags_labels["inner"]
+)
 
 # Internal state
 P_element = basix.ufl.quadrature_element(mesh.topology.cell_name(), degree=k_stress)
@@ -323,13 +338,19 @@ def return_mapping(deps_, sigma_n_, p_):
         sigma = sigma_elastic - beta * s
 
         n_elas_matrix = np.outer(n_elas, n_elas)
-        C_tang = C_elas - 3 * mu * (3 * mu / (3 * mu + H) - beta) * n_elas_matrix - 2 * mu * beta * deviatoric
+        C_tang = (
+            C_elas
+            - 3 * mu * (3 * mu / (3 * mu + H) - beta) * n_elas_matrix
+            - 2 * mu * beta * deviatoric
+        )
 
         return C_tang, sigma, dp
 
     for i in range(0, num_cells):
         for j in range(0, num_quadrature_points):
-            C_tang_[i, j], sigma_[i, j], dp_[i, j] = _kernel(deps_[i, j], sigma_n_[i, j], p_[i, j])
+            C_tang_[i, j], sigma_[i, j], dp_[i, j] = _kernel(
+                deps_[i, j], sigma_n_[i, j], p_[i, j]
+            )
 
     return C_tang_, sigma_, dp_
 
@@ -367,7 +388,9 @@ def sigma_external(derivatives):
     if derivatives == (1,):
         return C_tang_impl
     else:
-        raise NotImplementedError(f"No external function is defined for the requested derivative {derivatives}.")
+        raise NotImplementedError(
+            f"No external function is defined for the requested derivative {derivatives}."
+        )
 
 
 sigma.external_function = sigma_external
@@ -433,7 +456,12 @@ petsc_options = {
 }
 
 problem = NonlinearProblem(
-    F_replaced, Du, J=J_replaced, bcs=bcs, petsc_options_prefix="demo_von_mises_", petsc_options=petsc_options
+    F_replaced,
+    Du,
+    J=J_replaced,
+    bcs=bcs,
+    petsc_options_prefix="demo_von_mises_",
+    petsc_options=petsc_options,
 )
 
 
@@ -445,12 +473,16 @@ problem = NonlinearProblem(
 
 # %%
 def constitutive_update(
-    F_external_operators: list[FEMExternalOperator], J_external_operators: list[FEMExternalOperator], dp: Function
+    F_external_operators: list[FEMExternalOperator],
+    J_external_operators: list[FEMExternalOperator],
+    dp: Function,
 ):
     """Update the constitutive model by evaluating the external operators."""
     evaluated_operands = evaluate_operands(F_external_operators)
     # Call `C_tang_impl` that returns additional arrays `sigma_new` and `dp_new`
-    ((_, sigma_new, dp_new),) = evaluate_external_operators(J_external_operators, evaluated_operands)
+    ((_, sigma_new, dp_new),) = evaluate_external_operators(
+        J_external_operators, evaluated_operands
+    )
     # Update external operator `sigma` via explicit copy
     sigma = F_external_operators[0]
     sigma.ref_coefficient.x.array[:] = sigma_new
@@ -590,7 +622,9 @@ results_pure_ufl = plasticity_von_mises_pure_ufl(verbose=True)
 # %%
 if len(points_on_process) > 0:
     plt.plot(results_pure_ufl[:, 0], results_pure_ufl[:, 1], "o-", label="pure UFL")
-    plt.plot(results[:, 0], results[:, 1], "*-", label="dolfinx-external-operator (Numba)")
+    plt.plot(
+        results[:, 0], results[:, 1], "*-", label="dolfinx-external-operator (Numba)"
+    )
     plt.xlabel(r"Displacement of inner boundary $u_x$ at $(R_i, 0)$ [mm]")
     plt.ylabel(r"Applied pressure $q/q_{\text{lim}}$ [-]")
     plt.legend()

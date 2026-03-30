@@ -311,6 +311,7 @@ if domain.comm.rank == 0:  # Only print the error on one process
 # You can print the current backend and change it with `pyvista.set_jupyter_backend`.
 
 # +
+import pyvista
 from dolfinx import plot
 
 domain.topology.create_connectivity(tdim, tdim)
@@ -326,7 +327,6 @@ grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 # In the jupyter notebook environment, we use the default setting of `pyvista.OFF_SCREEN=False`,
 # which will render plots directly in the notebook.
 
-import pyvista
 
 def plot_pyvista():
     pyvista.set_jupyter_backend("static")
@@ -336,6 +336,8 @@ def plot_pyvista():
     plotter.show()
     plotter.close()
     plotter.deep_clean()
+
+
 plot_pyvista()
 
 # setting the backend to `html` again

@@ -42,8 +42,6 @@ tutorial](fundamentals_code.ipynb)
 Run something like the following **locally** (or in CI) to generate the standalone HTML file.
 
 ```python
-import pyvista
-
 def plot_pyvista():
     pyvista.set_jupyter_backend("static")
     plotter = pyvista.Plotter()
