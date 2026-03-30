@@ -599,7 +599,6 @@ if len(points_on_process) > 0:
     plt.show()
 
 # %% [markdown]
-# ## References
 #
 # ```{bibliography}
 # :filter: docname in docnames
