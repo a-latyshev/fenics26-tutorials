@@ -13,4 +13,3 @@ _build
 
 # PyVista HTML exports (generated during CI execution)
 *.html
-!site_exports/pyvista/pyvista_scene.html
