@@ -22,14 +22,30 @@ The Advanced Tutorial Session is tailored for FEniCS 2026 participants and is sc
 
 The conference officially starts at 13:20, see the conference schedule.
 
-## Requirements
+## Installation
 
-Make sure that you installed Jupyter Book 2
+### Docker
+
+Install npm
 ```shell
-pip install "jupyter-book>=2.0.0"
+apt update
+apt install npm -y
 ```
 
-TODO
+Install python dependencies
+```shell
+pip install requirements.txt
+```
+OR
+```shell
+pip install "jupyter-book>=2.0.0" "pyvista[jupyter]" jupytext jupyter-server
+```
+Optional:
+```shell
+pip install dolfinx-external-operator>=0.10.0
+```
+TODO: Remove dolfinx-external-operator dependence.
+
 
 ## For authors
 

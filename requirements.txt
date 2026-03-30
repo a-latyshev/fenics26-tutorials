@@ -1,5 +1,5 @@
 dolfinx-external-operator>=0.10.0
 jupytext
-pyvista 
-trame 
-trame-vtk
+jupyter-server
+jupyter-book
+"pyvista[jupyter]"
