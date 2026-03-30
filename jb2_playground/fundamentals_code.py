@@ -312,8 +312,6 @@ if domain.comm.rank == 0:  # Only print the error on one process
 
 # +
 import pyvista
-
-pyvista.set_jupyter_backend('html')
 print(pyvista.global_theme.jupyter_backend)
 
 # +
