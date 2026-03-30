@@ -7,8 +7,10 @@
 #   authors:
 #     - name: Andrey Latyshev
 #       affiliation: University of Luxembourg
+#       email: andrey.latyshev@uni.lu
 #     - name: Jack S. Hale
 #       affiliation: University of Luxembourg
+#       email: jack.hale@uni.lu
 # ---
 
 # %% [markdown]

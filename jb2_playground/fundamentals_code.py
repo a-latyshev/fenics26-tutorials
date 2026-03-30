@@ -7,6 +7,7 @@
 #   authors:
 #     - name: Jørgen Schartum Dokken
 #       affiliation: Simula Research Laboratory
+#       email: dokken@simula.no
 # ---
 
 # # Poisson equation
