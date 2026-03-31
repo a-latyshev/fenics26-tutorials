@@ -4,7 +4,7 @@
 This script mirrors the GitHub Actions workflow in .github/workflows/deploy.yml:
 
 1) Convert Jupytext-authored .py files into .ipynb notebooks
-2) Start a Jupyter server (so `jupyter book build --execute` can connect)
+2) Execute the resulting notebooks via `jupyter nbconvert --execute` (so side-effects like PyVista export_html run)
 3) Build the book to HTML
 4) Copy any standalone *.html exports (e.g. PyVista) into `_build/html/pyvista/`
 
@@ -15,7 +15,7 @@ Usage examples:
   python tools/local_book_build.py --no-execute
 
 Notes:
-- Requires: jupytext, jupyter-server, and jupyter-book (MyST) available on PATH.
+- Requires: jupytext, jupyter (nbconvert), and jupyter-book (MyST) available on PATH.
 - By default, converts all *.py under the repo root (like CI). Use --py-glob to narrow.
 """
 
@@ -31,7 +31,6 @@ import shutil
 import socket
 import subprocess
 import sys
-import time
 from pathlib import Path
 from typing import Iterable
 
@@ -185,23 +184,6 @@ def _strip_jupytext_extra_keys(ipynb_file: Path) -> bool:
     return changed
 
 
-def _is_tcp_open(host: str, port: int) -> bool:
-    try:
-        with socket.create_connection((host, port), timeout=0.5):
-            return True
-    except OSError:
-        return False
-
-
-def _wait_for_server(host: str, port: int, timeout_s: float) -> None:
-    start = time.monotonic()
-    while time.monotonic() - start < timeout_s:
-        if _is_tcp_open(host, port):
-            return
-        time.sleep(0.2)
-    raise TimeoutError(f"Timed out waiting for Jupyter server at http://{host}:{port}/")
-
-
 def convert_py_to_ipynb(*, root: Path, py_globs: list[str]) -> None:
     py_files = _iter_files_by_globs(root, py_globs)
     if not py_files:
@@ -235,6 +217,43 @@ def convert_py_to_ipynb(*, root: Path, py_globs: list[str]) -> None:
             _strip_jupytext_extra_keys(ipynb_file)
 
 
+def _discover_ipynb_from_py_globs(*, root: Path, py_globs: list[str]) -> list[Path]:
+    """Return the list of ipynb files corresponding to the selected .py inputs."""
+
+    py_files = _iter_files_by_globs(root, py_globs)
+    if not py_files:
+        return []
+
+    ipynb_files: list[Path] = []
+    for py_file in py_files:
+        parts = set(py_file.parts)
+        if {
+            ".git",
+            "_build",
+            "site_exports",
+            ".venv",
+            "venv",
+            "__pycache__",
+            "tools",
+        } & parts:
+            continue
+        if not py_file.is_file():
+            continue
+        ipynb = py_file.with_suffix(".ipynb")
+        if ipynb.exists():
+            ipynb_files.append(ipynb)
+
+    # De-duplicate while keeping order.
+    seen: set[Path] = set()
+    uniq: list[Path] = []
+    for p in ipynb_files:
+        rp = p.resolve()
+        if rp not in seen:
+            seen.add(rp)
+            uniq.append(p)
+    return uniq
+
+
 def _find_free_port(host: str, starting_port: int, max_tries: int = 50) -> int:
     port = starting_port
     for _ in range(max_tries):
@@ -248,48 +267,30 @@ def _find_free_port(host: str, starting_port: int, max_tries: int = 50) -> int:
     raise RuntimeError(f"Could not find a free port starting at {starting_port}")
 
 
-def start_jupyter_server(
-    *,
-    root: Path,
-    host: str,
-    port: int,
-    token: str,
-    env: dict[str, str] | None = None,
-) -> tuple[int, subprocess.Popen[str]]:
-    cmd = [
-        "jupyter",
-        "server",
-        f"--IdentityProvider.token={token}",
-        f"--ServerApp.port={port}",
-        "--ServerApp.port_retries=0",
-        "--no-browser",
-        f"--ServerApp.ip={host}",
-        "--allow-root",
-    ]
-    print(f"\n$ {' '.join(cmd)} (background)", flush=True)
-    # Inherit stdio so users can see logs; most environments run fine like this.
-    proc = subprocess.Popen(cmd, cwd=str(root), text=True, env=env)
-    return port, proc
-
-
-def stop_process(proc: subprocess.Popen[str]) -> None:
-    if proc.poll() is not None:
+def execute_notebooks(*, root: Path, ipynb_files: list[Path], env: dict[str, str]) -> None:
+    if not ipynb_files:
+        print("No .ipynb files found to execute; skipping notebook execution.")
         return
 
-    try:
-        proc.terminate()
-        proc.wait(timeout=10)
-        return
-    except Exception:
-        pass
+    for ipynb in ipynb_files:
+        _run(
+            [
+                "jupyter",
+                "nbconvert",
+                "--execute",
+                "--to",
+                "notebook",
+                "--inplace",
+                "--clear-output",
+                "--log-level=WARN",
+                str(ipynb),
+            ],
+            cwd=root,
+            env=env,
+        )
 
-    try:
-        proc.kill()
-    except Exception:
-        pass
 
-
-def build_book(*, root: Path, host: str, port: int, token: str, execute: bool) -> None:
+def build_book(*, root: Path, host: str, execute: bool) -> None:
     env = os.environ.copy()
     # MyST/jupyter-book starts a local web server and then fetches pages.
     # On some systems, `localhost` resolves to IPv6 (::1) first, which can
@@ -300,38 +301,11 @@ def build_book(*, root: Path, host: str, port: int, token: str, execute: bool) -
     env.setdefault("PYVISTA_OFF_SCREEN", "true")
     env.setdefault("PYVISTA_JUPYTER_BACKEND", "html")
     env.setdefault("JUPYTER_EXTENSION_ENABLED", "true")
-    env["JUPYTER_BASE_URL"] = f"http://{host}:{port}/"
-    env["JUPYTER_TOKEN"] = token
 
-    cmd = ["jupyter", "book", "build", "--html", "--ci", "--keep-host"]
-    if execute:
-        cmd.append("--execute")
+    # We execute notebooks separately via nbconvert; build without `--execute`.
+    cmd = ["jupyter", "book", "build", "--html", "--ci"]
 
     _run(cmd, cwd=root, env=env)
-
-
-def clear_myst_execute_cache(*, root: Path) -> None:
-    """Remove the MyST execution cache.
-
-    MyST can reuse cached notebook outputs even when `--execute` is set.
-    That skips code execution and therefore skips side-effects like
-    PyVista's `export_html(...)` writing files to disk.
-    """
-
-    # MyST v1 stores executed notebook artifacts under `_build/execute/`.
-    # Some older setups may also use `_build/cache/execute/`.
-    cache_dirs = [
-        root / "_build" / "execute",
-        root / "_build" / "cache" / "execute",
-    ]
-    cleared_any = False
-    for cache_dir in cache_dirs:
-        if cache_dir.exists():
-            shutil.rmtree(cache_dir)
-            print(f"Cleared MyST execute cache: {cache_dir}")
-            cleared_any = True
-    if not cleared_any:
-        print("No MyST execute cache directories found to clear.")
 
 
 def copy_pyvista_html_exports(*, root: Path) -> None:
@@ -426,8 +400,15 @@ def main(argv: list[str]) -> int:
         help="Repository root (default: repo root)",
     )
     parser.add_argument("--host", default=DEFAULT_HOST)
-    parser.add_argument("--port", type=int, default=DEFAULT_PORT)
-    parser.add_argument("--token", default=DEFAULT_TOKEN)
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=DEFAULT_PORT,
+        help="(ignored; kept for backward compatibility)",
+    )
+    parser.add_argument(
+        "--token", default=DEFAULT_TOKEN, help="(ignored; kept for backward compatibility)"
+    )
     parser.add_argument(
         "--py-glob",
         action="append",
@@ -436,14 +417,6 @@ def main(argv: list[str]) -> int:
     )
     parser.add_argument(
         "--no-execute", action="store_true", help="Build without executing notebooks"
-    )
-    parser.add_argument(
-        "--server-timeout", type=float, default=30.0, help="Seconds to wait for server"
-    )
-    parser.add_argument(
-        "--keep-cache",
-        action="store_true",
-        help="Keep MyST execution cache (by default we clear it to ensure side-effects like PyVista export_html run)",
     )
     parser.add_argument(
         "--serve",
@@ -474,34 +447,19 @@ def main(argv: list[str]) -> int:
     env.setdefault("PYVISTA_JUPYTER_BACKEND", "html")
     env.setdefault("JUPYTER_EXTENSION_ENABLED", "true")
 
-    server_proc: subprocess.Popen[str] | None = None
     try:
         convert_py_to_ipynb(root=root, py_globs=args.py_glob)
 
-        if not args.no_execute and not args.keep_cache:
-            clear_myst_execute_cache(root=root)
+        ipynb_files = _discover_ipynb_from_py_globs(root=root, py_globs=args.py_glob)
+        if not args.no_execute:
+            execute_notebooks(root=root, ipynb_files=ipynb_files, env=env)
 
-        port = _find_free_port(args.host, args.port)
-        port, server_proc = start_jupyter_server(
-            root=root, host=args.host, port=port, token=args.token, env=env
-        )
-        _wait_for_server(args.host, port, args.server_timeout)
-
-        build_book(
-            root=root,
-            host=args.host,
-            port=port,
-            token=args.token,
-            execute=not args.no_execute,
-        )
+        build_book(root=root, host=args.host, execute=False)
         copy_pyvista_html_exports(root=root)
         if not args.no_patch_pyvista_exports:
             patch_copied_pyvista_exports(root=root, vtkjs_base_url=args.vtkjs_base_url)
 
         print("\nBuild finished.")
-        print(
-            "Note: the transient MyST build server port (e.g. :3004/:3005) stops when the build ends."
-        )
         print(f"Static site output: {root / '_build' / 'html'}")
         if args.serve:
             serve_built_site(root=root, host=args.host, port=args.serve_port)
@@ -513,8 +471,7 @@ def main(argv: list[str]) -> int:
         print(f"ERROR: {e}", file=sys.stderr)
         return 1
     finally:
-        if server_proc is not None:
-            stop_process(server_proc)
+        pass
 
 
 if __name__ == "__main__":
