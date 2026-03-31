@@ -9,16 +9,8 @@
 #     language: python
 #     name: python3
 #   authors:
-#     - name: Andrey Latyshev
-#       affiliation: University of Luxembourg
-#       email: andrey.latyshev@uni.lu
-#       orcid: 0009-0002-7512-0413
-#       url: https://www.uni.lu/fstm-en/people/andrey-latyshev/
-#       linkedin: https://www.linkedin.com/in/andrey-latyshev/
-#     - name: Jack S. Hale
-#       affiliation: University of Luxembourg
-#       email: jack.hale@uni.lu
-#       url: https://www.jackhale.co.uk/
+#   - alatyshev
+#   - jshale
 # ---
 
 # %% [markdown]

@@ -20,14 +20,16 @@ The Advanced Tutorial Session is tailored for FEniCS 2026 participants and is sc
 | 11:30 - 12:00 | Open QA session.      |
 | 1h20   | Free lunch                                |
 
-The conference officially starts at 13:20, see the conference schedule.
+The conference officially starts at 13:20, see the [conference
+schedule](https://fenicsproject.org/fenics-2026/).
 
 ## Installation
 
 ### Docker
 
 Install docker container with `dolfinx/dolfinx:v0.10.0` image. See
-[instructions](https://github.com/FEniCS/dolfinx). Then install the following dependencies.
+[instructions](https://github.com/FEniCS/dolfinx). Then install the following
+dependencies in the container:
 
 Install npm
 ```shell
@@ -49,7 +51,6 @@ pip install dolfinx-external-operator>=0.10.0
 ```
 TODO: Remove dolfinx-external-operator dependence.
 
-
 ## For authors
 
 :::{tip} Summary 
@@ -69,7 +70,8 @@ corresponding `.ipynb` files to [myst.yml](./myst.yml).
 3. Github CI will automatically convert all `.py` files into their `.ipynb`
    counterparts via `jupytext`.
 
-To test your site locally, use the following supplementary function:
+To test your site locally, use the following supplementary function from the
+root of the repository:
 
 ```shell
 python tools/local_book_build.py --serve --serve-port 8001
@@ -79,7 +81,7 @@ and access via:
 http://127.0.0.1:8001/
 ```
 The script `local_book_build.py` converts jupytext files into notebooks,
-launches a jupyter server, build the book and serves site from `\html`.
+executes them with `jupyter`, build the book and serves site from `_build\html`.
 Launching the jupyter server is required to **build** the notebook, because
 `a-latyshev` did not find another way to do it. Furthermore, currently
 `local_book_build.py` **does not** compile PyVista static scenes, but GitHub

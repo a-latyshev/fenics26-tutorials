@@ -1,8 +1,6 @@
 ---
 authors:
-- name: "Jack S. Hale"
-  affiliation: University of Luxembourg
-  email: jack.hale@uni.lu
+- jshale
 ---
 # Practice session 2
 
