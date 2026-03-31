@@ -26,6 +26,9 @@ The conference officially starts at 13:20, see the conference schedule.
 
 ### Docker
 
+Install docker container with `dolfinx/dolfinx:v0.10.0` image. See
+[instructions](https://github.com/FEniCS/dolfinx). Then install the following dependencies.
+
 Install npm
 ```shell
 apt update
@@ -50,17 +53,15 @@ TODO: Remove dolfinx-external-operator dependence.
 ## For authors
 
 :::{tip} Summary 
-
 Jupyter Book 2 (JB2) is based on MyST markdown files and replaces jupytext `.py`
 files. JB2's pages are based on either `.ipynb` or `.md` files, which makes the
 workflow a bit less straightforward compared to Jupyter Book 1. To preserve
 version control, continue working with `.py` files. The current workflow
 generates `.ipynb` notebooks automatically. Don't forget to add the
 corresponding `.ipynb` files to [myst.yml](./myst.yml).
-
 :::
 
-**Instructions for the authors**:
+### Instructions for the authors
 
 1. In the appropriate `session` folder add your `.md` or `.py` files.
 2. Add the corresponding JB page to `myst.yml`. **NOTE:** In `myst.yml`, your
@@ -71,19 +72,20 @@ corresponding `.ipynb` files to [myst.yml](./myst.yml).
 To test your site locally, use the following supplementary function:
 
 ```shell
-python tools/local_book_build.py --serve
+python tools/local_book_build.py --serve --serve-port 8001
 ```
-and access via (port `8000` is default):
+and access via:
 ```
-http://127.0.0.1:8000/
+http://127.0.0.1:8001/
 ```
 The script `local_book_build.py` converts jupytext files into notebooks,
 launches a jupyter server, build the book and serves site from `\html`.
 Launching the jupyter server is required to **build** the notebook, because
-`a-latyshev` did not find another way to do it.
+`a-latyshev` did not find another way to do it. Furthermore, currently
+`local_book_build.py` **does not** compile PyVista static scenes.
 
-Authors are encouraged to take a look at [Jupyter Book 2
-playground](./jb2_key_features.md) to see main features of JB2 and JB2-based
+Authors are encouraged to take a look at [Jupyter Book 2 - key
+features](jb2_key_features.md) to see main features of JB2 and JB2-based
 standard FEniCSx demos look like.
 
 More about jupyter book execution: https://jupyterbook.org/stable/execution/execution/.

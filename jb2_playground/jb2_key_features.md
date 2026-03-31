@@ -41,7 +41,10 @@ tutorial](fundamentals_code.ipynb)
 
 Run something like the following **locally** (or in CI) to generate the standalone HTML file.
 
-```python
+```{code-block} python
+:linenos:
+:caption: Exporting `html`-based static scene with PyVista.
+
 def plot_pyvista():
     pyvista.set_jupyter_backend("static")
     plotter = pyvista.Plotter()
