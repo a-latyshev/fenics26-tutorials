@@ -51,9 +51,9 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends xvfb
-      - name: Convert Jupytext .py files to notebooks
+      - name: Convert tutorial Jupytext .py files to notebooks
         run: |
-          find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
+          find jb2_playground -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
       - name: Execute notebooks (headless)
         shell: bash
         run: |
@@ -69,7 +69,7 @@ jobs:
               --log-level=WARN \
               "$nb"
           done < <(
-            find . -type f -name "*.ipynb" \
+            find jb2_playground -type f -name "*.ipynb" \
               -not -path "./_build/*" \
               -not -path "./.git/*" \
               -not -path "./site_exports/*" \
