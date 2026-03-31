@@ -42,8 +42,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18.x
-      - name: Install Jupyter Book (via myst)
-        run: npm install -g jupyter-book
+      # - name: Install Jupyter Book (via myst)
+      #   run: npm install -g jupyter-book
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
@@ -78,7 +78,7 @@ jobs:
       - name: Build HTML Assets
         run: |
           jupyter book build --html
-      - name: Copy PyVista HTML exports into site
+      - name: Copy PyVista HTML exports into website
         shell: bash
         run: |
           mkdir -p _build/html/pyvista
