@@ -42,8 +42,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18.x
-      # - name: Install Jupyter Book (via myst)
-      #   run: npm install -g jupyter-book
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
@@ -51,30 +49,42 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends xvfb
-      - name: Convert tutorial Jupytext .py files to notebooks
+      - name: Convert Jupytext .py files to notebooks
+        shell: bash
         run: |
-          find jb2_playground -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
+          set -euo pipefail
+          dirs=(jb2_playground session1 session2)
+          for d in "${dirs[@]}"; do
+            if [[ -d "$d" ]]; then
+              while IFS= read -r -d '' py; do
+                jupytext --from py --to notebook "$py"
+              done < <(find "$d" -type f -name "*.py" -print0)
+            fi
+          done
       - name: Execute notebooks (headless)
         shell: bash
         run: |
           set -euo pipefail
-          while IFS= read -r -d '' nb; do
-            # Execute in-place; clear outputs to keep artifacts small.
-            # Run under Xvfb so any VTK/PyVista rendering code has a DISPLAY.
-            xvfb-run -a jupyter nbconvert \
-              --execute \
-              --to notebook \
-              --inplace \
-              --clear-output \
-              --log-level=WARN \
-              "$nb"
-          done < <(
-            find jb2_playground -type f -name "*.ipynb" \
-              -not -path "./_build/*" \
-              -not -path "./.git/*" \
-              -not -path "./site_exports/*" \
-              -print0
-          )
+          dirs=(jb2_playground session1 session2)
+          for d in "${dirs[@]}"; do
+            if [[ -d "$d" ]]; then
+              while IFS= read -r -d '' nb; do
+                # Execute in-place; clear outputs to keep artifacts small.
+                # Run under Xvfb so any VTK/PyVista rendering code has a DISPLAY.
+                xvfb-run -a jupyter nbconvert \
+                  --execute \
+                  --to notebook \
+                  --inplace \
+                  --clear-output \
+                  --log-level=WARN \
+                  "$nb"
+              done < <(
+                find "$d" -type f -name "*.ipynb" \
+                  -not -path "*/.ipynb_checkpoints/*" \
+                  -print0
+              )
+            fi
+          done
       - name: Build HTML Assets
         run: |
           jupyter book build --html
