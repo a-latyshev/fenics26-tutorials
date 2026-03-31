@@ -51,15 +51,33 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends xvfb
-      - name: Convert Jupytext .py files to MyST Markdown
+      - name: Convert Jupytext .py files to notebooks
         run: |
           find . -type f -name "*.py" -print0 | xargs -0 -I {} jupytext --from py --to notebook "{}"
+      - name: Execute notebooks (headless)
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' nb; do
+            # Execute in-place; clear outputs to keep artifacts small.
+            # Run under Xvfb so any VTK/PyVista rendering code has a DISPLAY.
+            xvfb-run -a jupyter nbconvert \
+              --execute \
+              --to notebook \
+              --inplace \
+              --clear-output \
+              --log-level=WARN \
+              "$nb"
+          done < <(
+            find . -type f -name "*.ipynb" \
+              -not -path "./_build/*" \
+              -not -path "./.git/*" \
+              -not -path "./site_exports/*" \
+              -print0
+          )
       - name: Build HTML Assets
         run: |
-          export JUPYTER_BASE_URL="http://127.0.0.1:8888/"
-          export JUPYTER_TOKEN="my-jupyter-token"
-          # Start the Jupyter server under Xvfb so executed kernels inherit DISPLAY.
-          xvfb-run -a sh -c "jupyter server --IdentityProvider.token='${JUPYTER_TOKEN}' --ServerApp.port='8888' --allow-root & jupyter book build --html --execute"
+          jupyter book build --html
       - name: Copy PyVista HTML exports into site
         shell: bash
         run: |
