@@ -5,10 +5,7 @@
 #     language: python
 #     name: python3
 #   authors:
-#     - name: Jørgen Schartum Dokken
-#       affiliation: Simula Research Laboratory
-#       email: dokken@simula.no
-#       url: https://jsdokken.com/
+#   - jsdokken
 # ---
 
 # # Poisson equation

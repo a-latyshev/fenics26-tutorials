@@ -1,0 +1,44 @@
+version: 1
+project:
+  contributors:
+    - id: alatyshev
+      name: Andrey Latyshev
+      email: andrey.latyshev@uni.lu
+      # orcid: 0009-0002-7512-0413
+      # github: a-latyshev
+      # url: https://www.uni.lu/fstm-en/people/andrey-latyshev/
+      # linkedin: https://www.linkedin.com/in/andrey-latyshev/
+      affiliations:
+        - id: UL
+        - id: SU
+    - id: jshale
+      name: Jack S. Hale
+      email: jack.hale@uni.lu
+      orcid: 0000-0001-7216-861X
+      github: jhale
+      url: https://www.jackhale.co.uk/
+      affiliations:
+        - id: UL
+    - id: jsdokken
+      name: Jørgen Schartum Dokken
+      email: dokken@simula.no
+      orcid: 0000-0001-6489-8858
+      url: https://jsdokken.com/
+      github: jorgensd
+      affiliations:
+        - id: simula
+  affiliations:
+    - id: UL
+      name: University of Luxembourg
+      department: Department of Engineering
+      url: https://www.uni.lu/fstm-en/research-departments/department-of-engineering/
+      
+    - id: simula
+      name: Simula Research Laboratory
+      department: Numerical Analysis and Scientific Computing
+      url: https://www.simula.no/research/research-areas/scientific-computing/numerical-analysis-and
+      
+    - id: SU
+      name: Sorbonne Université
+      department: D'Alambert Institute
+      url: https://www.dalembert.upmc.fr/ijlrda/

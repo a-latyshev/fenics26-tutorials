@@ -1,9 +1,6 @@
 ---
 authors:
-  - name: "Andrey Latyshev"
-    email: andrey.latyshev@uni.lu
-    url: https://www.uni.lu/fstm-en/people/andrey-latyshev/
-    affiliations: University of Luxembourg
+- alatyshev
 ---
 
 # Jupyter Book 2 - key features
