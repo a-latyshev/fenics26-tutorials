@@ -1,5 +1,9 @@
 # ---
 # jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .py
+#       format_name: percent
 #   kernelspec:
 #     display_name: dolfinx-env (3.12.3)
 #     language: python
@@ -10,6 +14,7 @@
 #       email: andrey.latyshev@uni.lu
 #       orcid: 0009-0002-7512-0413
 #       url: https://www.uni.lu/fstm-en/people/andrey-latyshev/
+#       linkedin: https://www.linkedin.com/in/andrey-latyshev/
 #     - name: Jack S. Hale
 #       affiliation: University of Luxembourg
 #       email: jack.hale@uni.lu
@@ -567,7 +572,7 @@ problem.solver.setFunction(assemble_residual_with_callback_, problem.b)
 # %% [markdown]
 # Now we are ready to solve the problem.
 
-# %% tags=["scroll-output"]
+# %% tags=["hide-output"]
 u = fem.Function(V, name="displacement")
 
 x_point = np.array([[R_i, 0, 0]])
@@ -610,7 +615,7 @@ for i, loading_v in enumerate(loadings):
 # the variational setting and so in UFL. Such a performant implementation is
 # presented by the function `plasticity_von_mises_pure_ufl`.
 
-# %% tags=["scroll-output"]
+# %% tags=["hide-output"]
 results_pure_ufl = plasticity_von_mises_pure_ufl(verbose=True)
 
 # %% [markdown]
