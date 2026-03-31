@@ -42,6 +42,7 @@ tutorial](fundamentals_code.ipynb)
 Run something like the following **locally** (or in CI) to generate the standalone HTML file.
 
 ```{code-block} python
+:label: my-program
 :linenos:
 :caption: Exporting `html`-based static scene with PyVista.
 

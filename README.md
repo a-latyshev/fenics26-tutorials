@@ -31,8 +31,8 @@ Install docker container with `dolfinx/dolfinx:v0.10.0` image. See
 
 Install npm
 ```shell
-apt update
-apt install npm -y
+apt-get -y update
+apt-get -y install npm
 ```
 
 Install Python dependencies
@@ -41,7 +41,7 @@ pip install -r requirements.txt
 ```
 OR
 ```shell
-pip install "jupyter-book>=2.0.0" "pyvista[jupyter]" jupytext jupyter-server
+pip install "jupyter-book>=2.0.0" "pyvista[jupyter]" jupytext
 ```
 Optional:
 ```shell
@@ -82,11 +82,12 @@ The script `local_book_build.py` converts jupytext files into notebooks,
 launches a jupyter server, build the book and serves site from `\html`.
 Launching the jupyter server is required to **build** the notebook, because
 `a-latyshev` did not find another way to do it. Furthermore, currently
-`local_book_build.py` **does not** compile PyVista static scenes.
+`local_book_build.py` **does not** compile PyVista static scenes, but GitHub
+Pages do.
 
 Authors are encouraged to take a look at [Jupyter Book 2 - key
-features](jb2_key_features.md) to see main features of JB2 and JB2-based
-standard FEniCSx demos look like.
+features](./jb2_playground/jb2_key_features.md) to see main features of JB2 and
+how JB2-based standard FEniCSx demos look like.
 
 More about jupyter book execution: https://jupyterbook.org/stable/execution/execution/.
 
