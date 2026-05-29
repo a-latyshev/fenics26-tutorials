@@ -1,4 +1,3 @@
 jupytext
 jupyter-book
 pyvista[jupyter]
-dolfinx-external-operator>=0.10.0

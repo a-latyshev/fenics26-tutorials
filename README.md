@@ -9,7 +9,11 @@ v0.10.0](https://github.com/FEniCS/dolfinx/releases/tag/v0.10.0.post0).
 
 ## Schedule 
 
-The Advanced Tutorial Session is tailored for FEniCS 2026 participants and is scheduled for the first day of the conference, June 17, 2026, before the main talks begin. It features two hands-on practice sessions, followed by a Q&A where you can ask FEniCS developers any questions you may have about using FEniCSx. You can find the detailed schedule below:
+The Advanced Tutorial Session is tailored for FEniCS 2026 participants and is
+scheduled for the first day of the conference, June 17, 2026, before the main
+talks begin. It features two hands-on practice sessions, followed by a Q&A
+where you can ask FEniCS developers any questions you may have about using
+FEniCSx. You can find the detailed schedule below:
 
 | Time    | Segment                                   |
 | ------- | ----------------------------------------- |
@@ -41,61 +45,30 @@ Install Python dependencies
 ```shell
 pip install -r requirements.txt
 ```
-OR
-```shell
-pip install "jupyter-book>=2.0.0" "pyvista[jupyter]" jupytext
-```
-Optional:
-```shell
-pip install dolfinx-external-operator>=0.10.0
-```
-TODO: Remove dolfinx-external-operator dependence.
 
 ## For authors
-
-:::{tip} Summary 
-Jupyter Book 2 (JB2) is based on MyST markdown files and replaces jupytext `.py`
-files. JB2's pages are based on either `.ipynb` or `.md` files, which makes the
-workflow a bit less straightforward compared to Jupyter Book 1. To preserve
-version control, continue working with `.py` files. The current workflow
-generates `.ipynb` notebooks automatically. Don't forget to add the
-corresponding `.ipynb` files to [myst.yml](./myst.yml).
-:::
 
 ### Instructions for the authors
 
 1. In the appropriate `session` folder add your `.md` or `.py` files.
-2. Add the corresponding JB page to `myst.yml`. **NOTE:** In `myst.yml`, your
+2. Add the corresponding page to `myst.yml`. **NOTE:** In `myst.yml`, your
    files with the `.py` extension must be replaced with the `.ipynb` extension.
 3. Github CI will automatically convert all `.py` files into their `.ipynb`
-   counterparts via `jupytext`.
+   counterparts via `jupytext` before rendering the book.
 
-To test your site locally, use the following supplementary function from the
-root of the repository:
+To build your site locally:
 
 ```shell
-python tools/local_book_build.py --serve --serve-port 8001
+jupytext --to md:myst session*/*.py
+jupyter-book build --strict
 ```
-and access via:
+
+and to serve as a website:
+
+```shell
+jupyter-book start
 ```
-http://127.0.0.1:8001/
-```
-The script `local_book_build.py` converts jupytext files into notebooks,
-executes them with `jupyter`, build the book and serves site from `_build\html`.
-Launching the jupyter server is required to **build** the notebook, because
-`a-latyshev` did not find another way to do it. Furthermore, currently
-`local_book_build.py` **does not** compile PyVista static scenes, but GitHub
-Pages do.
-
-Authors are encouraged to take a look at [Jupyter Book 2 - key
-features](./jb2_playground/jb2_key_features.md) to see main features of JB2 and
-how JB2-based standard FEniCSx demos look like.
-
-More about jupyter book execution: https://jupyterbook.org/stable/execution/execution/.
-
-There are issues when the site is statically hosted:
-https://github.com/orgs/jupyter-book/projects/1/views/1?pane=issue&itemId=122114744&issue=jupyter-book%7Cmystmd%7C2000.
 
 ## License
 
-Which one?
+
