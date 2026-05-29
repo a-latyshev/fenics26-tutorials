@@ -49,7 +49,8 @@ jobs:
           jupyter book build --html --execute
       - name: Copy across pyvista html
         run: |
-          cp session*/pyvista_*.html _build/html/pyvista
+          mkdir -p _build/html/pyvista
+          cp session*/pyvista_*.html _build/html/pyvista/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         id: deployment
