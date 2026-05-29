@@ -5,7 +5,7 @@
 Launch a Docker container with DOLFINx installed
 
 ```shell
-docker run -ti -p 3000 dolfinx/dolfinx:stable
+docker run -ti -p 3000 dolfinx/lab:stable
 ```
 
 Install npm
