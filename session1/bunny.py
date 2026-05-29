@@ -17,10 +17,10 @@ from pyvista import examples
 mesh = examples.download_bunny()
 plotter = pv.Plotter()
 plotter.add_mesh(mesh, color='lightblue')
-plotter.export_html('scene.html')
+plotter.export_html('pyvista_rabbit.html')
 
 # %% [markdown]
-# :::{iframe} scene.html
+# :::{iframe} ../pyvista/pyvista_rabbit.html
 # :width: 100%
 # :title: Bunny
 # :::

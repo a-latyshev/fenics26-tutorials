@@ -50,16 +50,21 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends xvfb
       - name: Convert Jupytext .py files to notebooks
-        shell: bash
         run: |
-          jupytext --to md:myst session*/*.py
+          jupytext --to ipynb session*/*.py
+      - name: Execute python files to make pyvista HTML files
+        run: |
+          jupyter nbconvert --inplace --clear-output --execute session*/*.ipynb 
       - name: Build HTML Assets
         run: |
           jupyter book build --html --execute
+      - name: Copy across pyvista html
+        run: |
+          cp session*/pyvista_*.html _build/html/pyvista
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './_build/html'
+          path: ./_build/html
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
