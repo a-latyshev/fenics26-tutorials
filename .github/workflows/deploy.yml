@@ -11,21 +11,13 @@ env:
   # If, instead, your site lives at the root of the domain, at `https://mydomain.org`, set `BASE_URL=''`.
   BASE_URL: /${{ github.event.repository.name }}
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: 'pages'
   cancel-in-progress: false
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     container: ghcr.io/fenics/dolfinx/lab:v0.10.0
     env:
@@ -53,7 +45,7 @@ jobs:
           jupytext --to ipynb session*/*.py
       - name: Execute python files to make pyvista HTML files
         run: |
-          jupyter nbconvert --inplace --clear-output --execute session*/*.ipynb 
+          jupyter nbconvert --inplace --clear-output --execute session*/*.ipynb
       - name: Build HTML Assets
         run: |
           jupyter book build --html --execute
@@ -64,7 +56,17 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./_build/html
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        if: github.ref == 'refs/heads/main'
         uses: actions/deploy-pages@v4
