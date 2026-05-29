@@ -31,9 +31,9 @@ schedule](https://fenicsproject.org/fenics-2026/).
 
 ## Authors
 
-Jørgen S. Dokken, Simula Research Laboratory
-Jack S. Hale, University of Luxembourg
-Andrey Latyshev, University of Luxembourg and Sorbonne Université
+- Jørgen S. Dokken, Simula Research Laboratory
+- Jack S. Hale, University of Luxembourg
+- Andrey Latyshev, University of Luxembourg and Sorbonne Université
 
 ## License
 
