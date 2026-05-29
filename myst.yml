@@ -13,7 +13,6 @@ project:
     - jsdokken
   github: https://github.com/a-latyshev/fenics26-tutorials
   license:
-    code: MIT
     content: CC-BY-4.0
   open_access: true
 
