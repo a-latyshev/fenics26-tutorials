@@ -1,6 +1,6 @@
-## Installation
+# For authors
 
-### Docker
+## Installation
 
 Launch a Docker container with DOLFINx installed
 
@@ -20,8 +20,6 @@ Install extra Python dependencies
 ```shell
 pip install -r requirements.txt
 ```
-
-## For authors
 
 ### Instructions for authors
 
