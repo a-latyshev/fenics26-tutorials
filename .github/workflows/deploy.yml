@@ -52,6 +52,7 @@ jobs:
           cp session*/pyvista_*.html _build/html/pyvista
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+        id: deployment
         with:
           path: ./_build/html
 
