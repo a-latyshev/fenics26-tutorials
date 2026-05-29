@@ -52,61 +52,10 @@ jobs:
       - name: Convert Jupytext .py files to notebooks
         shell: bash
         run: |
-          set -euo pipefail
-          dirs=(jb2_playground session1 session2)
-          for d in "${dirs[@]}"; do
-            if [[ -d "$d" ]]; then
-              while IFS= read -r -d '' py; do
-                jupytext --from py --to notebook "$py"
-              done < <(find "$d" -type f -name "*.py" -print0)
-            fi
-          done
-      - name: Execute notebooks (headless)
-        shell: bash
-        run: |
-          set -euo pipefail
-          dirs=(jb2_playground session1 session2)
-          for d in "${dirs[@]}"; do
-            if [[ -d "$d" ]]; then
-              while IFS= read -r -d '' nb; do
-                # Execute in-place; clear outputs to keep artifacts small.
-                # Run under Xvfb so any VTK/PyVista rendering code has a DISPLAY.
-                xvfb-run -a jupyter nbconvert \
-                  --execute \
-                  --to notebook \
-                  --inplace \
-                  --clear-output \
-                  --log-level=WARN \
-                  "$nb"
-              done < <(
-                find "$d" -type f -name "*.ipynb" \
-                  -not -path "*/.ipynb_checkpoints/*" \
-                  -print0
-              )
-            fi
-          done
+          jupytext --to md:myst session*/*.py
       - name: Build HTML Assets
         run: |
-          jupyter book build --html
-      - name: Copy PyVista HTML exports into website
-        shell: bash
-        run: |
-          mkdir -p _build/html/pyvista
-          # Copy standalone HTML exports created during notebook execution.
-          # Tutorial code exports plain filenames (no fixed export directory),
-          # so we gather any *.html files from the source tree while excluding
-          # the built site itself.
-
-          # Source tree (exclude _build/ entirely to avoid copying the built site)
-          while IFS= read -r -d '' f; do
-            cp -v "$f" "_build/html/pyvista/$(basename "$f")" || true
-          done < <(
-            find . -type f -name "*.html" \
-              -not -path "./_build/*" \
-              -not -path "./.git/*" \
-              -not -path "./site_exports/*" \
-              -print0
-          )
+          jupyter book build --html --execute
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
