@@ -2,7 +2,9 @@
 authors:
 - jshale
 ---
-# Practice session 2
+
+# Ten years of FEniCS on HPC in fifty minutes
+
 
 ## Best practices of using FEniCS in parallel?
 

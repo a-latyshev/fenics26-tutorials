@@ -19,15 +19,11 @@ project:
 
   toc:
     - file: README.md
-    - title: Jupyter 2 playground
-      children:
-        - file: jb2_playground/jb2_key_features.md
-        - file: jb2_playground/demo_plasticity_von_mises.ipynb
-        - file: jb2_playground/fundamentals_code.ipynb
     - title: Session 1
       children:
         - file: session1/session1.md
-    - title: Session 2
+        - file: session1/bunny.ipynb
+    - title: FEniCS on HPC
       children:
         - file: session2/session2.md
 site:
