@@ -37,13 +37,13 @@ docker pull spack/ubuntu-noble:develop
 My thanks to the following people for their many days/weeks fiddling with
 FEniCS on HPC systems over the past decade or so:
 
-- Martin Rehor
-- Raphaël Bulle (talk on $\phi$-FEM on...)
-- Andrey Latyshev (co-organiser)
-- Sona Salehian Ghamsari
-- Georgious Kafanas (talk on EasyBuild on ...)
-- Jahid Hassan (talk on Easybuild on ...)
-- Chris Richardson (talk on ...)
+- Martin Rehor (University of Luxembourg, UL)
+- Raphaël Bulle (UL, INRIA: talk on $\phi$-FEM on...)
+- Andrey Latyshev (UL, Sorbonne Université, co-organiser)
+- Sona Salehian Ghamsari (UL)
+- Georgious Kafanas (UL, talk on EasyBuild on ...)
+- Jahid Hassan (UL, talk on Easybuild on ...)
+- Chris Richardson (Cambridge University, talk on ...)
 
 whose shared knowledge has made this guide possible.
 
@@ -53,24 +53,28 @@ whose shared knowledge has made this guide possible.
 ### Learning outcomes
 
 1. Understand the main methods for installing FEniCSx on HPC systems.
-2. Recognise MPI 
-3. Be able to 
+3. Assess that an installation provides *reasonable* performance and scalability. 
+4. Under
 
 ## Installing
 
 ### Methods
 
+Although FEniCS/DOLFINx can be installed in many ways, the only ones relavent
+for good performance on HPC are:
+
 1. **Source**. Build from source. With a reasonable set of system-provided
-   modules this can be OK, but if your HPC system ships with out-of-date
-   software or you need many additional complex dependencies, it can quickly
-   become painful.
-2. [Easybuild](https://easybuild.io). Easybuild is a software build and installation framework that
-   allows you to manage (scientific) software on High Performance Computing
-   (HPC) systems in an efficient way. Focus on high-quality, well-tested
-   package sets released twice a year (e.g. `2024a`, `2024b`).
-3. [Spack](https://spack.io) is a very powerful build and installation
-   framework complex and custom scientific software stacks across languages,
-   compilers and microarchitectures. For a full tutorial see [Tutorial Spack
+   modules this us possible, but if your HPC system ships with out-of-date
+   modules, or you many additional complex dependencies built alongside
+   DOLFINx, it can quickly become painful.
+2. [Easybuild](https://easybuild.io). Easybuild is a software build and
+   installation framework that allows you to manage (scientific) software on
+   High Performance Computing (HPC) systems in an efficient way. Focus on
+   high-quality, well-tested package sets released twice a year (e.g. `2024a`,
+   `2024b`).
+3. [Spack](https://spack.io) is a powerful build and installation framework
+   complex and custom scientific software stacks across languages, compilers
+   and microarchitectures. For a full tutorial see [Tutorial Spack
    101](https://spack-tutorial.readthedocs.io/). Focus on automatically
    building complex and custom software stacks from scratch.
 4. [The European Scientific Software Initiative (EESSI)](https://www.eessi.io)
@@ -80,9 +84,9 @@ whose shared knowledge has made this guide possible.
 
 :::{important} Always use the system-provided MPI 
 For good performance DOLFINx requires an optimal MPI implementation tuned to
-the underlying interconnect of *your* HPC, and a queue-aware launcher e.g.
-`srun`. This rules out using pre-built DOLFINx binaries aimed at desktop
-computers (Conda) and generic launchers e.g. `mpiexec`.
+the underlying interconnect of *your* HPC, used within a queue-aware job
+launcher e.g. `srun`. This rules out using pre-built DOLFINx binaries aimed at
+desktop computers (Conda) and generic launchers e.g. `mpiexec`.
 :::
 
 ### Decision tree
@@ -125,30 +129,22 @@ standards-based build tooling, in particular, CMake for C++ and
 wrappers.
 
 Standards-compliance build tooling means FEniCSx is reasonably easy to build
-from source on any platform. However, additional DOLFINx dependencies (MPI,
-PETSc, partitioners), additional complex runtime dependencies (gmsh, JAX,
-TensorFlow), installed in non-standard ways (HPC module systems) can lead to
-brittle builds and lots of trial-and-error required.
+from source on any platform with a good set of dependencies.
 
-#### FEniCSx C++ components
+For example, on a clean Ubuntu 26.04 Docker image, it is possible to install
+FEniCSx into a prefixed Python virtual environment `~/fenics` in around 50 
+nearly standard `cmake` and `pip` commands:
 
-DOLFINx, the problem-solving environment, and Basix, the basis tabulator, are
-pure C++ libraries and can be installed and run on a system without Python.
-The Python wrappers can then be built separately.
+:::{literalinclude} source-install/Dockerfile
+:lang: dockerfile
+:lineno-match:
+:caption: Installing FEniCSx 
+:::
 
-```bash
-docker run -ti ubuntu
-```
-
-#### FEniCSx Python components
-
-FFCx and UFL are pure Python and are 'nearly trivial' to install.
-
-
-```bash
-apt update
-apt 
-```
+However, additional DOLFINx dependencies (MPI, PETSc, partitioners), additional
+complex runtime dependencies (gmsh, JAX, TensorFlow), and critical dependencies
+installed in non-standard ways (HPC module systems) can lead to brittle builds
+and lots of trial-and-error.
 
 #### FEniCSx Python wrappers
 
