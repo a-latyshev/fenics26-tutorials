@@ -7,14 +7,12 @@ authors:
 
 ## Introduction
 
-This guide is an attempt to distill some knowledge built up at the University
-of Luxembourg over the past decade around building and running FEniCS on HPC
-systems.
+This guide distills knowledge built up at the University of Luxembourg over the
+past decade on building and running FEniCS on HPC systems.
 
-During the tutorial session I will go through this material and at the end I
-will give a brief interactive demo on installing FEniCS using the
-[Spack](https://spack-tutorial.readthedocs.io/en/latest/) package manager, with
-a particular focus on the specific aspects important for working with FEniCS.
+During the session I will present this material and give a brief interactive
+demo on installing FEniCS with
+[Spack](https://spack-tutorial.readthedocs.io/en/latest/).
 
 The most important points will be called out and summarised as a TLDR; at the
 end:
@@ -122,9 +120,9 @@ roughly as follows:
 
 #### Ubuntu container
 
-As an example, on a clean Ubuntu 26.04 Docker image, it is possible to install
-FEniCSx into a Python virtual environment `~/fenics` in around 50 nearly
-standard `apt`, `cmake` and `pip` commands:
+As an example, on a clean Ubuntu 26.04 Docker image, FEniCSx can be installed
+into a virtual environment `~/fenics` in around 50 `apt`, `cmake` and `pip`
+commands:
 
 :::{literalinclude} source-install/Dockerfile
 :lang: dockerfile
@@ -155,19 +153,19 @@ module load devel/Boost mpi/OpenMPI devel/CMake math/SCOTCH \
 I was pretty happy, as some of these dependencies are tricky and time-consuming
 to build. However, I could not find `pkgconfig`, `spdlog`, `pugixml`,
 `nanobind` or `scikit-build-core`. I then tried the newer `2025a` release which
-did not have `petsc4py`,  although it did have `scikit-build-core` and
+did not have `petsc4py`, although it did have `scikit-build-core` and
 `pkgconfig`.
 
 So in the end, I decided to go with the `2024a` release, 'knowing' that both
 `spdlog` and `pugixml` are relatively easy to build, and that I could
 (hopefully) install `nanobind` and `scikit-build-core` from PyPI using `pip`.
 
-I then copy and pasted `RUN` commands out from the `Dockerfile` above and
+I then copied and pasted `RUN` commands out from the `Dockerfile` above and
 recorded my successes/failures:
 
-- :white_check_mark: Basix C++ build. Easy!
-- :white_check_mark: UFCx header. Easy!
-- :white_check_mark: DOLFINx C++ build; worked after manually installing
+- ✅ Basix C++ build. Easy!
+- ✅ UFCx header. Easy!
+- 🟡 DOLFINx C++ build; worked after manually installing
   `spdlog` and `pugixml` from source using CMake. The first time I forgot to
   build both with shared library support `.so`, so I had to manually inspect
   the `CMakeLists.txt` for the `-DBUILD_SHARED_LIBS=ON` option and build again.
@@ -176,7 +174,7 @@ recorded my successes/failures:
       cmake -B build-dir/ -S . -DDOLFINX_UFCX_PYTHON=OFF \
         -DCMAKE_PREFIX_PATH=~/fenics
 
-- :white_check_mark: Basix Python wrapper; Here I began running into an
+- 🟡 Basix Python wrapper; Here I began running into an
   issue. Recall that I wanted to use some Easybuild-provided Python modules;
   this requires that the Python be allowed to 'see' the Easybuild
   Python `site-packages`:
@@ -186,20 +184,20 @@ recorded my successes/failures:
       python -m pip install scikit-build-core[pyproject] nanobind
       python -m build --no-build-isolation --check-build-dependencies .
 
-- :white_check_mark: UFL and FFCx install. Easy!
-- :white_check_mark: DOLFINx Python wrapper. Easy!
+- ✅ UFL and FFCx install. Easy!
+- ✅ DOLFINx Python wrapper. Easy!
 
 :::{seealso} The Future? The MPI ABI Initiative.
 :class: dropdown
 :open: false
-An ABI compatibility guarantee allows a piece of software to be compiled
-against one library (e.g. MPICH), and for the implementation to be swapped out
-at runtime via dynamic linking (e.g. Intel MPI, Cray MPI, MVAPICH2).
+An ABI compatibility guarantee allows software compiled against one MPI
+implementation (e.g. MPICH) to have it swapped out at runtime via dynamic
+linking (e.g. Intel MPI, Cray MPI, MVAPICH2).
 
 The recent MPI5 ABI Initiative [](https://doi.org/10.1145/3615318.3615319)
-ensures that all MPI5-compliant implementations *must* be ABI compatible -- in
-the future it may be possible to ship DOLFINx binaries and then 'swap out' to
-the platform-specific MPI implementation at runtime.
+guarantees ABI compatibility across all MPI5-compliant implementations — in
+the future it may be possible to ship DOLFINx binaries and swap in the
+platform-specific MPI at runtime.
 :::
 
 ### With Easybuild
