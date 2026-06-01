@@ -49,12 +49,17 @@ whose shared knowledge has made this guide possible.
 
 ## Overview
 
+### Assumptions
+
+1. You are familiar with the basics (launching jobs, module systems etc.) on
+   your HPC.
+2. You have built software from source, although perhaps not on your HPC.
 
 ### Learning outcomes
 
 1. Understand the main methods for installing FEniCSx on HPC systems.
-3. Assess that an installation provides *reasonable* performance and scalability. 
-4. Under
+2. Be able to configure FEniCSx at runtime for optimal performance.
+3. Assess if an installation provides *reasonable* performance and scalability. 
 
 ## Installing
 
@@ -110,7 +115,7 @@ desktop computers (Conda) and generic launchers e.g. `mpiexec`.
    - **Yes**: Containers (e.g. Apptainer/Singularity), wrapping one of the
      above build approaches.
 
-:::{important} Avoid source builds
+:::{important} Avoid source builds if you can
 Source builds are hard - if in doubt, choose partial stack Spack,
 Easybuild/EESSI binaries, or as a last resort, full stack Spack. 
 :::
@@ -128,8 +133,6 @@ standards-based build tooling, in particular, CMake for C++ and
 [scikit-build-core](https://scikit-build-core.readthedocs.io) for Python
 wrappers.
 
-#### Ubuntu container
-
 Standards-compliance build tooling means FEniCSx is reasonably easy to build
 from source on any platform with a good set of dependencies, by proceeding
 roughly as follows:
@@ -139,9 +142,11 @@ roughly as follows:
 3. Python/pip - Install UFL and FFCx.
 4. Python/pip - Install DOLFINx Python wrapper. 
 
-For example, on a clean Ubuntu 26.04 Docker image, it is possible to install
-FEniCSx into a prefixed Python virtual environment `~/fenics` in around 50 
-nearly standard `cmake` and `pip` commands:
+#### Ubuntu container
+
+As an example, on a clean Ubuntu 26.04 Docker image, it is possible to install
+FEniCSx into a Python virtual environment `~/fenics` in around 50 nearly
+standard `apt`, `cmake` and `pip` commands:
 
 :::{literalinclude} source-install/Dockerfile
 :lang: dockerfile
@@ -219,27 +224,22 @@ the future it may be possible to ship DOLFINx binaries and then 'swap out' to
 the platform-specific MPI implementation at runtime.
 :::
 
-## With Easybuild
+### With Easybuild
+
+### With Spack
 
 
 
+## Runtime configuration
 
-### Benchmarking
+### The Python `import` problem 
+
+### JIT compilation
+
+## Testing and benchmarking
+
+### FEniCS unit tests
+
+### FEniCS performance tests
 
 
-
-#### Writing DOLFINx solvers
-
-
-
-#### Running
-
-
-
-#### The Python 
-
-#### JIT compilation
-
-DOLFINx Python uses just-in-time (JIT) compilation
-
-## TLDR
