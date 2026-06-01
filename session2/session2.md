@@ -128,8 +128,16 @@ standards-based build tooling, in particular, CMake for C++ and
 [scikit-build-core](https://scikit-build-core.readthedocs.io) for Python
 wrappers.
 
+#### Ubuntu container
+
 Standards-compliance build tooling means FEniCSx is reasonably easy to build
-from source on any platform with a good set of dependencies.
+from source on any platform with a good set of dependencies, by proceeding
+roughly as follows:
+
+1. CMake - Install the C++ Basix, UFCx header and DOLFINx libraries.
+2. Python/pip - Install Basix Python wrapper.
+3. Python/pip - Install UFL and FFCx.
+4. Python/pip - Install DOLFINx Python wrapper. 
 
 For example, on a clean Ubuntu 26.04 Docker image, it is possible to install
 FEniCSx into a prefixed Python virtual environment `~/fenics` in around 50 
@@ -141,13 +149,62 @@ nearly standard `cmake` and `pip` commands:
 :caption: Installing FEniCSx 
 :::
 
-However, additional DOLFINx dependencies (MPI, PETSc, partitioners), additional
+#### Typical HPC system
+
+However, additional DOLFINx dependencies (multiple partitioners, adios2),
 complex runtime dependencies (gmsh, JAX, TensorFlow), and critical dependencies
 installed in non-standard ways (HPC module systems) can lead to brittle builds
 and lots of trial-and-error.
 
-#### FEniCSx Python wrappers
+As an example, I logged onto the University of Luxembourg HPC `aion`, which has
+a good set of modules organised according to the easybuild `year{a,b}` system,
+e.g. `2024a`. I found using `module spider` (search) and by cross-referencing
+against the above Ubuntu build I loaded:
 
+```bash
+module load env/development/2024a
+module load devel/Boost mpi/OpenMPI devel/CMake math/SCOTCH \
+  math/ParMETIS data/HDF5 \
+  lib/FlexiBLAS tools/petsc4py \
+  lang/Python lib/mpi4py
+```
+
+I was pretty happy, as some of these dependencies are tricky and time-consuming
+to build. However, I could not find `pkgconfig`, `spdlog`, `pugixml`,
+`nanobind` or `scikit-build-core`. I then tried the newer `2025a` release which
+did not have `petsc4py`,  although it did have `scikit-build-core` and
+`pkgconfig`.
+
+So in the end, I decided to go with the `2024a` release, 'knowing' that both
+`spdlog` and `pugixml` are relatively easy to build, and that I could
+(hopefully) build `nanobind` and `scikit-build-core` from source using `pip`.
+
+I then copy and pasted `RUN` commands out from the `Dockerfile` above and
+recorded my successes/failures:
+
+- :white_check_mark: Basix C++ build. Easy!
+- :white_check_mark: UFCx header. Easy!
+- :white_check_mark: DOLFINx C++ build; worked after manually installing
+  `spdlog` and `pugixml` from source using CMake. The first time I forgot to
+  build both with shared library support `.so`, so I had to manually inspect
+  the `CMakeLists.txt` for the `-DBUILD_SHARED_LIBS=ON` option and build again.
+  Then I configured with:
+
+      cmake -B build-dir/ -S . -DDOLFINX_UFCX_PYTHON=OFF \
+        -DCMAKE_PREFIX_PATH=~/fenics
+
+- :white_check_mark: Basix Python wrapper; Here I began running into an
+  issues. Recall that I wanted to use some Easybuild-provided Python modules;
+  this requires that the Python be allowed 'see' the Easybuild
+  Python `site-packages`:
+
+      python -m venv --system-site-packages ~/fenics/
+      ...
+      python -m pip install scikit-build-core[pyproject] nanobind
+      python -m pip build --no-build-isolation --check-build-dependencies .
+
+- :white_check_mark: UFL and FFCx install. Easy!
+- :white_check_mark: DOLFINx Python wrapper. Easy!
 
 :::{seealso} The Future? The MPI ABI Initiative.
 :class: dropdown
@@ -161,6 +218,10 @@ ensures that all MPI5-compliant implementations *must* be ABI compatible -- in
 the future it may be possible to ship DOLFINx binaries and then 'swap out' to
 the platform-specific MPI implementation at runtime.
 :::
+
+## With Easybuild
+
+
 
 
 ### Benchmarking

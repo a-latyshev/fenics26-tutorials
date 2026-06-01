@@ -30,7 +30,7 @@ RUN apt-get install -y libboost-dev libhdf5-mpi-dev libopenmpi-dev libpugixml-de
 # DOLFINx C++ build
 RUN git clone --depth 1 https://github.com/FEniCS/dolfinx.git && \
     cd dolfinx/cpp && \
-    cmake -DDOLFINX_UFCX_PYTHON=OFF -Dufcx_DIR=~/fenics -DDOLFINX_BASIX_PYTHON=OFF -DBasix_DIR=~/fenics -DCMAKE_INSTALL_PREFIX=~/fenics -B build-dir -S . && \
+    cmake -DDOLFINX_UFCX_PYTHON=OFF -DDOLFINX_BASIX_PYTHON=OFF -DCMAKE_PREFIX_PATH=~/fenics -B build-dir -S . && \
     cmake --build build-dir && \
     cmake --install build-dir --prefix ~/fenics
 
