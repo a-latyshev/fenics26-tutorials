@@ -69,9 +69,10 @@ for good performance on HPC are:
 
 :::{important} Always use the system-provided MPI 
 For good performance DOLFINx requires an optimal MPI implementation tuned to
-the underlying interconnect of *your* HPC, used within a queue-aware job
-launcher e.g. `srun`. This rules out using pre-built DOLFINx binaries aimed at
-desktop computers (Conda) and generic launchers e.g. `mpiexec`.
+the underlying interconnect of *your* HPC, used within a scheduler-integrated
+job launcher e.g. `srun`. This rules out using pre-built DOLFINx binaries aimed
+at desktop computers (Conda) and non-scheduler-integrated launchers e.g.
+`mpiexec`.
 :::
 
 ### Decision tree
@@ -159,7 +160,7 @@ did not have `petsc4py`,  although it did have `scikit-build-core` and
 
 So in the end, I decided to go with the `2024a` release, 'knowing' that both
 `spdlog` and `pugixml` are relatively easy to build, and that I could
-(hopefully) build `nanobind` and `scikit-build-core` from source using `pip`.
+(hopefully) install `nanobind` and `scikit-build-core` from PyPI using `pip`.
 
 I then copy and pasted `RUN` commands out from the `Dockerfile` above and
 recorded my successes/failures:
