@@ -49,36 +49,72 @@ whose shared knowledge has made this guide possible.
 
 ## Overview
 
+
+### Learning outcomes
+
+1. Understand the main methods for installing FEniCSx on HPC systems.
+2. Recognise MPI 
+3. Be able to 
+
 ## Installing
 
+### Methods
 
-
-### Decision tree
-
-1. Does my HPC provide an up-to-date set of basic dependencies? A
-   C++20-compliant compiler, MPI, Python, BLAS, CMake, HDF5, PETSc (rare!).
-   - **Yes**: Source build, or *partial stack* Spack build.
-   - **No**: *Full stack* Spack build, or contact your HPC system administrators.
-2. Does my HPC centre offer FEniCS Easybuild packages, or support the [European
-   Scientific Software Initiative (EESSI)](https://www.eessi.io) **and** are my
-   requirements met by the binary builds on offer?
-   - **Yes**: Easybuild or EESSI.
-   - **No**: Source build or Spack build. 
-3. Do I have extensive custom requirements, e.g. need to integrate at runtime
-   with other complex packages like gmsh, JAX, pytorch:
-   - **Yes**: Spack build.
-   - **No**: Source.
-
-:::{important} Avoid source builds
-Source builds are hard - if in doubt, choose partial stack Spack,
-Easybuild/EESSI binaries, or as a last resort, full stack Spack. 
-:::
+1. **Source**. Build from source. With a reasonable set of system-provided
+   modules this can be OK, but if your HPC system ships with out-of-date
+   software or you need many additional complex dependencies, it can quickly
+   become painful.
+2. [Easybuild](https://easybuild.io). Easybuild is a software build and installation framework that
+   allows you to manage (scientific) software on High Performance Computing
+   (HPC) systems in an efficient way. Focus on high-quality, well-tested
+   package sets released twice a year (e.g. `2024a`, `2024b`).
+3. [Spack](https://spack.io) is a very powerful build and installation
+   framework complex and custom scientific software stacks across languages,
+   compilers and microarchitectures. For a full tutorial see [Tutorial Spack
+   101](https://spack-tutorial.readthedocs.io/). Focus on automatically
+   building complex and custom software stacks from scratch.
+4. [The European Scientific Software Initiative (EESSI)](https://www.eessi.io)
+   pronounced 'easy' aims to build a common stack of scientific software
+   installations. Focus on providing uniform set of binaries across European
+   HPC sites. Support for FEniCS since early 2026.
 
 :::{important} Always use the system-provided MPI 
 For good performance DOLFINx requires an optimal MPI implementation tuned to
 the underlying interconnect of *your* HPC, and a queue-aware launcher e.g.
 `srun`. This rules out using pre-built DOLFINx binaries aimed at desktop
 computers (Conda) and generic launchers e.g. `mpiexec`.
+:::
+
+### Decision tree
+
+1. Does my HPC provide an up-to-date set of basic dependencies? A
+   C++20-compliant compiler, MPI, Python, BLAS, CMake, HDF5, PETSc (rare!).
+   - **Yes**: Source build, or *partial stack* Spack build.
+   - **No**: Contact your HPC system administrators, or *full stack* Spack
+     build, but can be tricky.
+2. Does my HPC centre offer pre-built FEniCS Easybuild packages, or support the
+   [EESSI](https://www.eessi.io) **and** are my requirements met by the binary
+   builds on offer?
+   - **Yes**: Easybuild or EESSI.
+   - **No**: Another option. 
+3. Do I have extensive custom requirements, e.g. need to integrate at runtime
+   with other complex packages like gmsh, JAX, pytorch? or use exotic compiler
+   toolchains (Intel, AOCC, NVIDIA)?:
+   - **Yes**: Spack build.
+   - **No**: Another option.
+4. Do I have strict reproducibility requirements?
+   - **Yes**: Containers (e.g. Apptainer/Singularity), wrapping one of the
+     above build approaches.
+
+:::{important} Avoid source builds
+Source builds are hard - if in doubt, choose partial stack Spack,
+Easybuild/EESSI binaries, or as a last resort, full stack Spack. 
+:::
+
+:::{important} Our opinion
+Today all of our internal projects use the *partial stack Spack* approach, with
+around fifteen dependencies brought in pre-built from UL's Easybuild-based
+module system. Everything else is built by Spack.
 :::
 
 ### Source build
@@ -88,17 +124,33 @@ standards-based build tooling, in particular, CMake for C++ and
 [scikit-build-core](https://scikit-build-core.readthedocs.io) for Python
 wrappers.
 
-Standards-compliance means FEniCSx is reasonably easy to build from source on
-any platform. However, additional dependencies (MPI, PETSc, partitioners),
-additional complex runtime dependencies (gmsh, JAX, TensorFlow), installed in
-non-standard ways (HPC module systems) can lead to brittle builds and lots of
-trial-and-error required.
+Standards-compliance build tooling means FEniCSx is reasonably easy to build
+from source on any platform. However, additional DOLFINx dependencies (MPI,
+PETSc, partitioners), additional complex runtime dependencies (gmsh, JAX,
+TensorFlow), installed in non-standard ways (HPC module systems) can lead to
+brittle builds and lots of trial-and-error required.
+
+#### FEniCSx C++ components
+
+DOLFINx, the problem-solving environment, and Basix, the basis tabulator, are
+pure C++ libraries and can be installed and run on a system without Python.
+The Python wrappers can then be built separately.
 
 ```bash
 docker run -ti ubuntu
 ```
 
-This container is effectively clean, allowing us to see 
+#### FEniCSx Python components
+
+FFCx and UFL are pure Python and are 'nearly trivial' to install.
+
+
+```bash
+apt update
+apt 
+```
+
+#### FEniCSx Python wrappers
 
 
 :::{seealso} The Future? The MPI ABI Initiative.
