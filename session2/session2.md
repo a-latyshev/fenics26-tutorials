@@ -7,8 +7,15 @@ authors:
 
 ## Introduction
 
+
 This guide distills knowledge built up at the University of Luxembourg over the
 past decade on building and running FEniCS on HPC systems.
+
+:::{figure} images/aion_compute_racks.jpg
+:width: 50%
+:align: left
+Aion supercomputer compute racks, University of Luxembourg HPC.
+:::
 
 During the session I will present this material and give a brief interactive
 demo on installing FEniCS with
@@ -202,7 +209,88 @@ platform-specific MPI at runtime.
 
 ### With Easybuild
 
+:::{figure} images/easybuild_logo.png
+:width: 250px
+:align: left
+:::
+
+#### Using pre-built modules
+
+Only some HPC centres will have FEniCSx available as a pre-built Easybuild
+module. If yours does, search for it with:
+
+```bash
+module spider FEniCS-DOLFINx-Python
+```
+
+Then load the module and its dependencies:
+
+```bash
+module load FEniCS-DOLFINx-Python/0.9.0-foss-2023b
+```
+
+:::{important} Check the toolchain
+Easybuild packages are built against a specific toolchain (e.g. `foss-2023b`,
+`intel-2023b`). Ensure any other modules you load use the same toolchain to
+avoid ABI mismatches.
+:::
+
+#### Building with `eb`
+
+If no pre-built module is available, you can build FEniCSx yourself. First,
+load EasyBuild from the module system (the exact name varies by site — use
+`module spider EasyBuild` to find it):
+
+```bash
+module load tools/EasyBuild
+```
+
+Next, clone the easyconfigs repository to get the FEniCSx easyconfig:
+
+```bash
+git clone https://github.com/easybuilders/easybuild-easyconfigs
+```
+
+The easyconfig is at:
+
+```
+easybuild-easyconfigs/easybuild/easyconfigs/f/FEniCS-DOLFINx-Python/FEniCS-DOLFINx-Python-0.9.0-foss-2023b.eb
+```
+
+Do a dry run first to check what will be built:
+
+```bash
+eb FEniCS-DOLFINx-Python-0.9.0-foss-2023b.eb --robot --dry-run
+```
+
+Then build (this will take a while):
+
+```bash
+eb FEniCS-DOLFINx-Python-0.9.0-foss-2023b.eb --robot
+```
+
+`--robot` automatically resolves and builds all missing dependencies. Once
+complete, make the new modules visible and load:
+
+```bash
+module use $EASYBUILD_INSTALLPATH/modules/all
+module load FEniCS-DOLFINx-Python/0.9.0-foss-2023b
+```
+
+:::{note} Easyconfig availability
+Each version of FEniCSx against each toolchain requires a dedicated easyconfig
+file, written and reviewed by the community. As a result, support for new
+FEniCSx releases can lag behind, and not every version will have an easyconfig
+available. If your work requires a specific recent version, Spack may be a more
+practical choice.
+:::
+
 ### With Spack
+
+:::{figure} images/spack_logo.svg
+:width: 200px
+:align: left
+:::
 
 
 
