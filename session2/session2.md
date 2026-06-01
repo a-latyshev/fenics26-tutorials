@@ -14,7 +14,7 @@ systems.
 During the tutorial session I will go through this material and at the end I
 will give a brief interactive demo on installing FEniCS using the
 [Spack](https://spack-tutorial.readthedocs.io/en/latest/) package manager, with
-a particular focus on the specifics aspects important for working with FEniCS.
+a particular focus on the specific aspects important for working with FEniCS.
 
 The most important points will be called out and summarised as a TLDR; at the
 end:
@@ -41,7 +41,7 @@ FEniCS on HPC systems over the past decade or so:
 - Raphaël Bulle (UL, INRIA: talk on $\phi$-FEM on...)
 - Andrey Latyshev (UL, Sorbonne Université, co-organiser)
 - Sona Salehian Ghamsari (UL)
-- Georgious Kafanas (UL, talk on EasyBuild on ...)
+- Georgios Kafanas (UL, talk on EasyBuild on ...)
 - Jahid Hassan (UL, talk on Easybuild on ...)
 - Chris Richardson (Cambridge University, talk on ...)
 
@@ -65,20 +65,20 @@ whose shared knowledge has made this guide possible.
 
 ### Methods
 
-Although FEniCS/DOLFINx can be installed in many ways, the only ones relavent
+Although FEniCS/DOLFINx can be installed in many ways, the only ones relevant
 for good performance on HPC are:
 
 1. **Source**. Build from source. With a reasonable set of system-provided
-   modules this us possible, but if your HPC system ships with out-of-date
-   modules, or you many additional complex dependencies built alongside
+   modules this is possible, but if your HPC system ships with out-of-date
+   modules, or you need many additional complex dependencies built alongside
    DOLFINx, it can quickly become painful.
 2. [Easybuild](https://easybuild.io). Easybuild is a software build and
    installation framework that allows you to manage (scientific) software on
    High Performance Computing (HPC) systems in an efficient way. Focus on
    high-quality, well-tested package sets released twice a year (e.g. `2024a`,
    `2024b`).
-3. [Spack](https://spack.io) is a powerful build and installation framework
-   complex and custom scientific software stacks across languages, compilers
+3. [Spack](https://spack.io) is a powerful build and installation framework for
+   managing complex and custom scientific software stacks across languages, compilers
    and microarchitectures. For a full tutorial see [Tutorial Spack
    101](https://spack-tutorial.readthedocs.io/). Focus on automatically
    building complex and custom software stacks from scratch.
@@ -107,7 +107,7 @@ desktop computers (Conda) and generic launchers e.g. `mpiexec`.
    - **Yes**: Easybuild or EESSI.
    - **No**: Another option. 
 3. Do I have extensive custom requirements, e.g. need to integrate at runtime
-   with other complex packages like gmsh, JAX, pytorch? or use exotic compiler
+   with other complex packages like gmsh, JAX, pytorch, or use exotic compiler
    toolchains (Intel, AOCC, NVIDIA)?:
    - **Yes**: Spack build.
    - **No**: Another option.
@@ -133,7 +133,7 @@ standards-based build tooling, in particular, CMake for C++ and
 [scikit-build-core](https://scikit-build-core.readthedocs.io) for Python
 wrappers.
 
-Standards-compliance build tooling means FEniCSx is reasonably easy to build
+Standards-compliant build tooling means FEniCSx is reasonably easy to build
 from source on any platform with a good set of dependencies, by proceeding
 roughly as follows:
 
@@ -199,14 +199,14 @@ recorded my successes/failures:
         -DCMAKE_PREFIX_PATH=~/fenics
 
 - :white_check_mark: Basix Python wrapper; Here I began running into an
-  issues. Recall that I wanted to use some Easybuild-provided Python modules;
-  this requires that the Python be allowed 'see' the Easybuild
+  issue. Recall that I wanted to use some Easybuild-provided Python modules;
+  this requires that the Python be allowed to 'see' the Easybuild
   Python `site-packages`:
 
       python -m venv --system-site-packages ~/fenics/
       ...
       python -m pip install scikit-build-core[pyproject] nanobind
-      python -m pip build --no-build-isolation --check-build-dependencies .
+      python -m build --no-build-isolation --check-build-dependencies .
 
 - :white_check_mark: UFL and FFCx install. Easy!
 - :white_check_mark: DOLFINx Python wrapper. Easy!
@@ -214,7 +214,7 @@ recorded my successes/failures:
 :::{seealso} The Future? The MPI ABI Initiative.
 :class: dropdown
 :open: false
-An ABI compatibility guarantee allows one a piece of software to be compiled
+An ABI compatibility guarantee allows a piece of software to be compiled
 against one library (e.g. MPICH), and for the implementation to be swapped out
 at runtime via dynamic linking (e.g. Intel MPI, Cray MPI, MVAPICH2).
 
