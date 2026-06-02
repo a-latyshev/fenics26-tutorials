@@ -25,12 +25,14 @@ RUN git clone --depth 1 https://github.com/FEniCS/ffcx.git && \
 
 # DOLFINx C++ dependencies
 # Add libpetsc-real-dev for PETSc
-RUN apt-get install -y libboost-dev libhdf5-mpi-dev libopenmpi-dev libpugixml-dev libptscotch-dev libspdlog-dev pkg-config
+RUN apt-get install -y libboost-dev libhdf5-mpi-dev libopenmpi-dev \
+      libpugixml-dev libptscotch-dev libspdlog-dev pkg-config
 
 # DOLFINx C++ build
 RUN git clone --depth 1 https://github.com/FEniCS/dolfinx.git && \
     cd dolfinx/cpp && \
-    cmake -DDOLFINX_UFCX_PYTHON=OFF -DDOLFINX_BASIX_PYTHON=OFF -DCMAKE_PREFIX_PATH=~/fenics -B build-dir -S . && \
+    cmake -DDOLFINX_UFCX_PYTHON=OFF -DDOLFINX_BASIX_PYTHON=OFF \
+      -DCMAKE_PREFIX_PATH=~/fenics -B build-dir -S . && \
     cmake --build build-dir && \
     cmake --install build-dir --prefix ~/fenics
 
