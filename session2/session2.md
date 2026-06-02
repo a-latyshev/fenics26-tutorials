@@ -320,3 +320,9 @@ FEniCS on HPC systems over the past decade or so:
 - Chris Richardson (Cambridge University, talk on ...)
 
 whose shared knowledge has made this guide possible.
+
+## AI use statement
+
+The document draft was written without AI. Claude Sonnet 4.6 was used for
+proof-reading, suggestions on improving the flow, and adding some visual
+elements (logos etc.).
