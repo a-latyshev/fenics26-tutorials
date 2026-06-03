@@ -292,7 +292,83 @@ practical choice.
 :align: left
 :::
 
+Spack can build an entire software stack — compilers, MPI, PETSc, ADIOS2, gmsh
+— in a single shot.
 
+On a cluster, the *partial stack* approach works well in practice: Spack reuses
+the scheduler-integrated and interconnect-tuned MPI and compiler from the
+module system, and then builds everything else itself. This is what we use for
+all internal projects at the University of Luxembourg.
+
+#### Setting up Spack
+
+```bash
+cd ~
+git clone --depth=2 https://github.com/spack/spack.git
+source $HOME/spack/share/spack/setup-env.sh
+```
+
+The key step for a *partial stack* build is telling Spack which dependencies to
+take from the module system rather than building itself. Create
+`~/.spack/packages.yaml` with entries for each system-provided package. The
+*abbreviated* example below is for the University of Luxembourg `aion` cluster
+(GCC 13.2.0, OpenMPI 4.1.6, SLURM):
+
+```yaml
+packages:
+  gcc:
+    externals:
+    - spec: gcc@13.2.0+binutils languages:='c,c++,fortran'
+      modules:
+      - compiler/GCC/13.2.0
+      extra_attributes:
+        compilers:
+          c: /opt/apps/easybuild/.../GCCcore/13.2.0/bin/gcc
+          cxx: /opt/apps/easybuild/.../GCCcore/13.2.0/bin/g++
+          fortran: /opt/apps/easybuild/.../GCCcore/13.2.0/bin/gfortran
+    buildable: false
+  openmpi:
+    variants: fabrics=ofi,ucx schedulers=slurm
+    externals:
+    - spec: openmpi@4.1.6
+      modules:
+      - mpi/OpenMPI/4.1.6-GCC-13.2.0
+    buildable: false
+  mpi:
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@23.11.10 sysconfdir=/etc/slurm
+      prefix: /usr
+    buildable: false
+  # ... plus binutils, libevent, libfabric, hwloc, ucx, pmix, etc.
+```
+
+:::{important} Pin MPI as not buildable
+Setting `mpi: buildable: false` together with the specific `openmpi` entry
+ensures Spack always uses the scheduler-integrated MPI from the module system,
+not a self-built one that may lack the native fabric or Slurm support.
+:::
+
+#### Building FEniCS
+
+Create a Spack environment and add the FEniCSx specs:
+
+```bash
+spack env create -d ~/fenicsx-env/
+spack env activate ~/fenicsx-env/
+spack add py-fenics-dolfinx@0.10 ^fenics-dolfinx+adios2 ^adios2+python ^petsc+mumps
+spack concretize
+spack install
+```
+
+#### Testing and using the build
+
+Quickly verify the build works under MPI:
+
+```bash
+srun python -c "from mpi4py import MPI; import dolfinx"
+```
 
 ## Runtime configuration
 
