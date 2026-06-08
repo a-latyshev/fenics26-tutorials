@@ -637,6 +637,36 @@ of MPI ranks.
 
 ### JIT compilation
 
+Each time DOLFINx encounters a new variational form, FFCx compiles it to a
+shared library (`.so`) and writes it to a cache directory (default
+`~/.cache/fenics`). On HPC systems, simultaneous cache reads and writes from
+thousands of ranks cause the same filesystem pressure as the `import` problem.
+
+DOLFINx mitigates this, to an extent, via `mpi_jit_decorator`: rank 0 compiles
+the form and writes to the cache; all other ranks block on an MPI broadcast,
+then load from the cache once rank 0 succeeds. Each form is therefore compiled
+once per job regardless of rank count.
+
+The cache read on non-root ranks still touches the parallel filesystem. Pointing
+the cache at a node-local path:
+
+```bash
+export XDG_CACHE_HOME=$TMPDIR/$USER/fenics-cache-$SLURM_JOB_ID
+```
+
+*and* performing the JIT-compilation + cache lookup on a communicator split
+along the shared memory boundaries (i.e. one communicator per node):
+
+```python
+...
+a = ufl.inner(u, v)*ufl.dx
+shared_mem_comm = MPI.COMM_WORLD.Split_type(MPI.COMM_TYPE_SHARED, key=MPI.COMM_WORLD.rank)
+a_dolfinx = form(a, jit_comm=shared_mem_comm)
+```
+
+This solves the parallel file system bottleneck at the expense of requiring JIT
+compilation on every job start, as typically `$TMPDIR` is wiped on job exit.
+
 ## Testing and benchmarking
 
 ### FEniCS unit tests
