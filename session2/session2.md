@@ -3,10 +3,9 @@ authors:
 - jshale
 ---
 
-# Ten years of FEniCS on HPC systems 
+# A guide to building and running FEniCSx on HPC systems
 
 ## Introduction
-
 
 This guide distills knowledge built up at the University of Luxembourg over the
 past decade on building and running FEniCS on HPC systems.
@@ -36,7 +35,6 @@ and pull the following image with Spack pre-installed:
 ```bash
 docker pull spack/ubuntu-noble:develop
 ```
-
 
 ## Overview
 
@@ -96,14 +94,15 @@ at desktop computers (Conda) and non-scheduler-integrated launchers e.g.
    pytorch, or exotic compiler toolchains (Intel, AOCC, NVIDIA)?
    - **Yes**: Spack build (partial or full stack).
 4. Do I have strict reproducibility requirements?
-   - **Yes**: Wrap your chosen approach in a container (e.g. Apptainer/Singularity).
+   - **Yes**: Wrap your chosen approach in a container image and execute in an
+     HPC-aware container runtime (e.g. Apptainer/Singularity).
 
 :::{important} Avoid source builds if you can
 Source builds are hard - if in doubt, choose partial stack Spack,
 Easybuild/EESSI binaries, or as a last resort, full stack Spack. 
 :::
 
-:::{important} Our opinion
+:::{important} My opinion
 Today all of our internal projects use the *partial stack Spack* approach, with
 around fifteen dependencies brought in pre-built from UL's Easybuild-based
 module system. Everything else is built by Spack.
@@ -117,9 +116,10 @@ standards-based build tooling, in particular, CMake for C++ and
 wrappers.
 
 Standards-compliant build tooling means FEniCSx is reasonably easy to build
-from source on any platform with a good set of dependencies, by proceeding
-roughly as follows:
+from source on any platform with a 'good enough' set of dependencies, by
+proceeding roughly as follows:
 
+1. Install and/or build the necessary dependencies.
 1. CMake - Install the C++ Basix, UFCx header and DOLFINx libraries.
 2. Python/pip - Install Basix Python wrapper.
 3. Python/pip - Install UFL and FFCx.
@@ -134,7 +134,7 @@ commands:
 :::{literalinclude} source-install/Dockerfile
 :lang: dockerfile
 :lineno-match:
-:caption: Installing FEniCSx 
+:caption: Installing FEniCSx within a clean Ubuntu 26.04 Docker image. 
 :::
 
 #### Typical HPC system
@@ -144,10 +144,10 @@ complex runtime dependencies (gmsh, JAX, TensorFlow), and critical dependencies
 installed in non-standard ways (HPC module systems) can lead to brittle builds
 and lots of trial-and-error.
 
-As an example, I logged onto the University of Luxembourg HPC `aion`, which has
-a good set of modules organised according to the easybuild `year{a,b}` system,
-e.g. `2024a`. I found using `module spider` (search) and by cross-referencing
-against the above Ubuntu build I loaded:
+As an example, I logged onto the University of Luxembourg HPC aion cluster,
+which has a good set of modules organised according to the easybuild
+`year{a,b}` system, e.g. `2024a`. I found using `module spider` (search) and by
+cross-referencing against the above Ubuntu build I loaded:
 
 ```bash
 module load env/development/2024a
@@ -158,14 +158,13 @@ module load devel/Boost mpi/OpenMPI devel/CMake math/SCOTCH \
 ```
 
 I was pretty happy, as some of these dependencies are tricky and time-consuming
-to build. However, I could not find `pkgconfig`, `spdlog`, `pugixml`,
-`nanobind` or `scikit-build-core`. I then tried the newer `2025a` release which
-did not have `petsc4py`, although it did have `scikit-build-core` and
-`pkgconfig`.
+to build. However, I could not find pkgconfig, spdlog, pugixml, nanobind or
+scikit-build-core. I then tried the newer `2025a` release which did not have
+petsc4py, although it did have scikit-build-core and pkgconfig.
 
-So in the end, I decided to go with the `2024a` release, 'knowing' that both
-`spdlog` and `pugixml` are relatively easy to build, and that I could
-(hopefully) install `nanobind` and `scikit-build-core` from PyPI using `pip`.
+So in the end, I decided to go with the 2024a release, 'knowing' that both
+spdlog and pugixml are relatively easy to build, and that I could
+(hopefully) install nanobind and scikit-build-core from PyPI using `pip`.
 
 I then copied and pasted `RUN` commands out from the `Dockerfile` above and
 recorded my successes/failures:
@@ -194,18 +193,10 @@ recorded my successes/failures:
 - ✅ UFL and FFCx install. Easy!
 - ✅ DOLFINx Python wrapper. Easy!
 
-:::{seealso} The Future? The MPI ABI Initiative.
-:class: dropdown
-:open: false
-An ABI compatibility guarantee allows software compiled against one MPI
-implementation (e.g. MPICH) to have it swapped out at runtime via dynamic
-linking (e.g. Intel MPI, Cray MPI, MVAPICH2).
-
-The recent MPI5 ABI Initiative [](https://doi.org/10.1145/3615318.3615319)
-guarantees ABI compatibility across all MPI5-compliant implementations — in
-the future it may be possible to ship DOLFINx binaries and swap in the
-platform-specific MPI at runtime.
-:::
+How smoothly this will depend on how well-aligned your cluster's modules are
+with the requirements of FEniCS - only three years ago, I had to build CMake,
+PETSc and PugiXML from source, and in the past I recall building Boost and HDF5
+from source too!
 
 ### With Easybuild
 
@@ -263,7 +254,7 @@ Do a dry run first to check what will be built:
 eb FEniCS-DOLFINx-Python-0.9.0-foss-2023b.eb --robot --dry-run
 ```
 
-Then build (this will take a while):
+Then build (this can take a while):
 
 ```bash
 eb FEniCS-DOLFINx-Python-0.9.0-foss-2023b.eb --robot
@@ -281,8 +272,132 @@ module load FEniCS-DOLFINx-Python/0.9.0-foss-2023b
 Each version of FEniCSx against each toolchain requires a dedicated easyconfig
 file, written and reviewed by the community. As a result, support for new
 FEniCSx releases can lag behind, and not every version will have an easyconfig
-available. If your work requires a specific recent version, Spack may be a more
-practical choice.
+available. If your work requires a specific configuration or more recent
+version, Spack may be a more practical choice.
+:::
+
+### European Enviroment for Scientific Software Installations (EESSI)
+
+The EESSI aims to set up a shared binary stack of scientific software
+installations, and so avoid a lot of duplicate work across HPC sites. In
+particular, EESSI aims to provide a *uniform* experience across all sites,
+while focusing on performance. EESSI uses Easybuild to generate this shared
+binary stack.
+
+:::{figure} images/overview_layers.png
+:width: 50%
+:align: left
+:::
+
+EESSI is available on several of the EuroHPC JU systems including Karolina,
+Vega, Deucalion ARM and GPU parititions and MareNostrum 5, for a full list
+see [Systems where EESSI is available](https://www.eessi.io/docs/systems/).
+
+Once installed by your site admin, EESSI is nearly trivial to use:
+
+1. Check that EESSI is available.
+
+```bash
+ls /cvmfs/software.eessi.io
+```
+
+should show:
+
+```
+defaults  host_injections  init  README.eessi  versions
+```
+
+and then:
+
+```bash
+source /cvmfs/software.eessi.io/versions/2023.06/init/bash
+```
+
+giving (abbreviated):
+
+```
+Found EESSI repo @ /cvmfs/software.eessi.io/versions/2023.06!
+archdetect says x86_64/amd/zen2
+archdetect could not detect any accelerators
+Using x86_64/amd/zen2 as software subdirectory.
+...
+Prepending site path /cvmfs/software.eessi.io/host_injections/2023.06/software/linux/x86_64/amd/zen2/modules/all to $MODULEPATH...
+Environment set up to use EESSI (2023.06), have fun!
+```
+
+then load the module for e.g. DOLFINx Python:
+
+```bash
+module load FEniCS-DOLFINx-Python/0.9.0-foss-2023b
+```
+
+and run e.g.:
+
+```bash
+mpiexec python -c "from mpi4py import MPI; import dolfinx"  
+```
+
+:::{important} Some rough edges
+:class: dropdown
+:open: false
+I encountered two rough edges related to MPI in the EESSI 2023.06 set on the aion
+cluster at ULHPC in mid-2026. Both of these points link back to the guidance
+"Always using the system-provided MPI" - as EESSI provides a full binary stack,
+it cannot follow this guidance.
+
+
+1. A [known
+   issue](https://www.eessi.io/docs/known_issues/eessi-2023.06/#eessi-production-repository-v202306)
+   when using `mpirun` leading to the failure:
+
+```bash
+Failed to modify UD QP to INIT on mlx5_0: Operation not permitted
+```
+  
+  It is possible to fix this by instructing OpenMPI to not use libfabric
+  and turn off UCX uct:
+
+```bash
+mpiexec -mca pml ucx -mca btl '^uct,ofi' -mca mtl '^ofi'
+```
+
+  Whether libfabric or ucx provides higher performance communication
+  depends on the interconnect used in your cluster.
+
+2. Inability to use system `srun` to launch jobs. This is perhaps a bigger
+   issue; launching MPI jobs with a scheduler-integrated launcher e.g. `srun`
+   currently fails:
+
+```bash
+--------------------------------------------------------------------------
+A requested component was not found, or was unable to be opened.  This
+means that this component is either not installed or is unable to be
+used on your system (e.g., sometimes this means that shared libraries
+that the component requires are unable to be found/loaded).  Note that
+PMIx stopped checking at the first component that it did not find.
+
+Host:      aion-0086
+Framework: psec
+Component: munge
+--------------------------------------------------------------------------
+```
+
+   Using a scheduler-integrated launcher like `srun` over `mpiexec` greatly
+   improves the HPC experience and many of our workflows are built around
+   `srun`, so this is not ideal.
+:::
+
+:::{seealso} The Future? The MPI ABI Initiative.
+:class: dropdown
+:open: false
+An ABI compatibility guarantee allows software compiled against one MPI
+implementation (e.g. MPICH) to have it swapped out at runtime via dynamic
+linking (e.g. Intel MPI, Cray MPI, MVAPICH2).
+
+The recent MPI5 ABI Initiative [](https://doi.org/10.1145/3615318.3615319)
+guarantees ABI compatibility across all MPI5-compliant implementations — in the
+future it may be possible to ship DOLFINx binaries (via EESSI, conda, pypi.org
+etc.) and swap in a platform-tuned MPI at runtime.
 :::
 
 ### With Spack
@@ -293,26 +408,52 @@ practical choice.
 :::
 
 Spack can build an entire software stack — compilers, MPI, PETSc, ADIOS2, gmsh
-— in a single shot.
+etc. — in a single shot. Particularly powerful is Spack's concretisation
+algorithm that acts as a very smart constraint solver: constraints from package
+definitions, already-installed specs, and the user's request are compiled into
+a logical encoding, and the concretisation algorithm finds the optimal
+'concrete' solution satisfying all of them.
 
-On a cluster, the *partial stack* approach works well in practice: Spack reuses
-the scheduler-integrated and interconnect-tuned MPI and compiler from the
-module system, and then builds everything else itself. This is what we use for
-all internal projects at the University of Luxembourg.
+:::{important} Spack documentation
+Spack is a complex and powerful piece of software; I recommend following the
+[Spack Tutorial](https://spack-tutorial.readthedocs.io/en/latest/). Here I will
+cover only some aspects related to installing and running FEniCS.
+:::
+
+On a cluster, the *partial stack* approach works well in practice: we tell
+Spack to reuse the scheduler-integrated and interconnect-tuned MPI along with
+the compiler from the module system, and then build everything else itself.
+This is what we use for most internal projects at the University of Luxembourg.
 
 #### Setting up Spack
+
+Spack has a very minimal dependency set and can be installed by checking the source
+out using `git`:
 
 ```bash
 cd ~
 git clone --depth=2 https://github.com/spack/spack.git
-source $HOME/spack/share/spack/setup-env.sh
+source ~/spack/share/spack/setup-env.sh
 ```
 
 The key step for a *partial stack* build is telling Spack which dependencies to
-take from the module system rather than building itself. Create
-`~/.spack/packages.yaml` with entries for each system-provided package. The
-*abbreviated* example below is for the University of Luxembourg `aion` cluster
-(GCC 13.2.0, OpenMPI 4.1.6, SLURM):
+take from the module system rather than building them itself. On an 'unknown'
+HPC system I typically explore with `module spider` to find all compiler and
+interconnect/MPI related components, e.g.:
+
+```bash
+module spider OpenMPI
+module spider PMIx
+module spider GCC
+module spider compiler/GCCcore
+```
+
+While making notes of version numbers. I then `module load` all of the modules
+and check for warning messages related to e.g. compatability.
+
+Then, create `~/.spack/packages.yaml` with entries for each system-provided
+package. The *abbreviated* example below is for the University of Luxembourg
+`aion` cluster (GCC 13.2.0, OpenMPI 4.1.6, SLURM):
 
 ```yaml
 packages:
@@ -341,13 +482,57 @@ packages:
     - spec: slurm@23.11.10 sysconfdir=/etc/slurm
       prefix: /usr
     buildable: false
-  # ... plus binutils, libevent, libfabric, hwloc, ucx, pmix, etc.
+  # ... plus binutils, libevent, libfabric, hwloc, ucx, pmix, libxml2, zlib etc.
 ```
 
-:::{important} Pin MPI as not buildable
-Setting `mpi: buildable: false` together with the specific `openmpi` entry
-ensures Spack always uses the scheduler-integrated MPI from the module system,
+The full `packages.yaml` can be found
+[here](https://gist.github.com/jhale/23d4d7646e2dc05d0adc0395767d044a).
+
+:::{important} Pin partial stack dependencies as not buildable
+Setting `mpi: buildable: false` etc. together with the specific `openmpi` entry
+guarantees Spack always uses the scheduler-integrated MPI from the module system,
 not a self-built one that may lack the native fabric or Slurm support.
+:::
+
+:::{important} Checking dynamic linking
+:class: dropdown
+:open: false
+Inspecting the full `packages.yaml` file you will see entries for `libxml2` and
+`zlib`. Why do we need these? The first time I tried this Spack configuration
+without `libxml2` and `zlib`, Spack chose to build `zlib` and `libxml2`.
+However, `libxml2` produced warnings at runtime due to OpenMPI dynamically
+linking against potentially incompatible (Spack-provided) version. To avoid
+this, it is good practice to inspect the linking of at least MPI and ask Spack
+not to build all the lower-level dependencies as well.
+
+```bash
+module load mpi/OpenMPI/4.1.6-GCC-13.2.0
+ldd $EBROOTOPENMPI/lib64/libmpi.so
+```
+
+gives:
+
+```
+linux-vdso.so.1 (0x00007fffb1bf7000)
+libopen-rte.so.40 => /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/lib/libopen-rte.so.40 (0x00007f25507ab000)
+libopen-pal.so.40 => /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/lib/libopen-pal.so.40 (0x00007f25506b9000)
+librt.so.1 => /lib64/librt.so.1 (0x00007f25504b1000)
+libutil.so.1 => /lib64/libutil.so.1 (0x00007f25502ad000)
+libhwloc.so.15 => /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/hwloc/2.9.2-GCCcore-13.2.0/lib64/libhwloc.so.15 (0x00007f255024c000)
+libpciaccess.so.0 => /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libpciaccess/0.17-GCCcore-13.2.0/lib64/libpciaccess.so.0 (0x00007f2550240000)
+libxml2.so.2 => /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libxml2/2.11.5-GCCcore-13.2.0/lib64/libxml2.so.2 (0x00007f25500db000)
+libdl.so.2 => /lib64/libdl.so.2 (0x00007f254fed7000)
+libz.so.1 => /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/zlib/1.2.13-GCCcore-13.2.0/lib64/libz.so.1 (0x00007f254febc000)
+liblzma.so.5 => /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/XZ/5.4.4-GCCcore-13.2.0/lib64/liblzma.so.5 (0x00007f254fe8d000)
+libevent_core-2.1.so.7 => /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libevent/2.1.12-GCCcore-13.2.0/lib64/libevent_core-2.1.so.7 (0x00007f254fe55000)
+libevent_pthreads-2.1.so.7 => /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libevent/2.1.12-GCCcore-13.2.0/lib64/libevent_pthreads-2.1.so.7 (0x00007f254fe50000)
+libm.so.6 => /lib64/libm.so.6 (0x00007f254face000)
+libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f254f8ae000)
+libc.so.6 => /lib64/libc.so.6 (0x00007f254f4d7000)
+/lib64/ld-linux-x86-64.so.2 (0x00007f255076b000)
+```
+
+While writing this tutorial, I realised I should probably also add `xz` to my `packages.yaml` file.
 :::
 
 #### Building FEniCS
@@ -371,6 +556,8 @@ srun python -c "from mpi4py import MPI; import dolfinx"
 ```
 
 ## Runtime configuration
+
+
 
 ### The Python `import` problem 
 
