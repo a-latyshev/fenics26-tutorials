@@ -227,7 +227,7 @@ plotter_collision.add_mesh(
 )
 plotter_collision.add_legend()
 plotter_collision.view_xy()
-plotter_collision.export_html("pyvista_bb_collision.html")
+plotter_collision.export_html("pyvista_bb_collisions.html")
 
 # %% [markdown]
 # :::{iframe} ../pyvista/pyvista_bb_collisions.html
@@ -372,7 +372,7 @@ plotter_submesh.export_html("pyvista_submesh.html")
 
 # ## The shifted boundary method
 #
-# We start creating $u_G$, the boundary condition on the true boundary $\Gamam$.
+# We start creating $u_G$, the boundary condition on the true boundary $\Gamma$.
 # Furthermore, we also define the tangential deriviative along the true boundary, which we will require in the variational formulation.
 
 J = ufl.Jacobian(true_surface)
