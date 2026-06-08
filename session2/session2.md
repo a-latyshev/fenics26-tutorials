@@ -557,7 +557,14 @@ srun python -c "from mpi4py import MPI; import dolfinx"
 
 ## Runtime configuration
 
-
+Two of the most common and impactful runtime performance problems on HPC
+systems are caused not by the numerical computation itself, but by disk access
+patterns during program startup. HPC storage systems are optimised for high
+aggregate throughput on large sequential reads and writes — the kind generated
+by parallel I/O libraries such as HDF5 or ADIOS2. They perform poorly under
+workloads that issue many small, random, or metadata-heavy operations, which is
+precisely the access pattern generated when Python initialises and when FEniCSx
+performs just-in-time (JIT) compilation of finite element kernels.
 
 ### The Python `import` problem 
 
