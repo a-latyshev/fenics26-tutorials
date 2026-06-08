@@ -639,6 +639,8 @@ of MPI ranks.
 
 ### JIT compilation
 
+#### Performance
+
 Each time DOLFINx encounters a new variational form, FFCx compiles it to a
 shared library and writes it to a cache directory (default `~/.cache/fenics` or
 `$XDG_CACHE_HOME` if set). On HPC systems, simultaneous JIT cache reads and
@@ -652,7 +654,8 @@ broadcast, which rank 0 sends when it succeeds. So when using `MPI_COMM_WORLD`,
 the default, each form is compiled once per job regardless of the size.
 
 However, the cache read on non-root ranks still touches the parallel
-filesystem. Pointing the cache at a node-local path:
+filesystem. Pointing the cache at a node-local path such as an SSD-backed
+`$TMPDIR`:
 
 ```bash
 export XDG_CACHE_HOME=$TMPDIR/$USER/fenics-cache-$SLURM_JOB_ID
@@ -669,8 +672,12 @@ a_dolfinx = form(a, jit_comm=shared_mem_comm)
 ```
 
 solves the parallel file system bottleneck at the expense of requiring JIT
-compilation on every node and on every job start, as typically `$TMPDIR` is is
-wiped on job exit.
+compilation on every node within a job, and on every job start, as typically
+`$TMPDIR` is is cleared on job exit.
+
+#### Compiler flags
+
+
 
 ## Testing and benchmarking
 
