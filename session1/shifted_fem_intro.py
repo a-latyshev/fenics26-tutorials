@@ -1,8 +1,19 @@
+# ---
+# jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.3'
+#       jupytext_version: 1.19.3
+#   kernelspec:
+#     display_name: python3
+#     language: python
+#     name: python3
+# ---
+#
 # # The shifted boundary method in FEniCSx
 #
-# Author: Jørgen S. Dokken
-# SPDX-License-Identifier: MIT
-
 # In this tutorial, we will focus on the [shifted boundary method](https://doi.org/10.1016/j.jcp.2017.10.026).
 #
 # The idea of the method is to shift the boundary conditions from a true boundary $\Gamma$ that is not aligned with the
@@ -27,10 +38,10 @@ import ufl
 # Next, we define the characteristics of the line mesh, i.e. the center $(c_x, c_y)$, the radii $(R_x, R_y)$, and the number of elements $M$
 # and the Lagrange degree of the elements.
 
-line_degree = 2
+line_degree = 3
 center = (0.4, 0.3)
 radii = (0.2, 0.13)
-M = 10
+M = 5
 
 # We define the number of nodes in the mesh, which depends on the number of elements and the degree of the Lagrange polynomials.
 # We then define the coordinates of the nodes, which are placed equidistantly on the ellipse.
@@ -89,3 +100,61 @@ assert line_mesh.geometry.index_map().size_global == num_nodes
 # - `max_facet_to_cell_links`: Indicates that at max two cells can be connected to **any** facet, which is the case for
 # this mesh, but not for T-joint grids or graph based meshes.
 # ```
+
+# Furthermore, we create the structured grid we will perform simulations on
+domain = ((0.17, 0), (0.7, 0.6))
+nx = ny = 21
+mesh = dolfinx.mesh.create_rectangle(
+    MPI.COMM_WORLD, domain, (nx, ny), cell_type=dolfinx.mesh.CellType.quadrilateral
+)
+
+# To illustrate that the true boundary is curved, we use the function `interpolate_geometry` to interpolate
+# the geometry into a first order space, i.e. remove all nodes that are not vertices
+
+linear_cmap = dolfinx.fem.coordinate_element(line_mesh.topology.cell_type, 1)
+linear_lines = dolfinx.fem.interpolate_geometry(line_mesh, linear_cmap)
+
+# +[tags="hide-output"]
+import pyvista as pv
+
+surface_grid = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(mesh))
+obstacle_grid = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(line_mesh))
+linear_obstacle_grid = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(linear_lines))
+plotter = pv.Plotter()
+plotter.add_mesh(
+    surface_grid,
+    color="darkblue",
+    show_edges=True,
+    opacity=0.5,
+    label="Background mesh",
+)
+plotter.add_mesh(
+    linear_obstacle_grid,
+    color="blue",
+    style="points",
+    point_size=15.0,
+    label="Mesh vertices",
+)
+plotter.add_mesh(
+    obstacle_grid, color="red", style="points", point_size=10.0, label="Mesh nodes"
+)
+tessellated = obstacle_grid.tessellate()
+tessellated.clear_data()
+plotter.add_mesh(
+    tessellated,
+    color="black",
+    style="wireframe",
+    label="True boundary",
+)
+plotter.add_legend()
+plotter.view_xy()
+plotter.export_html("pyvista_true_boundary.html")
+
+# -
+
+# %% [markdown]
+# :::{iframe} ../pyvista/pyvista_true_boundary.html
+# :width: 100%
+# :title: True boundary $\Gamma$
+# :::
+# %%
