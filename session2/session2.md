@@ -617,7 +617,23 @@ equally common [Apptainer/Singularity](https://apptainer.org) runtime.
 
 #### Spindle
 
-[Spindle]()
+[Spindle](https://github.com/hpc/Spindle) replaces the dynamic linker and
+Python import machinery at runtime. When one MPI rank reads a shared library or
+Python module for the first time, Spindle broadcasts the file contents to all
+other ranks over MPI. All subsequent ranks satisfy the request from an in-memory
+cache rather than hitting the filesystem. The net effect is that each file is
+read from disk exactly once per job, regardless of node count, which eliminates
+the per-rank metadata request that causes the `import` problem. Spindle requires
+no changes to the application or the installation; it is invoked by prepending
+`spindle` to the usual `srun` command:
+
+```bash
+spindle srun python my_fenicsx_script.py
+```
+
+Spindle can be installed using Spack or from source, and does not require
+special permissions. We have used it with success to execute jobs with 10000s
+of MPI ranks.
 
 ### JIT compilation
 
