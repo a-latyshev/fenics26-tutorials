@@ -11,7 +11,7 @@
 #     language: python
 #     name: python3
 # ---
-#
+
 # # The shifted boundary method in FEniCSx
 #
 # In this tutorial, we will focus on the [shifted boundary method](https://doi.org/10.1016/j.jcp.2017.10.026).
@@ -36,8 +36,139 @@
 # :::
 # %%
 #
+# The mathematical formulation of the problem can be written as follows:
+# Given a domain $\tilde\Omega$ with exterior boundary $\bar\Gamma$ and a map $M: \bar\Gamma \to \Gamma$,
+# we define:
+#
+# $$
+# \begin{aligned}
+# \nb(\xtilde) & \equiv \mathbf{n}(M(\xtilde)), \\
+# \bartau(\xtilde) & \equiv\boldsymbol{\tau}_i(M(\xtilde)), \\
+# \dM(\xtilde) & = M(\xtilde) - \xtilde, \\
+# \psi_{,\bar z}(\xtilde) = \nabla \psi(\xtilde) \cdot \bar{\mathbf{z}}
+# & = \nabla \psi(\xtilde) \cdot \mathbf{z}(M(\xtilde)),
+# \quad \text{for } \mathbf{z} = \bar{\mathbf{n}}, \bar{\boldsymbol{\tau}}_i.
+# \end{aligned}
+# $$
+#
+# where $\mathbf{n}$ is the normal vector and $i$th tangent vector on the true boundary $\Gamma$.
+#
+# The extension operator of a function $\phi$ on $\Gamma$ to $\bar\Gamma$ is defined as
+# $\bar{\phi}(\mathbf{\tilde x}) \equiv \phi(M(\xtilde))$.
+#
+# and therefore for the boundary condition, we can write
+#
+# $$
+# \uG(\mathbf{\tilde x}) = u_G(M(\xtilde)),\\
+# \duGtau(\mathbf{\tilde x}) = \nabla \uG(\xtilde) \cdot \bartau(\xtilde).
+# $$
+#
+# The full derivation of the variational formulation can be found in [the original paper](https://doi.org/10.1016/j.jcp.2017.10.026),
+# and can be written as:
+# Find $u^h \in V(\tilde\Omega)$ such that
+#
+# $$
+# \begin{aligned}
+# a(u^h, v^h) &= L(v^h) \quad \forall v^h \in V(\tilde\Omega), \\
+# a(u, v) & = \intO{\nabla u}{\nabla v}
+# - \intG{\nabla u \cdot \nt}{v + \nabla v \cdot \dM}\\
+# &- \intG{u + \nabla u \cdot \dM}{\nabla v \cdot \nt}
+# + \intG{(\nb\cdot \nt)/\vert\vert \dM\vert\vert \nabla u \cdot \dM}{\nabla v \cdot \dM}, \\
+# &+ \intG{\alpha/h u + \nabla u \cdot \dM}{v + \nabla v \cdot \dM}, \\
+# L(v) & = \intO{f}{v} - \intG{\uG}{\nabla v \cdot \nt}
+# - \intG{\duGtau(\bartau \cdot \nt)}{\nabla v \cdot \dM}\\
+# &+ \intG{\alpha/h \uG}{v + \nabla v \cdot \dM}.
+# \end{aligned}
+# $$
+
+# Assuming we have the mesh above, we can start to implement this in UFL as follows
+
+# +
+import ufl
+import basix.ufl
+
+cell = "quadrilateral"
+c_el = basix.ufl.element("Lagrange", cell, 1, shape=(2,))
+OmegaG = ufl.Mesh(c_el)
+el = basix.ufl.element("Lagrange", cell, 1)
+V = ufl.FunctionSpace(OmegaG, el)
+
+u = ufl.TrialFunction(V)
+w = ufl.TestFunction(V)
+a = ufl.inner(ufl.grad(u), ufl.grad(w)) * ufl.dx
+
+x = ufl.SpatialCoordinate(OmegaG)
+f = ufl.sin(x[0]) * ufl.cos(x[1])  # Some spatially varying expression
+L = ufl.inner(f, w) * ufl.dx
+# -
+
+# However, we require $\dM$, $\nt$, $\bartau$, $\uG$ and $\duGtau$ to be implemented on the boundary of the domain.
+# For this we will use a submesh of the original mesh, which only contain the exterior facets.
+# For now, this can symbolically be defined as
+
+facet = "interval"
+f_el = basix.ufl.element("Lagrange", facet, 1, shape=(2,))
+GammaG = ufl.Mesh(f_el)
+
+# Furthermore, we only require these quantities at the quadrature points used in the numerical integration,
+# and therefore we define the following abstract functions
+
+# +
+quadrature_degree = 4
+q_el = basix.ufl.quadrature_element(facet, degree=quadrature_degree, value_shape=(2,))
+q_scalar_el = basix.ufl.quadrature_element(
+    facet, degree=quadrature_degree, value_shape=()
+)
+
+Q_scalar = ufl.FunctionSpace(GammaG, q_scalar_el)
+uG = ufl.Coefficient(Q_scalar)
+duG_t = ufl.Coefficient(Q_scalar)
+
+Q = ufl.FunctionSpace(GammaG, q_el)
+dM = ufl.Coefficient(Q)
+t_bar = ufl.Coefficient(Q)
+# -
+
+# The normal vector on the true boundary is derived from the closest point project from the surrogate boundary to the true boundary.
+
+d_scalar = ufl.sqrt(ufl.dot(dM, dM))
+n_bar = dM / d_scalar
+
+# Next we can define the integration measure over the surrogate boundary
+
+nt = ufl.FacetNormal(OmegaG)
+dsG = ufl.Measure(
+    "ds", domain=OmegaG, metadata={"quadrature_degree": quadrature_degree}
+)
+
+# and define the remainder of the variational formulation
+
+alpha = ufl.Constant(OmegaG)
+h = ufl.Coefficient(Q_scalar)
+
+
+def shift(z, d):
+    return z + ufl.dot(ufl.grad(z), d)
+
+
+a -= ufl.inner(ufl.dot(ufl.grad(u), nt), shift(w, dM)) * dsG
+a -= ufl.inner(shift(u, dM), ufl.dot(ufl.grad(w), nt)) * dsG
+a += (
+    ufl.dot(nt, n_bar)
+    / d_scalar
+    * ufl.inner(ufl.dot(ufl.grad(u), dM), ufl.dot(ufl.grad(w), dM))
+    * dsG
+)
+
+a += alpha / h * ufl.inner(shift(u, dM), shift(w, dM)) * dsG
+L -= ufl.inner(uG, ufl.dot(ufl.grad(w), nt)) * dsG
+L += alpha / h * ufl.inner(uG, shift(w, dM)) * dsG
+L -= ufl.inner(ufl.dot(duG_t * t_bar, nt), ufl.dot(ufl.grad(w), dM)) * dsG
+
+
 # We will first illustrate some of the core concepts require for the method in detail, before we move on to the variational
 # formulation and how it can be implemented in FEniCSx.
+
 
 # ## Creating the real boundary $\Gamma$
 #
@@ -52,13 +183,13 @@ import numpy as np
 import basix.ufl
 import ufl
 
-# Next, we define the characteristics of the line mesh, i.e. the center $(c_x, c_y)$, the radii $(R_x, R_y)$, and the number of elements $M$
+# Next, we define the characteristics of the line mesh and the number of elements $M$
 # and the Lagrange degree of the elements.
 
 line_degree = 3
-center = (0.4, 0.3)
-radii = (0.2, 0.13)
-M = 5
+center = (1.1, 0.9)
+scale = 0.05
+M = 12
 
 # We define the number of nodes in the mesh, which depends on the number of elements and the degree of the Lagrange polynomials.
 # We then define the coordinates of the nodes, which are placed equidistantly on the ellipse.
@@ -67,8 +198,13 @@ M = 5
 num_nodes = (M - 1) * (line_degree) + line_degree
 nodes = np.zeros((num_nodes, 2), dtype=np.float64)
 theta = np.linspace(0, 2 * np.pi, nodes.shape[0] + 1, endpoint=True)[:-1]
-nodes[:, 0] = center[0] + radii[0] * np.cos(theta)
-nodes[:, 1] = center[1] + radii[1] * np.sin(theta)
+nodes[:, 0] = center[0] + (scale * 16 * np.sin(theta) ** 3)
+nodes[:, 1] = center[1] + scale * (
+    13 * np.cos(theta)
+    - 5 * np.cos(2 * theta)
+    - 2 * np.cos(3 * theta)
+    - 1 * np.cos(4 * theta)
+)
 
 # Next, we can define the connecitivty of the mesh, which can be easily done with numpy tiling.
 
@@ -112,15 +248,16 @@ assert true_surface.geometry.index_map().size_global == num_nodes
 
 # ```{admonition} Important input parameters
 # There are three very important input parameters that we send into the mesh creator:
-# - `surface_comm`: The true boundary $\Gamma$ is represented on every process and is not distributed it across processes, which ensured by using `MPI.COMM_SELF` as the communicator for the mesh.
+# - `surface_comm`: The true boundary $\Gamma$ is represented on every process and is not distributed it across processes,
+# which ensured by using `MPI.COMM_SELF` as the communicator for the mesh.
 # - `ghost_mode`: As the mesh is not distributed, we set the `ghost_mode` to `GhostMode.none`.
 # - `max_facet_to_cell_links`: Indicates that at max two cells can be connected to **any** facet, which is the case for
 # this mesh, but not for T-joint grids or graph based meshes.
 # ```
 
 # Furthermore, we create the structured grid we will perform simulations on
-domain = ((0.17, 0), (0.7, 0.6))
-nx = ny = 21
+domain = ((-0.1, -0.2), (2.1, 2.0))
+nx = ny = 37
 mesh = dolfinx.mesh.create_rectangle(
     MPI.COMM_WORLD, domain, (nx, ny), cell_type=dolfinx.mesh.CellType.quadrilateral
 )
@@ -134,7 +271,13 @@ linear_lines = dolfinx.fem.interpolate_geometry(true_surface, linear_cmap)
 # +[tags="hide-output"]
 import pyvista as pv
 
-surface_grid = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(mesh))
+topology, cell_types, geometry = dolfinx.plot.vtk_mesh(mesh)
+cell_types[:] = (
+    pv.CellType.QUAD
+    if mesh.topology.cell_type == dolfinx.mesh.CellType.quadrilateral
+    else cell_types
+)
+surface_grid = pv.UnstructuredGrid(topology, cell_types, geometry)
 true_surface_grid = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(true_surface))
 linearized_surface_grid = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(linear_lines))
 plotter = pv.Plotter()
@@ -206,17 +349,17 @@ bulk_elements = dolfinx.geometry.compute_collisions_trees(bbox_bulk, bbox_surfac
 colliding_cells = np.unique(bulk_elements[:, 0])
 
 # We visualize this
-
-values = np.full(num_cells_local, 0.0)
-values[colliding_cells] = 1.0
+OUTSIDE_MARKER = 0
+KEEP_MARKER = 2
+values = np.full(num_cells_local, OUTSIDE_MARKER, dtype=np.int32)
+values[colliding_cells] = KEEP_MARKER
 initial_tag = dolfinx.mesh.meshtags(
     mesh, mesh.topology.dim, np.arange(num_cells_local, dtype=np.int32), values
 )
-cell_grid = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(mesh))
-cell_grid.cell_data["colliding"] = values
+surface_grid.cell_data["colliding"] = values
 plotter_collision = pv.Plotter()
 plotter_collision.add_mesh(
-    cell_grid,
+    surface_grid,
     scalars="colliding",
     show_edges=True,
     cmap="coolwarm",
@@ -244,7 +387,7 @@ plotter_collision.export_html("pyvista_bb_collisions.html")
 
 reference_points = basix.create_lattice(
     true_surface.basix_cell(),
-    25,
+    50,
     basix.LatticeType.equispaced,
     exterior=True,
     method=basix.LatticeSimplexMethod.none,
@@ -273,47 +416,57 @@ plotter.export_html("pyvista_pc_boundary.html")
 # Now that we have a good representation of the curved boundary,
 # to find all cells that are intersected by the true boundary $\Gamma$.
 # We will use the [GJK distance algorithm](https://doi.org/10.1109/56.2083) to compute
-# the distance between th convex hull that makes up each cell and the point cloud
-# that represents the true boundary. If the distance is small, then we check
-# if all the vertices of the cell are within the convex hull of the true boundary.
+# the distance between th convex hull that makes up each cell of the background mesh
+# and the point cloud that represents the true boundary.
 
 background_cell_nodes = mesh.geometry.x[mesh.geometry.dofmap][colliding_cells]
 cell_indicator = dolfinx.la.vector(
     mesh.topology.index_map(mesh.topology.dim), bs=1, dtype=np.int32
 )
-KEEP_MARKER = 2
+INTERFACE_MARKER = 3
 tol = 10 * np.finfo(refined_surface_nodes.dtype).eps
-for cell, cell_geom in zip(colliding_cells, background_cell_nodes):
-    distance = dolfinx.geometry.compute_distance_gjk(cell_geom, refined_surface_nodes)
-    cell_indicator.array[cell] = np.linalg.norm(distance) < tol
+cell_indicator.array[colliding_cells] = KEEP_MARKER
 
-    # For each cell that is marked, check that all vertices are inside the surface
-    if cell_indicator.array[cell]:
-        inside = True
-        for point in cell_geom:
-            sub_distance = dolfinx.geometry.compute_distance_gjk(
-                point, refined_surface_nodes
-            )
-            if np.linalg.norm(sub_distance) > tol:
-                inside = False
-                break
-        cell_indicator.array[cell] = inside
-cell_indicator.scatter_reverse(dolfinx.la.InsertMode.add)
+# For each node in the interface, we find which cells that contains the nodes.
+for i, node in enumerate(refined_surface_nodes):
+    distance_vector = dolfinx.geometry.compute_distances_gjk(
+        list(background_cell_nodes), node.reshape(-1, 3), num_threads=2
+    )
+    close_cells = np.linalg.norm(distance_vector, axis=1) < tol
+    cell_indicator.array[colliding_cells[close_cells]] = INTERFACE_MARKER
 cell_indicator.scatter_forward()
-cell_indicator = KEEP_MARKER * (cell_indicator.array > 0).astype(np.int32)
+
+
+num_new_cells = 1
+sweep = 0
+mesh.topology.create_connectivity(mesh.topology.dim - 1, mesh.topology.dim)
+while num_new_cells > 0:
+    outside_cells = np.flatnonzero(cell_indicator.array == OUTSIDE_MARKER)
+    # Find all cells connected to these by facet
+    facets = dolfinx.mesh.compute_incident_entities(
+        mesh.topology, outside_cells, mesh.topology.dim, mesh.topology.dim - 1
+    )
+    adjacent_cells = dolfinx.mesh.compute_incident_entities(
+        mesh.topology, facets, mesh.topology.dim - 1, mesh.topology.dim
+    )
+    new_outside_cells = cell_indicator.array[adjacent_cells] != INTERFACE_MARKER
+    cell_indicator.array[adjacent_cells[new_outside_cells]] = OUTSIDE_MARKER
+    num_new_cells = np.sum(cell_indicator.array == OUTSIDE_MARKER) - len(outside_cells)
+    sweep += 1
+    print(f"Sweep {sweep}: Marked {num_new_cells} new cells as outside.")
 cell_tag = dolfinx.mesh.meshtags(
     mesh,
     mesh.topology.dim,
-    np.arange(len(cell_indicator), dtype=np.int32),
-    cell_indicator,
+    np.arange(len(cell_indicator.array), dtype=np.int32),
+    cell_indicator.array,
 )
 
 # Next we plot the new set of tagged cells, which is what we will use as the set of colliding cells for the rest of the tutorial.
 
-cell_grid["refined_collisions"] = cell_tag.values
+surface_grid["refined_collisions"] = cell_tag.values
 plotter_refined_collision = pv.Plotter()
 plotter_refined_collision.add_mesh(
-    cell_grid,
+    surface_grid,
     scalars="refined_collisions",
     show_edges=True,
     cmap="coolwarm",
@@ -342,7 +495,7 @@ plotter_refined_collision.export_html("pyvista_refined_collision.html")
 # %%
 
 ## Creating the reduced mesh
-# We use {py:func}`dolfinx.mesh.create_submesh` to restrict the problem to the marked cells only
+# We use [create_submesh](xref:dolfinx#mesh.create_submesh) to restrict the problem to the marked cells only
 
 submesh, entity_map, vertex_map, _ = dolfinx.mesh.create_submesh(
     mesh, mesh.topology.dim, cell_tag.find(KEEP_MARKER)
@@ -350,7 +503,15 @@ submesh, entity_map, vertex_map, _ = dolfinx.mesh.create_submesh(
 submesh.topology.create_connectivity(submesh.topology.dim - 1, submesh.topology.dim)
 submesh_facets = dolfinx.mesh.exterior_facet_indices(submesh.topology)
 
-submesh_grid = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(submesh))
+submesh_topology, submesh_cell_types, submesh_geometry = dolfinx.plot.vtk_mesh(submesh)
+submesh_cell_types[:] = (
+    pv.CellType.QUAD
+    if submesh.topology.cell_type == dolfinx.mesh.CellType.quadrilateral
+    else submesh_cell_types
+)
+submesh_grid = pv.UnstructuredGrid(
+    submesh_topology, submesh_cell_types, submesh_geometry
+)
 plotter_submesh = pv.Plotter()
 plotter_submesh.add_mesh(
     submesh_grid,

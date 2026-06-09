@@ -26,6 +26,22 @@ project:
     - title: FEniCS on HPC
       children:
         - file: session2/session2.md
+  math:
+   '\nt': '\tilde{\mathbf{n}}'
+   '\nb': '{\color{#009988}{\bar{\mathbf{n}}}}'
+   '\barbf': '\bar{\mathbf{#1}}'
+   '\bartau': '{\color{#EE3377}\bar{\boldsymbol{\tau}}_i}'
+   '\xtilde': '\mathbf{\tilde x}'
+   '\uG': '{\color{#E69F00}\bar{u}_G}'
+   '\duGtau': '{\color{#DDCC77}\bar{u}_{G,\bar{\boldsymbol{\tau}}_i}}'
+   '\intO': '\left(#1, #2\right)_{\tilde\Omega}'
+   '\intG': '\left(#1,#2\right)_{\bar\Gamma}'
+   '\dM': '{\color{#56B4E9}\mathbf{d_M}}'
+
+  references:
+    python: https://docs.python.org/3.13/
+    dolfinx: https://docs.fenicsproject.org/dolfinx/main/python/
+
 site:
   template: book-theme
   options:
