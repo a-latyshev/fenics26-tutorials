@@ -20,9 +20,8 @@ project:
     - file: README.md
     - title: Session 1
       children:
-        - file: session1/session1.md
         - file: session1/shifted_fem_intro.ipynb
-        - file: session1/bunny.ipynb
+        - file: session1/surrogate_grid_creation.ipynb
     - title: FEniCS on HPC
       children:
         - file: session2/session2.md
