@@ -41,8 +41,8 @@ scale = 0.05
 M = 12
 
 # We define the number of nodes in the mesh, which depends on the number of elements and the degree of the Lagrange polynomials.
-# We then define the coordinates of the nodes, which are placed equidistantly on the ellipse.
-#  Finally, we define the connectivity of the mesh, which describes how the nodes are connected to form elements.
+# We then define the coordinates of the `nodes`, which are placed equidistantly on the ellipse.
+#  Finally, we define the `connectivity` of the mesh, which describes how the nodes are connected to form elements.
 
 num_nodes = (M - 1) * (line_degree) + line_degree
 nodes = np.zeros((num_nodes, 2), dtype=np.float64)
@@ -105,19 +105,21 @@ assert true_surface.geometry.index_map().size_global == num_nodes
 # ```
 
 # Furthermore, we create the structured grid we will perform simulations on
+
 domain = ((-0.1, -0.2), (2.1, 2.0))
 nx = ny = 37
 mesh = dolfinx.mesh.create_rectangle(
     MPI.COMM_WORLD, domain, (nx, ny), cell_type=dolfinx.mesh.CellType.quadrilateral
 )
 
-# To illustrate that the true boundary is curved, we use the function [interpolate_geometry](xref:dolfinx#dolfinx.fem.interpolate_geometry)
+# To illustrate that the true boundary is curved, we use the function
+# [interpolate_geometry](xref:dolfinx#dolfinx.fem.interpolate_geometry)
 # to interpolate the geometry into a first order space, i.e. remove all nodes that are not vertices
 
 linear_cmap = dolfinx.fem.coordinate_element(true_surface.topology.cell_type, 1)
 linear_lines = dolfinx.fem.interpolate_geometry(true_surface, linear_cmap)
 
-# +[tags="hide-output"]
+# + tags=["hide-input", "hide-output"]
 import pyvista as pv
 
 topology, cell_types, geometry = dolfinx.plot.vtk_mesh(mesh)
@@ -172,7 +174,8 @@ plotter.export_html("pyvista_true_boundary.html")
 # The next step is to remove all cells that are not intersected by the true boundary $\Gamma$.
 
 # We start by creating a set of [axis-aligned bounding boxes](https://doi.org/10.1137/11085949X)
-# for the cells in the background mesh
+# for the cells in the background mesh using [bb_tree](xref:dolfinx#dolfinx.geometry.bb_tree),
+# which we can use to quickly query which cells are intersected by the true boundary $\Gamma$.
 
 tol = 10 * np.finfo(mesh.geometry.x.dtype).eps
 bulk_cells = mesh.topology.index_map(mesh.topology.dim)
@@ -251,9 +254,11 @@ q_manifold = basix.ufl.quadrature_element(
 Q = dolfinx.fem.functionspace(true_surface, q_manifold)
 refined_surface_nodes = Q.tabulate_dof_coordinates()
 
+# + tags=["hide-input"]
 point_cloud = pv.PolyData(refined_surface_nodes)
 plotter.add_mesh(point_cloud, label="Point cloud", point_size=10.0, color="green")
 plotter.export_html("pyvista_pc_boundary.html")
+# -
 
 # %% [markdown]
 # :::{iframe} ../pyvista/pyvista_pc_boundary.html
@@ -268,7 +273,7 @@ plotter.export_html("pyvista_pc_boundary.html")
 # the distance between th convex hull that makes up each cell of the background mesh
 # and the point cloud that represents the true boundary.
 
-background_cell_nodes = mesh.geometry.x[mesh.geometry.dofmap][colliding_cells]
+background_cell_nodes = mesh.geometry.x[mesh.geometry.dofmaps[0]][colliding_cells]
 cell_indicator = dolfinx.la.vector(
     mesh.topology.index_map(mesh.topology.dim), bs=1, dtype=np.int32
 )
@@ -277,6 +282,7 @@ tol = 10 * np.finfo(refined_surface_nodes.dtype).eps
 cell_indicator.array[colliding_cells] = KEEP_MARKER
 
 # For each node in the interface, we find which cells that contains the nodes.
+
 for i, node in enumerate(refined_surface_nodes):
     distance_vector = dolfinx.geometry.compute_distances_gjk(
         list(background_cell_nodes), node.reshape(-1, 3), num_threads=2
@@ -285,6 +291,10 @@ for i, node in enumerate(refined_surface_nodes):
     cell_indicator.array[colliding_cells[close_cells]] = INTERFACE_MARKER
 cell_indicator.scatter_forward()
 
+# Once we have the interface, we can create an iterative algorithm that starts with the cells that are outside
+# the initial bounding box tree collision and iteratively mark all cells connected to these
+# by using [compute_incident_entities](xref:dolfinx#dolfinx.mesh.compute_incident_entities)
+# until we have marked all cells that are not intersected by the true boundary $\Gamma$.
 
 num_new_cells = 1
 sweep = 0
@@ -312,6 +322,7 @@ cell_tag = dolfinx.mesh.meshtags(
 
 # Next we plot the new set of tagged cells, which is what we will use as the set of colliding cells for the rest of the tutorial.
 
+# + tags=["hide-input"]
 surface_grid["refined_collisions"] = cell_tag.values
 plotter_refined_collision = pv.Plotter()
 plotter_refined_collision.add_mesh(
@@ -327,6 +338,7 @@ plotter_refined_collision.add_mesh(
 plotter_refined_collision.add_legend()
 plotter_refined_collision.view_xy()
 plotter_refined_collision.export_html("pyvista_refined_collision.html")
+# -
 
 # ```{note}
 # Note that GJK is only correct for convex shapes. Therefore, to adapt the method to non-convex shapes,
@@ -353,6 +365,7 @@ submesh, entity_map, vertex_map, _ = dolfinx.mesh.create_submesh(
 submesh.topology.create_connectivity(submesh.topology.dim - 1, submesh.topology.dim)
 submesh_facets = dolfinx.mesh.exterior_facet_indices(submesh.topology)
 
+# + tags=["hide-input"]
 submesh_topology, submesh_cell_types, submesh_geometry = dolfinx.plot.vtk_mesh(submesh)
 submesh_cell_types[:] = (
     pv.CellType.QUAD
@@ -373,6 +386,7 @@ plotter_submesh.add_mesh(
 plotter_submesh.add_legend()
 plotter_submesh.view_xy()
 plotter_submesh.export_html("pyvista_submesh.html")
+# -
 
 # %% [markdown]
 # :::{iframe} ../pyvista/pyvista_submesh.html
@@ -381,38 +395,6 @@ plotter_submesh.export_html("pyvista_submesh.html")
 # :::
 # %%
 
-# ## The shifted boundary method
-#
-# We start creating $u_G$, the boundary condition on the true boundary $\Gamma$.
-# Furthermore, we also define the tangential deriviative along the true boundary, which we will require in the variational formulation.
-
-J = ufl.Jacobian(true_surface)
-tangent_unscaled = ufl.as_vector([J[i, 0] for i in range(true_surface.geometry.dim)])
-t = tangent_unscaled / ufl.sqrt(ufl.dot(tangent_unscaled, tangent_unscaled))
-x_s, y_s = ufl.SpatialCoordinate(true_surface)
-uG = x_s * ufl.cos(y_s)
-duG_dt = ufl.dot(ufl.grad(uG), t)
-
-# In the shifted boundary method, we require a map $M: \bar\Gamma \to \Gamma$ that maps points on the surrogate boundary $\bar\Gamma$ to the true boundary $\Gamma$.
-# As we are working with finite element methods, we actually only need this map at the quadrature points of the surrogate boundary.
-# We therefore create another submesh of the restricted mesh, which only contains the exterior facets of the submesh, which will be our surrogate boundary $\bar\Gamma$.
-
-# Create a vector and scalar quadrature space for integration on the submesh
-facet_qdeg = 4
 facet_submesh, facet_map = dolfinx.mesh.create_submesh(
     submesh, submesh.topology.dim - 1, submesh_facets
 )[:2]
-q_surface = basix.ufl.quadrature_element(
-    facet_submesh.basix_cell(),
-    degree=facet_qdeg,
-    value_shape=(facet_submesh.geometry.dim,),
-)
-Q_facet = dolfinx.fem.functionspace(facet_submesh, q_surface)
-Q_facet_coords = Q_facet.tabulate_dof_coordinates()
-d = dolfinx.fem.Function(Q_facet)
-
-q_scalar_surface = basix.ufl.quadrature_element(
-    facet_submesh.basix_cell(), degree=facet_qdeg, value_shape=()
-)
-Q_scalar_facet = dolfinx.fem.functionspace(facet_submesh, q_scalar_surface)
-np.testing.assert_allclose(Q_scalar_facet.tabulate_dof_coordinates(), Q_facet_coords)
