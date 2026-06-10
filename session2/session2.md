@@ -55,7 +55,7 @@ docker pull spack/ubuntu-noble:develop
 1. Understand the main methods for installing FEniCSx on HPC systems.
 2. Be able to configure FEniCSx at runtime for optimal performance.
 3. Kknow how to assess if an installation provides *reasonable* performance and
-   scalability. 
+   weak scalability. 
 
 ## Overview
 
@@ -91,7 +91,7 @@ DOLFINx binaries aimed at desktop computers (Conda) and
 discourages the use of non-scheduler-integrated launchers e.g. `mpiexec`.
 :::
 
-### Decision tree
+#### Decision tree
 
 1. Does my HPC centre offer pre-built FEniCS via Easybuild or
    [EESSI](https://www.eessi.io), **and** are my requirements met by the binary
@@ -640,13 +640,13 @@ looks OK, then no solution is needed.
 Containers (e.g. [Apptainer/Singularity](https://apptainer.org),
 [Docker](https://docker.io)) bundle the entire software stack into a single
 binary image file stored on shared storage. At job startup, the container
-runtime makes one large sequential copy into local memory, so each MPI rank
-reads a large local file rather than issuing thousands of independent metadata
-requests to the parallel filesystem for individual `.py` and `.so` files. This
-dramatically reduces the metadata load on the parallel filesystem and, in
-practice, eliminates the `import` problem even at large node counts. This was
-demonstrated in [](https://doi.org/10.1109/MCSE.2017.2421459) using the
-[Shifter](https://github.com/NERSC/shifter) runtime, and this applies more
+runtime makes one large sequential copy into fast local storage, so each MPI
+rank reads a large local file rather than issuing thousands of independent
+metadata requests to the parallel filesystem for individual `.py` and `.so`
+files. This dramatically reduces the metadata load on the parallel filesystem
+and, in practice, eliminates the `import` problem even at large node counts.
+This was demonstrated in [](https://doi.org/10.1109/MCSE.2017.2421459) using
+the [Shifter](https://github.com/NERSC/shifter) runtime, and this applies more
 common [Apptainer/Singularity](https://apptainer.org) runtime.
 
 #### Spindle
@@ -794,23 +794,92 @@ srun -n 8 ./dolfinx-scaling-test \
 
 #### Weak scaling test
 
-To execute a weak scaling test we 
+To execute a weak scaling test we typically execute an outer script on the
+login node:
 
-In this repository I have included raw data from a run from DOLFINx 0.11 on the
-Aion cluster built with Spack.
+```bash
+#!/bin/bash
+sbatch -N 1 poisson.sh
+sbatch -N 2 poisson.sh
+sbatch -N 4 poisson.sh
+sbatch -N 8 poisson.sh
+# etc., or in bash loop
+```
+
+which executes an inner script `poisson.sh`:
+
+```bash
+#!/bin/bash
+#SBATCH -J poisson-weak-scaling
+#SBATCH -p batch
+#SBATCH --qos=normal
+#SBATCH --time=0-00:10:00
+#SBATCH --ntasks-per-node=64
+#SBATCH --exclusive
+
+echo "== Starting run at $(date)"
+echo "== Job name: ${SLURM_JOB_NAME}"
+echo "== Job ID: ${SLURM_JOBID}"
+echo "== Node list: ${SLURM_NODELIST}"
+echo "== Submit dir: ${SLURM_SUBMIT_DIR}"
+echo "== Number of tasks: ${SLURM_NTASKS}"
+
+# Setup FEniCSx
+
+cd $SLURM_SUBMIT_DIR
+srun -v ./dolfinx-scaling-test \
+  --problem_type poisson \
+  --scaling_type weak \
+  --ndofs 500000 \
+  -log_view \
+  -ksp_view \
+  -ksp_type cg \
+  -ksp_rtol 1.0e-8 \
+  -pc_type hypre \
+  -pc_hypre_type boomeramg \
+  -pc_hypre_boomeramg_strong_threshold 0.7 \
+  -pc_hypre_boomeramg_agg_nl 4 \
+  -pc_hypre_boomeramg_agg_num_paths 2 \
+  -options_left
+
+echo "== Finished at $(date)"
+```
+
+The [README.md](https://github.com/FEniCS/performance-test/blob/main/README.md)
+gives detailed instructions on interpreting the output which will be written
+to the job log files.
+
+In this repository I have included raw data from a run from DOLFINx 0.11 built
+with Spack on the Aion cluster using the above scripts. I include a short
+section of the output here:
+
+```bash
+TODO
+```
+
+On a reasonably modern cluster you should see comparable (same order of
+magnitude) timings. You should be looking for approximately constant times for
+the DOLFINx assembly and PETSc solve stages with increasing node count. It is
+common to see a slight deterioration in scaling going from 1 node to 2 nodes
+due to the move from shared memory to interconnect-based MPI communication.
+
+## Summary
+
+TODO
 
 ## Credits
 
 My thanks to the following people for their many days/weeks/months fiddling
 with FEniCS on HPC systems over the past decade or so:
 
-- Martin Rehor (University of Luxembourg, UL)
-- Raphaël Bulle (UL, INRIA: talk on $\phi$-FEM on...)
+- Martin Řehoř (former UL, Rafinex Sarl)
+- Raphaël Bulle (former UL, INRIA: poster on $\phi$-FEM on today)
 - Andrey Latyshev (UL, Sorbonne Université, co-organiser)
-- Sona Salehian Ghamsari (UL)
-- Georgios Kafanas (UL, talk on EasyBuild on ...)
-- Jahid Hassan (UL, talk on Easybuild on ...)
-- Chris Richardson (Cambridge University, talk on ...)
+- Thomas Lavigne (former UL, École Polytechnique, talk on Thursday)
+- Georgios Kafanas (UL, talk on EasyBuild/EESSI today)
+- Jahid Hassan (UL, contributor to Easybuild/EESSI talk today)
+- Chris Richardson (Cambridge University, poster and software demo today)
+- Sona Salehian Ghamsari (former UL)
 
 whose shared knowledge has made this guide possible.
 
