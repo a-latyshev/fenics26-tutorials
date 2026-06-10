@@ -34,7 +34,7 @@
 # mesh to a surrogate boundary $\bar\Gamma$.
 #
 # %% [markdown]
-# :::{iframe} ../pyvista/pyvista_submesh.html
+# :::{iframe} ../pyvista/pyvista_surrogate_mesh.html
 # :width: 100%
 # :title: Submesh
 # :::
@@ -107,7 +107,7 @@ L = ufl.inner(f, w) * ufl.dx
 # -
 
 # However, we require $\dM$, $\nt$, $\bartau$, $\uG$ and $\duGtau$ to be implemented on the boundary of the domain.
-# For this we will use a submesh of the original mesh, which only contain the exterior facets.
+# For this we will use a surrogate_mesh of the original mesh, which only contain the exterior facets.
 # For now, this can symbolically be defined as
 
 facet = "interval"
@@ -178,4 +178,4 @@ L -= ufl.inner(ufl.dot(duG_t * t_bar, nt), ufl.dot(ufl.grad(w), dM)) * dsG
 # 2. How do we compute the map $M$ mapping each quadrature point on the surrogate boundary to the closest point on
 #    $\Gamma_h$?
 # 3. How do we transfer the associated quantities $\dM$, $\nb$, $\bartau$, $\uG$ and $\duGtau$?
-#    to the facet submesh?
+#    to the facet surrogate_mesh?

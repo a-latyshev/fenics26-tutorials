@@ -22,7 +22,7 @@
 #
 # First, we start by defining a simple domain $\Omega$, defined through its boundary $\bar\Gamma=\partial\Omega$.
 #
-# The boundary of our real object will be the [fifth parametric heart curve](https://mathworld.wolfram.com/HeartCurve.html),
+# The boundary of our real object will be a smoothed verison of the [fifth parametric heart curve](https://mathworld.wolfram.com/HeartCurve.html),
 # which we will define through arbitrary order Lagrange line segments.
 # First we import the required libaries
 
@@ -37,8 +37,10 @@ import ufl
 
 line_degree = 3
 center = (1.1, 0.9)
-scale = 0.05
-M = 12
+scale = 0.7
+mu = 0.99999
+M = 11
+
 
 # We define the number of nodes in the mesh, which depends on the number of elements and the degree of the Lagrange polynomials.
 # We then define the coordinates of the `nodes`, which are placed equidistantly on the ellipse.
@@ -47,13 +49,8 @@ M = 12
 num_nodes = (M - 1) * (line_degree) + line_degree
 nodes = np.zeros((num_nodes, 2), dtype=np.float64)
 theta = np.linspace(0, 2 * np.pi, nodes.shape[0] + 1, endpoint=True)[:-1]
-nodes[:, 0] = center[0] + (scale * 16 * np.sin(theta) ** 3)
-nodes[:, 1] = center[1] + scale * (
-    13 * np.cos(theta)
-    - 5 * np.cos(2 * theta)
-    - 2 * np.cos(3 * theta)
-    - 1 * np.cos(4 * theta)
-)
+nodes[:, 0] = center[0] + scale * np.sin(theta)
+nodes[:, 1] = center[1] + scale * (np.cos(theta) + mu * np.sin(theta) ** 2)
 
 # Next, we can define the connecitivty of the mesh, which can be easily done with numpy tiling.
 
@@ -107,7 +104,7 @@ assert true_surface.geometry.index_map().size_global == num_nodes
 # Furthermore, we create the structured grid we will perform simulations on
 
 domain = ((-0.1, -0.2), (2.1, 2.0))
-nx = ny = 37
+nx = ny = 23
 mesh = dolfinx.mesh.create_rectangle(
     MPI.COMM_WORLD, domain, (nx, ny), cell_type=dolfinx.mesh.CellType.quadrilateral
 )
@@ -122,34 +119,35 @@ linear_lines = dolfinx.fem.interpolate_geometry(true_surface, linear_cmap)
 # + tags=["hide-input", "hide-output"]
 import pyvista as pv
 
+pv.global_theme.allow_empty_mesh = True
 topology, cell_types, geometry = dolfinx.plot.vtk_mesh(mesh)
 cell_types[:] = (
     pv.CellType.QUAD
     if mesh.topology.cell_type == dolfinx.mesh.CellType.quadrilateral
     else cell_types
 )
-surface_grid = pv.UnstructuredGrid(topology, cell_types, geometry)
-true_surface_grid = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(true_surface))
-linearized_surface_grid = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(linear_lines))
+surrogate_pv = pv.UnstructuredGrid(topology, cell_types, geometry)
+true_surrogate_pv = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(true_surface))
+linearized_surrogate_pv = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(linear_lines))
 plotter = pv.Plotter()
 plotter.add_mesh(
-    surface_grid,
+    surrogate_pv,
     color="darkblue",
     show_edges=True,
     opacity=0.5,
     label="Background mesh",
 )
 plotter.add_mesh(
-    linearized_surface_grid,
+    linearized_surrogate_pv,
     color="blue",
     style="points",
     point_size=15.0,
     label="Mesh vertices",
 )
 plotter.add_mesh(
-    true_surface_grid, color="red", style="points", point_size=10.0, label="Mesh nodes"
+    true_surrogate_pv, color="red", style="points", point_size=10.0, label="Mesh nodes"
 )
-tessellated = true_surface_grid.tessellate(max_n_subdivide=10)
+tessellated = true_surrogate_pv.tessellate(max_n_subdivide=10)
 tessellated.clear_data()
 plotter.add_mesh(
     tessellated,
@@ -208,10 +206,10 @@ values[colliding_cells] = KEEP_MARKER
 initial_tag = dolfinx.mesh.meshtags(
     mesh, mesh.topology.dim, np.arange(num_cells_local, dtype=np.int32), values
 )
-surface_grid.cell_data["colliding"] = values
+surrogate_pv.cell_data["colliding"] = values
 plotter_collision = pv.Plotter()
 plotter_collision.add_mesh(
-    surface_grid,
+    surrogate_pv,
     scalars="colliding",
     show_edges=True,
     cmap="coolwarm",
@@ -323,10 +321,10 @@ cell_tag = dolfinx.mesh.meshtags(
 # Next we plot the new set of tagged cells, which is what we will use as the set of colliding cells for the rest of the tutorial.
 
 # + tags=["hide-input"]
-surface_grid["refined_collisions"] = cell_tag.values
+surrogate_pv["refined_collisions"] = cell_tag.values
 plotter_refined_collision = pv.Plotter()
 plotter_refined_collision.add_mesh(
-    surface_grid,
+    surrogate_pv,
     scalars="refined_collisions",
     show_edges=True,
     cmap="coolwarm",
@@ -351,42 +349,46 @@ plotter_refined_collision.export_html("pyvista_refined_collision.html")
 # We use [create_submesh](xref:dolfinx#dolfinx.mesh.create_submesh)
 # to restrict the problem to the marked cells only
 
-submesh, entity_map, vertex_map, _ = dolfinx.mesh.create_submesh(
+surrogate_mesh, entity_map, vertex_map, _ = dolfinx.mesh.create_submesh(
     mesh, mesh.topology.dim, cell_tag.find(KEEP_MARKER)
 )
-submesh.topology.create_connectivity(submesh.topology.dim - 1, submesh.topology.dim)
-submesh_facets = dolfinx.mesh.exterior_facet_indices(submesh.topology)
+surrogate_mesh.topology.create_connectivity(
+    surrogate_mesh.topology.dim - 1, surrogate_mesh.topology.dim
+)
+surrogate_mesh_facets = dolfinx.mesh.exterior_facet_indices(surrogate_mesh.topology)
 
 # + tags=["hide-input"]
-submesh_topology, submesh_cell_types, submesh_geometry = dolfinx.plot.vtk_mesh(submesh)
-submesh_cell_types[:] = (
+surrogate_mesh_topology, surrogate_mesh_cell_types, surrogate_mesh_geometry = (
+    dolfinx.plot.vtk_mesh(surrogate_mesh)
+)
+surrogate_mesh_cell_types[:] = (
     pv.CellType.QUAD
-    if submesh.topology.cell_type == dolfinx.mesh.CellType.quadrilateral
-    else submesh_cell_types
+    if surrogate_mesh.topology.cell_type == dolfinx.mesh.CellType.quadrilateral
+    else surrogate_mesh_cell_types
 )
-submesh_grid = pv.UnstructuredGrid(
-    submesh_topology, submesh_cell_types, submesh_geometry
+surrogate_mesh_pv = pv.UnstructuredGrid(
+    surrogate_mesh_topology, surrogate_mesh_cell_types, surrogate_mesh_geometry
 )
-plotter_submesh = pv.Plotter()
-plotter_submesh.add_mesh(
-    submesh_grid,
+plotter_surrogate_mesh = pv.Plotter()
+plotter_surrogate_mesh.add_mesh(
+    surrogate_mesh_pv,
     show_edges=True,
 )
-plotter_submesh.add_mesh(
+plotter_surrogate_mesh.add_mesh(
     tessellated, color="red", style="wireframe", label="True boundary"
 )
-plotter_submesh.add_legend()
-plotter_submesh.view_xy()
-plotter_submesh.export_html("pyvista_submesh.html")
+plotter_surrogate_mesh.add_legend()
+plotter_surrogate_mesh.view_xy()
+plotter_surrogate_mesh.export_html("pyvista_surrogate_mesh.html")
 # -
 
 # %% [markdown]
-# :::{iframe} ../pyvista/pyvista_submesh.html
+# :::{iframe} ../pyvista/pyvista_surrogate_mesh.html
 # :width: 100%
 # :title: Submesh
 # :::
 # %%
 
-facet_submesh, facet_map = dolfinx.mesh.create_submesh(
-    submesh, submesh.topology.dim - 1, submesh_facets
+surrogate_facetmesh, facet_map = dolfinx.mesh.create_submesh(
+    surrogate_mesh, surrogate_mesh.topology.dim - 1, surrogate_mesh_facets
 )[:2]
