@@ -41,6 +41,7 @@ project:
   references:
     python: https://docs.python.org/3.13/
     dolfinx: https://docs.fenicsproject.org/dolfinx/main/python/
+    scifem: https://scientificcomputing.github.io/scifem/
 
 site:
   template: book-theme

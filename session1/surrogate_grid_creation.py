@@ -340,14 +340,6 @@ plotter_refined_collision.view_xy()
 plotter_refined_collision.export_html("pyvista_refined_collision.html")
 # -
 
-# ```{note}
-# Note that GJK is only correct for convex shapes. Therefore, to adapt the method to non-convex shapes,
-# one can for instance adapt the sub distance measure to use a
-# [closest point projection method](https://scientificcomputing.github.io/scifem/docs/api.html#scifem.closest_point_projection)
-# (for instance implemented in scifem) in combination with a signed distance or winding number computation.
-# However, this is out of the scope of this tutorial.
-# ```
-
 # %% [markdown]
 # :::{iframe} ../pyvista/pyvista_refined_collision.html
 # :width: 100%

@@ -1,3 +1,4 @@
 jupytext
 jupyter-book
 pyvista[jupyter]
+scifem>=0.20.0
