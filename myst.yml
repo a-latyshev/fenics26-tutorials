@@ -20,11 +20,31 @@ project:
     - file: README.md
     - title: Session 1
       children:
-        - file: session1/session1.md
-        - file: session1/bunny.ipynb
+        - file: session1/shifted_fem_intro.ipynb
+        - file: session1/surrogate_grid_creation.ipynb
+        - file: session1/grid_mapping.ipynb
+        - file: session1/summary.ipynb
+
     - title: FEniCS on HPC
       children:
         - file: session2/session2.md
+  math:
+   '\nt': '\tilde{\mathbf{n}}'
+   '\nb': '{\color{#009988}{\bar{\mathbf{n}}}}'
+   '\barbf': '\bar{\mathbf{#1}}'
+   '\bartau': '{\color{#EE3377}\bar{\boldsymbol{\tau}}_i}'
+   '\xtilde': '\mathbf{\tilde x}'
+   '\uG': '{\color{#E69F00}\bar{u}_G}'
+   '\duGtau': '{\color{#DDCC77}\bar{u}_{G,\bar{\boldsymbol{\tau}}_i}}'
+   '\intO': '\left(#1, #2\right)_{\tilde\Omega}'
+   '\intG': '\left(#1,#2\right)_{\bar\Gamma}'
+   '\dM': '{\color{#56B4E9}\mathbf{d_M}}'
+
+  references:
+    python: https://docs.python.org/3.13/
+    dolfinx: https://docs.fenicsproject.org/dolfinx/main/python/
+    scifem: https://scientificcomputing.github.io/scifem/
+    ufl: https://docs.fenicsproject.org/ufl/2026.1.0/
 site:
   template: book-theme
   options:

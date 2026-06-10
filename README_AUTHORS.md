@@ -5,7 +5,7 @@
 Launch a Docker container with DOLFINx installed
 
 ```shell
-docker run -ti -p 3000 dolfinx/lab:stable
+docker run -ti -p 8888:8888 -e PORT=8888 --name=workshop2026 -v $(pwd):/root/shared -w /root/shared  --entrypoint=/bin/bash ghcr.io/fenics/dolfinx/lab:stable
 ```
 
 Install npm
@@ -38,5 +38,5 @@ To build the site locally:
 and to serve as a website:
 
 ```shell
-python -m http.server 3000 -d _build/html/
+python -m http.server 8888 -d _build/html/ &
 ```
