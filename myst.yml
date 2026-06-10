@@ -18,7 +18,7 @@ project:
 
   toc:
     - file: README.md
-    - title: Session 1
+    - title: Advanced features in FEniCS
       children:
         - file: session1/shifted_fem_intro.ipynb
         - file: session1/surrogate_grid_creation.ipynb
