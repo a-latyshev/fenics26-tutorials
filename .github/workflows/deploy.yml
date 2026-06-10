@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ghcr.io/fenics/dolfinx/lab:v0.10.0
+    container: ghcr.io/fenics/dolfinx/lab:nightly
     env:
       HOST: "127.0.0.1"
       # CI runners are headless; force PyVista/VTK to avoid X-backed windows.
@@ -27,8 +27,8 @@ jobs:
       PYVISTA_JUPYTER_BACKEND: html
       JUPYTER_EXTENSION_ENABLED: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 18.x
       - name: Install Python dependencies
@@ -52,7 +52,7 @@ jobs:
           mkdir -p _build/html/pyvista
           cp session*/pyvista_*.html _build/html/pyvista/
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         id: deployment
         with:
           path: ./_build/html
@@ -70,4 +70,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
