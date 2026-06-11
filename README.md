@@ -20,7 +20,7 @@ the detailed schedule below:
 | Time    | Segment                                   |
 | ------- | ----------------------------------------- |
 | 8:45 - 9:20 | Arrival/Registration of tutorial session participants |
-| 9:20 - 10:10 | [Tutorial session 1 with Jørgen S. Dokken: An exploration of advanced features in DOLFINx through the shifted boundary method](./session1/shifted_fem_intro.md)                |
+| 9:20 - 10:10 | [Tutorial session 1 with Jørgen S. Dokken: An exploration of advanced features in DOLFINx through the shifted boundary method](./session1/shifted_fem_intro.ipynb)                |
 | 10:10 - 10:40 | Coffee break                              |
 | 10:40 - 11:30 | [Tutorial session 2 with Jack S. Hale: A guide to building and running FEniCSx on HPC systems](./session2/session2.md)          |
 | 11:30 - 12:00 | Open QA session.      |
