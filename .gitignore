@@ -9,7 +9,6 @@ _build
 *.json
 *.idx
 *.ipynb
-*.png
 
 # PyVista HTML exports (generated during CI execution)
 *.html
