@@ -4,9 +4,9 @@ extends:
   - ./authors.yml
 project:
   id: 3baef407-2763-41f9-88fe-85d7edc3aa34
-  title: FEniCS 2026 - Advanced Tutorial Sessions 
+  title: FEniCS 2026 - Advanced Tutorial Session 
   # description:
-  keywords: [FEniCSx, finite element method]
+  keywords: [FEniCSx, Finite Element Method, HPC, surrogate grids, shifted boundary method]
   authors:
     - alatyshev
     - jshale
@@ -18,14 +18,14 @@ project:
 
   toc:
     - file: README.md
-    - title: Advanced features in FEniCS
+    - title: Advanced features in FEniCSx/DOLFINx
       children:
         - file: session1/shifted_fem_intro.ipynb
         - file: session1/surrogate_grid_creation.ipynb
         - file: session1/grid_mapping.ipynb
         - file: session1/summary.ipynb
 
-    - title: FEniCS on HPC
+    - title: FEniCSx on HPC
       children:
         - file: session2/session2.md
   math:
