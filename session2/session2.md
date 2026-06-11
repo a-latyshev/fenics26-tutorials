@@ -1022,7 +1022,7 @@ with Spack on the Aion cluster using the above scripts. I include a short
 section of the output here:
 
 ```bash
-TODO
+TODO when aion re-opens
 ```
 
 On a reasonably modern cluster you should see comparable (same order of
@@ -1041,16 +1041,15 @@ I think it's fair to say that installing scientific software has got a lot
 easier since 2005! Particularly impactful has been an increased emphasis on
 scientific software quality (including cross-platform installation and unit
 testing), standardisation efforts, and excellent HPC-specific build tooling.
-These tools have also allowed HPC administrators to ship a higher-quakity set
+These tools have also allowed HPC administrators to ship a better set
 of modules and for initiatives for cross-cluster standardisation, like EESSI
 and 'yearly software sets', to flourish.
 
 That said, the HPC software and hardware landscape is also becoming more
-complicated - users have increasingly complex demands (e.g. runtime
-combinations of complex software, e.g. DOLFINx and
-[PyTorch](https://pytorch.org) on increasingly heterogeneous hardware (ARM,
-NVIDIA, AMD etc.), to the point where 'building from source' may become
-unviable.
+difficult - users have increasingly complex demands (e.g. runtime combinations
+of complex software, e.g. DOLFINx and [PyTorch](https://pytorch.org) on
+increasingly heterogeneous hardware (ARM, NVIDIA, AMD etc.), to the point where
+'building most things from source' may become unviable.
 
 ## Credits
 
