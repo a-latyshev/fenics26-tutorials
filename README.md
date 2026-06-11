@@ -24,7 +24,7 @@ the detailed schedule below:
 | 10:10 - 10:40 | Coffee break                              |
 | 10:40 - 11:30 | [Tutorial session 2 with Jack S. Hale: A guide to building and running FEniCSx on HPC systems](./session2/session2.md)          |
 | 11:30 - 12:00 | Open QA session.      |
-| 1h20   | Free lunch                                |
+| 12:00 - 13:20   | Lunch outside centre/Arrival/Registration of participants                              |
 
 The conference officially starts at 13:20, see the [conference
 programme](https://fenicsproject.org/fenics-2026/programme/).
