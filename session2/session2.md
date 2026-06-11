@@ -44,6 +44,20 @@ docker pull spack/ubuntu-noble:develop
 
 ## Overview
 
+This guide covers three stages of working with FEniCSx on an HPC system. The
+first is [building](#building): choosing between a direct source build, the Easybuild or
+EESSI binary stacks, and the Spack package manager, with a decision tree to
+guide that choice. The second is [runtime configuration](#runtime-configuration): mitigating the two
+most common performance bottlenecks, namely the Python `import` problem and
+just-in-time (JIT) compilation of finite element kernels. The third is
+[testing and benchmarking](#testing-and-benchmarking): running the DOLFINx unit tests and the FEniCSx
+performance test suite to verify correctness and assess parallel scalability
+before committing to large production runs.
+
+This guide is not intended as a comprehensive tutorial for any of the tools
+discussed; rather, it aims to highlight the most impactful decisions and point
+towards the relevant documentation for each tool.
+
 ### Assumptions
 
 1. You are familiar with the basics (launching jobs, module systems etc.) on
@@ -64,22 +78,23 @@ docker pull spack/ubuntu-noble:develop
 Although FEniCS/DOLFINx can be installed in many ways, the only ones relevant
 for good performance on HPC are:
 
-1. **Source**. Build directly from source using system-provided modules, e.g.
+1. **[Source](#source-build)**. Build directly from source using system-provided modules, e.g.
    MPI. Focus on full control over the build, at the cost of manual dependency
    management.
 2. [Easybuild](https://easybuild.io). A build and installation framework for
    scientific software on HPC. Focus on high-quality, well-tested package sets
    released twice a year (e.g. `2024a`, `2024b`). Recently added FEniCSx
-   packages for `2023b` set.
+   packages for `2023b` set. (see [With Easybuild](#with-easybuild))
 3. [Spack](https://spack.io). A flexible build and installation framework for
    complex scientific software stacks. For a full tutorial see [Spack
    101](https://spack-tutorial.readthedocs.io/). Focus on custom stacks across
    compilers and microarchitectures. FEniCSx packages in [the official Package
    repository](https://packages.spack.io), and, if needed, the [FEniCS package
-   repository](https://github.com/fenics/spack-fenics).
+   repository](https://github.com/fenics/spack-fenics). (see [With Spack](#with-spack))
 4. [EESSI](https://www.eessi.io) (European Scientific Software Initiative,
    pronounced 'easy'). Focus on providing a uniform set of binaries across
    European HPC sites. Support for FEniCSx 0.9.0 since early 2026.
+   (see [With EESSI](#european-environment-for-scientific-software-installations-eessi))
 
 :::{important} Always use the system-provided MPI and job launchers 
 For good performance DOLFINx requires an optimal MPI implementation tuned to
@@ -94,16 +109,16 @@ discourages the use of non-scheduler-integrated launchers e.g. `mpiexec`.
 1. Does my HPC centre offer pre-built FEniCS via Easybuild or
    [EESSI](https://www.eessi.io), **and** are my requirements met by the binary
    builds on offer?
-   - **Yes**: Use Easybuild or EESSI — stop here.
+   - **Yes**: Use [Easybuild](#with-easybuild) or [EESSI](#european-environment-for-scientific-software-installations-eessi) — stop here.
    - **No**: Continue to step 2.
 2. Does my HPC provide an up-to-date set of basic dependencies? A
    C++20-compliant compiler, MPI, Python, BLAS, CMake, HDF5, PETSc with
    required solvers (rare!).
-   - **Yes**: Source build, or *partial stack* Spack build — stop here.
-   - **No**: *Full stack* Spack build. MPI setup can be an issue. 
+   - **Yes**: [Source build](#source-build), or *partial stack* [Spack build](#with-spack) — stop here.
+   - **No**: *Full stack* [Spack build](#with-spack). MPI setup can be an issue. 
    3. Do I have extensive custom requirements, e.g. integration with gmsh, JAX,
    pytorch, or exotic compiler toolchains (Intel, AOCC, NVIDIA)?
-   - **Yes**: Spack build (partial or full stack).
+   - **Yes**: [Spack build](#with-spack) (partial or full stack).
 4. Do I have strict reproducibility requirements?
    - **Yes**: Wrap your chosen approach in a container image and execute in an
      HPC-aware container runtime (e.g. Apptainer/Singularity).
@@ -449,7 +464,8 @@ cover only some aspects related to installing and running FEniCS.
 
 On a cluster, the *partial stack* approach works well in practice: we tell
 Spack to reuse the scheduler-integrated and interconnect-tuned MPI along with
-the compiler from the module system, and then build everything else itself.
+the compiler from the module system (e.g. as provided by [Easybuild](#with-easybuild)),
+and then build everything else itself.
 This is what we use for most internal projects at the University of Luxembourg.
 
 #### Setting up Spack
@@ -908,9 +924,9 @@ DOLFINx source code.
 We are currently in the process of integrating the execution of FEniCS unit
 tests and sanity checks into
 [Easybuild](https://docs.easybuild.io/writing-easyconfig-files/#sanity-check)
-and
+(see [§ With Easybuild](#with-easybuild)) and
 [Spack](https://spack.readthedocs.io/en/latest/packaging_guide_testing.html)
-package recipes - this will allow the test suites to be executed automatically.
+(see [§ With Spack](#with-spack)) package recipes - this will allow the test suites to be executed automatically.
 
 ### FEniCS performance tests
 
