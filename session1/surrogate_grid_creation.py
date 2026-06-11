@@ -198,14 +198,12 @@ bbox_surface_glob = bbox_surface.create_global_tree(true_surface.comm)
 bulk_elements = dolfinx.geometry.compute_collisions_trees(bbox_bulk, bbox_surface_glob)
 colliding_cells = np.unique(bulk_elements[:, 0])
 
-# We visualize this
 OUTSIDE_MARKER = 0
 KEEP_MARKER = 2
+
+# + tags=["hide-input", "hide-output"]
 values = np.full(num_cells_local, OUTSIDE_MARKER, dtype=np.int32)
 values[colliding_cells] = KEEP_MARKER
-initial_tag = dolfinx.mesh.meshtags(
-    mesh, mesh.topology.dim, np.arange(num_cells_local, dtype=np.int32), values
-)
 surrogate_pv.cell_data["colliding"] = values
 plotter_collision = pv.Plotter()
 plotter_collision.add_mesh(
@@ -221,6 +219,7 @@ plotter_collision.add_mesh(
 plotter_collision.add_legend()
 plotter_collision.view_xy()
 plotter_collision.export_html("pyvista_bb_collisions.html")
+# -
 
 # %% [markdown]
 # :::{iframe} ../pyvista/pyvista_bb_collisions.html
@@ -252,7 +251,7 @@ q_manifold = basix.ufl.quadrature_element(
 Q = dolfinx.fem.functionspace(true_surface, q_manifold)
 refined_surface_nodes = Q.tabulate_dof_coordinates()
 
-# + tags=["hide-input"]
+# + tags=["hide-input", "hide-output"]
 point_cloud = pv.PolyData(refined_surface_nodes)
 plotter.add_mesh(point_cloud, label="Point cloud", point_size=10.0, color="green")
 plotter.export_html("pyvista_pc_boundary.html")
