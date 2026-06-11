@@ -22,7 +22,7 @@
 #
 # First, we start by defining a simple domain $\Omega$, defined through its boundary $\bar\Gamma=\partial\Omega$.
 #
-# The boundary of our real object will be a smoothed verison of the [fifth parametric heart curve](https://mathworld.wolfram.com/HeartCurve.html),
+# The boundary of our real object will be a [Limacon](https://en.wikipedia.org/wiki/Lima%C3%A7on),
 # which we will define through arbitrary order Lagrange line segments.
 # First we import the required libaries
 
@@ -36,11 +36,9 @@ import ufl
 # and the Lagrange degree of the elements.
 
 line_degree = 3
-center = (1.1, 0.9)
-scale = 0.7
-mu = 0.99999
-M = 11
-
+center = (1.15, 1.4)
+scale = 0.6
+M = 13
 
 # We define the number of nodes in the mesh, which depends on the number of elements and the degree of the Lagrange polynomials.
 # We then define the coordinates of the `nodes`, which are placed equidistantly on the ellipse.
@@ -49,8 +47,17 @@ M = 11
 num_nodes = (M - 1) * (line_degree) + line_degree
 nodes = np.zeros((num_nodes, 2), dtype=np.float64)
 theta = np.linspace(0, 2 * np.pi, nodes.shape[0] + 1, endpoint=True)[:-1]
-nodes[:, 0] = center[0] + scale * np.sin(theta)
-nodes[:, 1] = center[1] + scale * (np.cos(theta) + mu * np.sin(theta) ** 2)
+a = 1
+b = 0.9
+
+x_p = (a + b * np.cos(theta)) * np.cos(theta)
+y_p = (a + b * np.cos(theta)) * np.sin(theta)
+psi = -np.pi / 2
+rotation = np.array([[np.cos(psi), -np.sin(psi)], [np.sin(psi), np.cos(psi)]])
+x_rot, y_rot = rotation @ np.array([x_p, y_p])
+nodes[:, 0] = center[0] + scale * x_rot
+nodes[:, 1] = center[1] + scale * y_rot
+
 
 # Next, we can define the connecitivty of the mesh, which can be easily done with numpy tiling.
 
@@ -132,20 +139,19 @@ linearized_surrogate_pv = pv.UnstructuredGrid(*dolfinx.plot.vtk_mesh(linear_line
 plotter = pv.Plotter()
 plotter.add_mesh(
     surrogate_pv,
-    color="darkblue",
-    show_edges=True,
-    opacity=0.5,
+    style="wireframe",
+    color="black",
     label="Background mesh",
 )
 plotter.add_mesh(
-    linearized_surrogate_pv,
-    color="blue",
-    style="points",
-    point_size=15.0,
-    label="Mesh vertices",
+    true_surrogate_pv, color="blue", style="points", point_size=10.0, label="Mesh nodes"
 )
 plotter.add_mesh(
-    true_surrogate_pv, color="red", style="points", point_size=10.0, label="Mesh nodes"
+    linearized_surrogate_pv,
+    color="orange",
+    style="points",
+    point_size=25.0,
+    label="Mesh vertices",
 )
 tessellated = true_surrogate_pv.tessellate(max_n_subdivide=10)
 tessellated.clear_data()
@@ -214,7 +220,7 @@ plotter_collision.add_mesh(
     label="Colliding cells",
 )
 plotter_collision.add_mesh(
-    tessellated, color="red", style="wireframe", label="True boundary"
+    tessellated, color="red", style="wireframe", label="True boundary", line_width=2.0
 )
 plotter_collision.add_legend()
 plotter_collision.view_xy()
