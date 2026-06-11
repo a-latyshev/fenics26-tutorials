@@ -480,6 +480,17 @@ module spider compiler/GCCcore
 While making notes of version numbers. I then `module load` all of the modules
 and check for warning messages related to e.g. compatibility.
 
+:::{seealso} Official site support?
+:class: dropdown
+:open: false
+If your site officially supports Spack, `packages.yaml` may already be provided
+in `/etc/spack`. For example, [ARCHER2
+Spack](https://docs.archer2.ac.uk/data-tools/spack/) is already setup to use
+the HPE Cray Programming Environment (Cray LibSci, Cray MPICH etc.) and has a
+large repository of cached package builds to speedup user builds and reduce
+storage quota use.
+:::
+
 Then, create `~/.spack/packages.yaml` with entries for each system-provided
 package. The *abbreviated* example below is for the University of Luxembourg
 `aion` cluster (GCC 13.2.0, OpenMPI 4.1.6, SLURM):
@@ -567,38 +578,194 @@ While writing this tutorial, I realised I should probably also add `xz` to the
 
 #### Building FEniCS
 
-I will now walk through the process of a partial stack build on Ubuntu 26.04
-using MPICH. 
+I will now walk through the process of building DOLFINx C++ 0.10 on Ubuntu
+24.04 using MPICH and GCC provided by the system packages - this (somewhat)
+approximates the experience of doing this on an HPC, although it is not
+necessary to deal with the HPC modules system in Ubuntu.
 
-Create a Spack environment and add the FEniCSx specs:
+Begin by launching a Ubuntu 24.04-based Spack container. This has `spack`
+preinstalled.
+
+```bash
+docker run -ti --rm spack/ubuntu-noble:develop 
+```
+
+All subsequent commands are run inside the container.
+
+Then install `libmpich-dev` (and `nano`!) from Ubuntu packages with `apt`:
+
+```bash
+apt update
+apt install libmpich-dev nano
+```
+
+We now need to setup Spack to use the system MPICH. This can be done by editing
+`~/spack/packages.yaml` which will already contain information about how to use
+the system-provided GCC:
+
+```
+packages:
+  gcc:
+    externals:
+    - spec: gcc@13.3.0 languages:='c,c++,fortran'
+      prefix: /usr
+      extra_attributes:
+        compilers:
+          c: /usr/bin/gcc
+          cxx: /usr/bin/g++
+          fortran: /usr/bin/gfortran
+```
+
+:::{seealso} Finding compilers on an HPC
+:class: dropdown
+:open: false
+On an HPC system, it is normally possible to load a compiler related module and
+then use `spack compiler find` to automatically complete `packages.yaml`, e.g.:
+
+```bash
+module load compiler/GCC/13.2.0
+spack compiler find
+```
+
+After running `spack compiler find` I recommend removing compilers that you
+don't want to use - often ancient GCC versions distributed by RedHat are
+detected, for example.
+:::
+
+`~/.spack/packages.yaml` can be modified to contain:
+
+```
+packages:
+  gcc:
+    externals:
+    - spec: gcc@13.3.0 languages:='c,c++,fortran'
+      prefix: /usr
+      extra_attributes:
+        compilers:
+          c: /usr/bin/gcc
+          cxx: /usr/bin/g++
+          fortran: /usr/bin/gfortran
+  # This is quite minimal - could also add hwloc, ucx, pmix etc.
+  mpich:
+    variants: netmod=ucx device=ch4 pmi=pmix
+    externals:
+    - spec: mpich@4.2.0+fortran
+      prefix: /usr
+    buildable: false
+  mpi:
+    buildable: false
+```
+
+We create an isolated Spack environment and ask Spack to add DOLFINx C++ 0.10 to 
+its spec (specification):
 
 ```bash
 spack env create -d ~/fenicsx-env/
 spack env activate ~/fenicsx-env/
-spack add py-fenics-dolfinx@0.10 ^fenics-dolfinx+adios2 ^adios2+python ^petsc+mumps
+spack add fenics-dolfinx@0.10
+```
+
+:::{seealso} DOLFINx Python and useful dependencies
+:class: dropdown
+:open: false
+
+The above example is a very minimal install - something more useful might be:
+
+```bash
+spack add py-fenics-dolfinx@0.10+petsc4py ^fenics-dolfinx+adios2 ^petsc+mumps+hypre ^adios2+python
+spack add gmsh+opencascade
+```
+:::
+
+We can then concretize the spec and inspect the output
+
+```bash
 spack concretize
+```
+
+gives:
+
+```
+ -   6l4eiqq  fenics-dolfinx@0.10.0.post4~adios2~ipo~petsc~slepc build_system=cmake build_type=RelWithDebInfo generator=make partitioners:=parmetis platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   p2nn264      ^boost@1.90.0~atomic~charconv~chrono~clanglibcpp~container~context~contract~conversion~date_time~debug~exception~fiber~filesystem~graph~graph_parallel~icu~iostreams~json~locale~log~math~mpi~mqtt5+multithreaded~nowide~numpy~openmethod~pic~program_options~python~random~regex~serialization+shared~signals2~singlethreaded~stacktrace~system~taggedlayout~test~thread~timer~type_erasure~url~versionedlayout~wave build_system=generic cxxstd=11 patches:=a440f96 visibility=hidden platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   fq22rga      ^cmake@3.31.11~doc+ncurses+ownlibs~qtgui build_system=generic build_type=Release platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   wxv5vhz          ^curl@8.20.0~gssapi~ldap~libidn2~librtmp~libssh~libssh2+nghttp2 build_system=autotools libs:=shared,static tls:=openssl platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   exfoem5              ^nghttp2@1.67.1 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   amzmsz3              ^openssl@3.6.1~docs+shared build_system=generic certs=mozilla platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   d7ca4nc                  ^ca-certificates-mozilla@2026-03-19 build_system=generic platform=linux os=ubuntu24.04 target=aarch64
+ -   lyw4g2i                  ^perl@5.42.0+cpanm+opcode+open+shared+threads build_system=generic platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   ovpkjrj                      ^berkeley-db@18.1.40+cxx~docs+stl build_system=autotools patches:=26090f4,b231fcc platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   zfz2pgv                      ^gdbm@1.26 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   xs4t3x2                          ^readline@8.3 build_system=autotools patches:=21f0a03 platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   2hvpi2y                      ^less@692 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   xfbth5w          ^ncurses@6.6~symlinks+termlib abi=none build_system=autotools patches:=7a351bc platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   zpbobzc          ^zlib-ng@2.3.3+compat+new_strategies+opt+pic+shared build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   6zpo3h7      ^compiler-wrapper@1.1.0 build_system=generic platform=linux os=ubuntu24.04 target=aarch64
+ -   u2pmqun      ^fenics-basix@0.10.0.post0~ipo build_system=cmake build_type=RelWithDebInfo generator=make platform=linux os=ubuntu24.04 target=aarch64 %cxx=gcc@13.3.0
+ -   x4ipjkj          ^openblas@0.3.33~bignuma~consistent_fpcsr+dynamic_dispatch+fortran~ilp64+locking+pic+shared~static build_system=makefile patches:=723ddc1 symbol_suffix=none threads=none platform=linux os=ubuntu24.04 target=aarch64 %c,cxx,fortran=gcc@13.3.0
+ -   qqjkyda      ^fenics-ufcx@0.10.0~ipo build_system=cmake build_type=Release generator=make platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+[e]  23jct2d      ^gcc@13.3.0+binutils+bootstrap~graphite+libsanitizer~mold~nvptx~piclibs~profiled~strip build_system=autotools build_type=RelWithDebInfo languages:='c,c++,fortran' platform=linux os=ubuntu24.04 target=aarch64
+ -   4jxqg6q      ^gcc-runtime@13.3.0 build_system=generic platform=linux os=ubuntu24.04 target=aarch64
+[e]  wqjtbsv      ^glibc@2.39 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64
+ -   vjzdhhz      ^gmake@4.4.1~guile build_system=generic platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   nwt5azx      ^hdf5@1.14.6~cxx~fortran~hl~ipo~java~map+mpi+shared~subfiling~szip~threadsafe+tools api=default build_system=cmake build_type=Release generator=make platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+[e]  wdv3m6g      ^mpich@4.2.0~argobots~cuda+fortran+hwloc+hydra~level_zero+libxml2+pci~rocm+romio~slurm~vci~verbs+wrapperrpath~xpmem build_system=autotools datatype-engine=auto device=ch4 netmod=ofi pmi=default platform=linux os=ubuntu24.04 target=aarch64
+ -   fa3jylq      ^parmetis@4.0.3~gdb~int64~ipo+shared build_system=cmake build_type=Release generator=make patches:=4f89253,50ed208,704b84f platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   p5yxbwj          ^metis@5.1.0~gdb~int64~ipo~no_warning~real64+shared build_system=cmake build_type=Release generator=make patches:=4991da9,93a7903,b1225da platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   pvvyxwe      ^pkgconf@2.5.1 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   jvnxyfr          ^gnuconfig@2025-07-10 build_system=generic platform=linux os=ubuntu24.04 target=aarch64
+ -   zhao4o3      ^pugixml@1.15~ipo+pic+shared build_system=cmake build_type=Release generator=make platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   uayylpc      ^scotch@7.0.11+compression~esmumps+fortran~int64~ipo~metis+mpi~mpi_thread~noarch+shared+threads build_system=cmake build_type=Release determinism=FIXED_SEED generator=make platform=linux os=ubuntu24.04 target=aarch64 %c,cxx,fortran=gcc@13.3.0
+ -   j6glmqg          ^bison@3.8.2~color build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   5mu32rv              ^diffutils@3.12 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   p3s4r7r                  ^libiconv@1.18 build_system=autotools libs:=shared,static platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   gja25k4              ^m4@1.4.21+sigsegv build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   kbxeckq                  ^libsigsegv@2.15 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   x57xudo          ^flex@2.6.4+lex~nls build_system=autotools patches:=f8b85a0 platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   atrwke6              ^autoconf@2.72 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64
+ -   2pmdyb6              ^automake@1.18.1 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   qrm6ttv              ^findutils@4.10.0 build_system=autotools patches:=440b954 platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   ytycm3s              ^gettext@1.0+bzip2+curses+git~libunistring+libxml2+pic+shared+tar+xz build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   hvoozan                  ^bzip2@1.0.8~debug~pic+shared build_system=generic platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   trlqzm2                  ^libxml2@2.15.3+pic~python+shared build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   v5ossow                  ^tar@1.35 build_system=autotools zip=pigz platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   gy44cjn                      ^pigz@2.8 build_system=makefile platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   elrdemo                      ^zstd@1.5.7+programs build_system=makefile compression:=none libs:=shared,static platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+ -   qao34e6                  ^xz@5.8.3~pic build_system=autotools libs:=shared,static platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   rwwo32e              ^help2man@1.49.3 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   ttxrt6k              ^libtool@2.5.4 build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   heqsdot                  ^file@5.46+static build_system=autotools platform=linux os=ubuntu24.04 target=aarch64 %c=gcc@13.3.0
+ -   ewp6ngh      ^spdlog@1.16.0~ipo+shared build_system=cmake build_type=Release cxxstd=14 generator=make patches:=fdc325d platform=linux os=ubuntu24.04 target=aarch64 %cxx=gcc@13.3.0
+ -   nncmdbb          ^fmt@12.1.0~ipo+pic~shared build_system=cmake build_type=Release cxxstd=11 generator=make platform=linux os=ubuntu24.04 target=aarch64 %c,cxx=gcc@13.3.0
+```
+
+Here the `[e]` denotes a system provided package, and `[-]` denotes a package
+that will be built. Spack caches packages intelligently - if a package had
+already been built it would have `[+]` at the side.
+
+If we are happy with the concretization, we can proceed with:
+
+```bash
 spack install
 ```
 
-#### Testing and using the build
+which can take around 30 minutes. On a bigger machine parallel jobs are
+possible with `spack install -p2 -j4` for e.g. 2 package builds with 4 build
+processes per package.
 
-Quickly verify the build works under MPI:
-
-```bash
-mpiexec -n 1 python -c "from mpi4py import MPI; import dolfinx"
-```
 
 ## Runtime configuration
 
-Two of the most common and impactful runtime performance problems on HPC
-systems are caused not by the numerical computation itself, but by disk access
-patterns during program startup and just-in-time compilation (JIT). HPC storage
-systems are optimised for high aggregate throughput on large sequential reads
-and writes - the kind generated by parallel I/O libraries such as HDF5 or
-ADIOS2. They perform poorly under workloads that issue many small, random, or
-metadata-heavy operations, which is precisely the access pattern generated when
-Python initialises and loads modules, and when FEniCSx performs just-in-time
-compilation of finite element kernels.
+Two of the most common and impactful runtime performance problems when using
+DOLFINx on HPC systems are caused not by the numerical computation itself, but
+by disk access patterns during program startup and just-in-time compilation
+(JIT). HPC storage systems are optimised for high aggregate throughput on large
+sequential reads and writes - the kind generated by DOLFINx parallel IO using
+as HDF5 or ADIOS2. However, they perform poorly under workloads that issue many
+small, random, or metadata-heavy operations, which is precisely the access
+pattern generated when Python initialises and loads modules, and when
+DOLFINx/FFCx performs just-in-time compilation, or cache reads, of finite
+element kernels.
 
 ### The Python `import` problem 
 
@@ -621,6 +788,7 @@ up to the maximum number needed for your analysis, e.g.:
 ```bash
 #!/bin/bash -l
 # SBATCH directives
+
 # Initialisation
 
 SCRIPT_START=$(date +%s)
@@ -824,7 +992,7 @@ echo "== Node list: ${SLURM_NODELIST}"
 echo "== Submit dir: ${SLURM_SUBMIT_DIR}"
 echo "== Number of tasks: ${SLURM_NTASKS}"
 
-# Setup FEniCSx
+# Setup FEniCSx (module load, spack activate etc.)
 
 cd $SLURM_SUBMIT_DIR
 srun -v ./dolfinx-scaling-test \
@@ -863,9 +1031,26 @@ the DOLFINx assembly and PETSc solve stages with increasing node count. It is
 common to see a slight deterioration in scaling going from 1 node to 2 nodes
 due to the move from shared memory to interconnect-based MPI communication.
 
-## Summary
+## Closing thoughts
 
-TODO
+> The third hardest thing in scientific computing is installing software on
+> someone else's computer.
+> **Jack S. Hale, FEniCS Conference 2026.**
+
+I think it's fair to say that installing scientific software has got a lot
+easier since 2005! Particularly impactful has been an increased emphasis on
+scientific software quality (including cross-platform installation and unit
+testing), standardisation efforts, and excellent HPC-specific build tooling.
+These tools have also allowed HPC administrators to ship a higher-quakity set
+of modules and for initiatives for cross-cluster standardisation, like EESSI
+and 'yearly software sets', to flourish.
+
+That said, the HPC software and hardware landscape is also becoming more
+complicated - users have increasingly complex demands (e.g. runtime
+combinations of complex software, e.g. DOLFINx and
+[PyTorch](https://pytorch.org) on increasingly heterogeneous hardware (ARM,
+NVIDIA, AMD etc.), to the point where 'building from source' may become
+unviable.
 
 ## Credits
 
