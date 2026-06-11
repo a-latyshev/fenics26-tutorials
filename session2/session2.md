@@ -26,13 +26,6 @@ During the tutorial session I will present this material in summary form and
 give a brief interactive demo on installing FEniCS with
 [Spack](https://spack-tutorial.readthedocs.io/en/latest/).
 
-The most important points will be called out and summarised as a TL;DR at the
-end:
-
-:::{important} Important point
-A very important point about FEniCS on HPC!
-:::
-
 ### Before the session
 
 Ensure that you have a container runtime installed (e.g. `docker` or `podman`)
@@ -116,7 +109,7 @@ discourages the use of non-scheduler-integrated launchers e.g. `mpiexec`.
    required solvers (rare!).
    - **Yes**: [Source build](#source-build), or *partial stack* [Spack build](#with-spack) — stop here.
    - **No**: *Full stack* [Spack build](#with-spack). MPI setup can be an issue. 
-   3. Do I have extensive custom requirements, e.g. integration with gmsh, JAX,
+3. Do I have extensive custom requirements, e.g. integration with gmsh, JAX,
    pytorch, or exotic compiler toolchains (Intel, AOCC, NVIDIA)?
    - **Yes**: [Spack build](#with-spack) (partial or full stack).
 4. Do I have strict reproducibility requirements?
