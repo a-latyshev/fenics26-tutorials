@@ -938,8 +938,22 @@ find an HPC centre willing to allow bot access for security reasons.
 
 #### Building and running
 
-Once you have DOLFINx C++ and FFCx installed, you can build the performance
-tests:
+With the following `spac.yaml` file:
+
+```
+spack:
+  specs:
+  - >-
+    fenics-dolfinx@0.11+adios2+superlu-dist+petsc
+    partitioners=parmetis %petsc+mumps+hypre+superlu-dist+int64
+    %boost+program_options
+  - py-fenics-ffcx@0.11
+  view: true
+  concretizer:
+    unify: true
+```
+
+it is possible to build the DOLFINx performance tests:
 
 ```bash
 git clone https://github.com/fenics/performance-test
@@ -951,7 +965,7 @@ cmake --build build-dir/
 which will produce a binary `build-dir/dolfinx-scaling-test` that can be executed using:
 
 ```bash
-srun -n 8 ./dolfinx-scaling-test \
+srun -n 8 ./build-dir/dolfinx-scaling-test \
   --problem_type poisson \
   --scaling_type weak \
   --ndofs 500000 \
@@ -973,18 +987,18 @@ To execute a weak scaling test we typically execute an outer script on the
 login node:
 
 ```bash
-#!/bin/bash
+#!/bin/bash -l
 sbatch -N 1 poisson.sh
 sbatch -N 2 poisson.sh
 sbatch -N 4 poisson.sh
 sbatch -N 8 poisson.sh
-# etc., or in bash loop
+# etc., or in a bash loop
 ```
 
 which executes an inner script `poisson.sh`:
 
 ```bash
-#!/bin/bash
+#!/bin/bash -l
 #SBATCH -J poisson-weak-scaling
 #SBATCH -p batch
 #SBATCH --qos=normal
@@ -1002,7 +1016,7 @@ echo "== Number of tasks: ${SLURM_NTASKS}"
 # Setup FEniCSx (module load, spack activate etc.)
 
 cd $SLURM_SUBMIT_DIR
-srun -v ./dolfinx-scaling-test \
+srun -v ./build-dir/dolfinx-scaling-test \
   --problem_type poisson \
   --scaling_type weak \
   --ndofs 500000 \
@@ -1026,17 +1040,50 @@ to the job log files.
 
 In this repository I have included raw data from a run from DOLFINx 0.11 built
 with Spack on the Aion cluster using the above scripts. I include a short
-section of the output here:
+section of the output here for 8 nodes with around 250 million degrees of
+freedom:
 
 ```bash
-TODO when aion re-opens
+[MPI_MAX] Summary of timings (s)                                            |  reps        avg        tot
+---------------------------------------------------------------------------------------------------------
+...
+ZZZ Assemble                                                                |     1   7.953762   7.953762
+ZZZ Assemble matrix                                                         |     1   2.804849   2.804849
+ZZZ Assemble vector                                                         |     1   0.604345   0.604345
+ZZZ Create Mesh                                                             |     1  51.775194  51.775194
+ZZZ Create RHS function                                                     |     1   2.287077   2.287077
+ZZZ Create boundary conditions                                              |     1   0.269884   0.269884
+ZZZ Create facets and facet->cell connectivity                              |     1   7.984695   7.984695
+ZZZ FunctionSpace                                                           |     1   0.812768   0.812768
+ZZZ Solve                                                                   |     1  20.749977  20.749977
 ```
 
+and 32 nodes with around 1 billion degrees of freedom:
+
+```bash
+[MPI_MAX] Summary of timings (s)                                            |  reps        avg        tot
+---------------------------------------------------------------------------------------------------------
+...
+ZZZ Assemble                                                                |     1   8.878067   8.878067
+ZZZ Assemble matrix                                                         |     1   2.874386   2.874386
+ZZZ Assemble vector                                                         |     1   0.637582   0.637582
+ZZZ Create Mesh                                                             |     1  61.881765  61.881765
+ZZZ Create RHS function                                                     |     1   2.828008   2.828008
+ZZZ Create boundary conditions                                              |     1   0.336124   0.336124
+ZZZ Create facets and facet->cell connectivity                              |     1   8.825502   8.825502
+ZZZ FunctionSpace                                                           |     1   0.920955   0.920955
+ZZZ Solve                                                                   |     1  25.791648  25.791648
+```
+
+The raw job outputs are available in this repository in
+`session2/weak-scaling`.
+
 On a reasonably modern cluster you should see comparable (same order of
-magnitude) timings. You should be looking for approximately constant times for
-the DOLFINx assembly and PETSc solve stages with increasing node count. It is
-common to see a slight deterioration in scaling going from 1 node to 2 nodes
-due to the move from shared memory to interconnect-based MPI communication.
+magnitude) absolute timings. You should be looking for approximately constant
+times for the DOLFINx assembly and PETSc solve stages with increasing node
+count (weak scaling). It is common to see a slight deterioration in scaling
+going from 1 node to 2 nodes due to the move from shared memory to
+interconnect-based MPI communication.
 
 ## Closing thoughts
 
