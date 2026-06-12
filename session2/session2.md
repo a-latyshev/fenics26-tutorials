@@ -1043,7 +1043,7 @@ with Spack on the Aion cluster using the above scripts. I include a short
 section of the output here for 8 nodes with around 250 million degrees of
 freedom:
 
-```bash
+```
 [MPI_MAX] Summary of timings (s)                                            |  reps        avg        tot
 ---------------------------------------------------------------------------------------------------------
 ...
@@ -1060,7 +1060,7 @@ ZZZ Solve                                                                   |   
 
 and 32 nodes with around 1 billion degrees of freedom:
 
-```bash
+```
 [MPI_MAX] Summary of timings (s)                                            |  reps        avg        tot
 ---------------------------------------------------------------------------------------------------------
 ...
@@ -1075,8 +1075,8 @@ ZZZ FunctionSpace                                                           |   
 ZZZ Solve                                                                   |     1  25.791648  25.791648
 ```
 
-The raw job outputs are available in this repository in
-`session2/weak-scaling`.
+The raw job outputs for various numbers of nodes are available in this
+repository in `session2/weak-scaling`.
 
 On a reasonably modern cluster you should see comparable (same order of
 magnitude) absolute timings. You should be looking for approximately constant
