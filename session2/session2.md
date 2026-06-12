@@ -51,18 +51,18 @@ This guide is not intended as a comprehensive tutorial for any of the tools
 discussed; rather, it aims to highlight the most impactful decisions and point
 towards the relevant documentation for each tool.
 
-### Assumptions
-
+:::{hint} Assumptions
 1. You are familiar with the basics (launching jobs, module systems etc.) on
    your HPC.
 2. You have built software from source, although perhaps not on your HPC.
+:::
 
-### Learning outcomes
-
+:::{hint} Learning outcomes
 1. Understand the main methods for installing FEniCSx on HPC systems.
 2. Be able to configure FEniCSx at runtime for optimal performance.
 3. Know how to assess if an installation provides *reasonable* performance and
-   weak scalability. 
+   weak scalability.
+:::
 
 ## Building
 
