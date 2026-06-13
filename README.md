@@ -29,6 +29,28 @@ the detailed schedule below:
 The conference officially starts at 13:20, see the [conference
 programme](https://fenicsproject.org/fenics-2026/programme/).
 
+## How to use
+
+To run the tutorials it is sufficient to download a container with v0.11.0 of
+FEniCSx using docker or podman
+```shell
+docker run -ti -p 8888:8888 -e PORT=8888 --name=workshop2026 -v $(pwd):/root/shared -w /root/shared  --entrypoint=/bin/bash ghcr.io/fenics/dolfinx/lab:v0.11.0
+```
+Here we use a Jupyter Lab environment with pre-installed PyVista.
+
+Install dependeces
+```shell
+apt-get update
+pip install scifem>=0.20.0
+```
+
+Clone repo
+```shell
+git clone https://github.com/a-latyshev/fenics26-tutorials.git
+```
+
+(Optional) to build the book via Jupyter Book 2 (MyST), follow instructions: [README_AUTHORS](./README_AUTHORS.md).
+
 ## Authors
 
 - Jørgen S. Dokken, Simula Research Laboratory
