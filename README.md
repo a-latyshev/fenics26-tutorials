@@ -4,8 +4,8 @@ Welcome to the repository with tutorials for the hands-on session at the [FEniCS
 2026](https://fenicsproject.org/fenics-2026/) conference! This session is
 designed for participants who are already familiar with the basic usage of
 [FEniCSx](https://fenicsproject.org/documentation/). We will explore advanced
-features and best practices for using [FEniCSx
-v0.10.0](https://github.com/FEniCS/dolfinx/releases/tag/v0.10.0.post5).
+features of [v0.10.0](https://docs.fenicsproject.org/dolfinx/v0.10.0.post5/python/release_notes.html) 
+and [v0.11.0](https://github.com/FEniCS/dolfinx/releases/tag/v0.11.0) of FEniCSx.
 
 ## Schedule 
 
@@ -19,15 +19,37 @@ the detailed schedule below:
 
 | Time    | Segment                                   |
 | ------- | ----------------------------------------- |
-| 8:45 - 9:20 | Arrival/Registration of participants |
-| 9:20 - 10:10 | [Practice session 1](./session1/session1.md)                |
+| 8:45 - 9:20 | Arrival/Registration of tutorial session participants |
+| 9:20 - 10:10 | [Tutorial session 1 with Jørgen S. Dokken: An exploration of advanced features in DOLFINx through the shifted boundary method](./session1/shifted_fem_intro.ipynb)                |
 | 10:10 - 10:40 | Coffee break                              |
-| 10:40 - 11:30 | [Practice session 2](./session2/session2.md)          |
+| 10:40 - 11:30 | [Tutorial session 2 with Jack S. Hale: A guide to building and running FEniCSx on HPC systems](./session2/session2.md)          |
 | 11:30 - 12:00 | Open QA session.      |
-| 1h20   | Free lunch                                |
+| 12:00 - 13:20   | Lunch outside centre/Arrival/Registration of participants                              |
 
 The conference officially starts at 13:20, see the [conference
-schedule](https://fenicsproject.org/fenics-2026/).
+programme](https://fenicsproject.org/fenics-2026/programme/).
+
+## How to use
+
+To run the tutorials it is sufficient to download a container with v0.11.0 of
+FEniCSx using docker or podman
+```shell
+docker run -ti -p 8888:8888 -e PORT=8888 --name=workshop2026 -v $(pwd):/root/shared -w /root/shared  --entrypoint=/bin/bash ghcr.io/fenics/dolfinx/lab:v0.11.0
+```
+Here we use a Jupyter Lab environment with pre-installed PyVista.
+
+Install dependeces
+```shell
+apt-get update
+pip install scifem>=0.20.0
+```
+
+Clone repo
+```shell
+git clone https://github.com/a-latyshev/fenics26-tutorials.git
+```
+
+(Optional) to build the book via Jupyter Book 2 (MyST), follow instructions: [README_AUTHORS](./README_AUTHORS.md).
 
 ## Authors
 
