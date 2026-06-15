@@ -930,11 +930,10 @@ parallel scalability and performance of DOLFINx and by extension, PETSc.
 
 We recommend running the Poisson problem in a weak scaling test from 1 through
 8 nodes at 50% core utilisation per node (i.e., undersubscription). If you plan
-on running larger problems, you will need to test with more nodes.
+on running larger problems, you will of course need to test with more nodes.
 
 Since 2024, the nightly performance test data on Cambridge CSD3 HPC has not
-been updated, and this is unlikely to change - it is increasingly difficult to
-find an HPC centre willing to allow bot access for security reasons.
+been updated. 
 
 #### Building and running
 
@@ -951,7 +950,7 @@ spack:
   - >-
     fenics-dolfinx@0.11+adios2+superlu-dist+petsc
     partitioners=parmetis
-    %petsc+mumps+hypre+superlu-dist+int64~fotran-bindings
+    %petsc+mumps+hypre+superlu-dist+int64~fortran-bindings
     %boost+program_options
   - py-fenics-ffcx@0.11
   packages:
@@ -966,7 +965,7 @@ spack:
 ```
 
 PETSc has rather conservative default compiler flags so it is worth making them
-more aggressive manually.
+more aggressive.
 
 Once the Spack environment is built it should be possible to build the DOLFINx
 performance tests:
@@ -1063,6 +1062,35 @@ The [README.md](https://github.com/FEniCS/performance-test/blob/main/README.md)
 gives detailed instructions on interpreting the output which will be written
 to the job log files.
 
+:::{hint} Aion specifics
+:class: dropdown
+This low-order Poisson problem is inherently memory-bandwidth and communication
+limited, so understanding your systems memory access layout is critical for
+good performance.
+
+The Aion cluster has two physical sockets each containing a physical processor
+with 64 cores. However, each node is setup in a [NUMA
+configuration](https://en.wikipedia.org/wiki/Non-uniform_memory_access) with 16
+NUMA domains per node, or 8 cores per domain. From previous performance tests we
+also know that memory bandwidth saturates at around 50% core usage.
+
+By specifying:
+```bash
+#SBATCH --ntasks-per-socket=8
+#SBATCH --ntasks-per-node=64
+```
+we can ensure that the 64 tasks (50% utilisation) are spread evenly across the
+NUMA domains (aka 'sockets') of each node.
+
+I also bind MPI processes to sockets (aka 'NUMA domains') to guarantee that
+they do not jump between sockets, which can lead to potentially costly memory
+access patterns.
+
+```bash
+srun --cpu-bind=socket ...
+```
+:::
+
 In this repository I have included raw data from a run from DOLFINx 0.11 built
 with Spack on the Aion cluster using the above scripts. I include a short
 section of the output here for 8 nodes with around 250 million degrees of
@@ -1081,6 +1109,7 @@ ZZZ Create boundary conditions                                              |   
 ZZZ Create facets and facet->cell connectivity                              |     1   6.248711   6.248711
 ZZZ FunctionSpace                                                           |     1   0.396796   0.396796
 ZZZ Solve                                                                   |     1  10.316947  10.316947
+...
 ```
 
 and 64 nodes with around 2 billion degrees of freedom:
@@ -1098,6 +1127,7 @@ ZZZ Create boundary conditions                                              |   
 ZZZ Create facets and facet->cell connectivity                              |     1   6.566935   6.566935
 ZZZ FunctionSpace                                                           |     1   0.478330   0.478330
 ZZZ Solve                                                                   |     1  12.945407  12.945407
+...
 ```
 
 The raw job outputs for varying numbers of nodes up to 160 are available in
@@ -1110,7 +1140,7 @@ count (weak scaling). It is common to see a slight deterioration in scaling
 going from 1 node to 2 nodes due to the move from shared memory to
 interconnect-based MPI communication.
 
-My results show a sudden drop in scalability in the Hypre/BoomerAMG
+My results also show a sudden drop in scalability in the Hypre/BoomerAMG
 preconditioner application at 96 nodes (`slurm-13009006.out`). Switching to
 Intel MPI fixed this issue.
 
