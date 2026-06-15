@@ -3,9 +3,7 @@
 Welcome to the repository with tutorials for the hands-on session at the [FEniCS
 2026](https://fenicsproject.org/fenics-2026/) conference! This session is
 designed for participants who are already familiar with the basic usage of
-[FEniCSx](https://fenicsproject.org/documentation/). We will explore advanced
-features of [v0.10.0](https://docs.fenicsproject.org/dolfinx/v0.10.0.post5/python/release_notes.html) 
-and [v0.11.0](https://github.com/FEniCS/dolfinx/releases/tag/v0.11.0) of FEniCSx.
+[FEniCSx](https://fenicsproject.org/documentation/).
 
 ## Schedule 
 
@@ -37,7 +35,7 @@ To run the scripts from tutorial 1 it is easiest to download a container image
 with FEniCSx v0.11 and JupyterLab using `docker` or `podman`
 
 ```shell
-docker run -ti -p 8888:8888 --name=workshop2026 ghcr.io/fenics/dolfinx/lab:v0.11.0
+docker run -ti -p 8888:8888 ghcr.io/fenics/dolfinx/lab:v0.11.0
 ```
 
 The lab environment can be accessed at `localhost:8888`.
@@ -55,7 +53,7 @@ and then clone this repository
 git clone https://github.com/a-latyshev/fenics26-tutorials.git
 ```
 
-The scripts are in `session1/` and can be run with `python` or opened in the
+The scripts in `session1/` and can be run with `python` or opened in the
 JupyterLab environment.
 
 (Optional) to build the book via Jupyter Book 2 (MyST), follow instructions:
