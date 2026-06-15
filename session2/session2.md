@@ -938,31 +938,52 @@ find an HPC centre willing to allow bot access for security reasons.
 
 #### Building and running
 
-With the following `spac.yaml` file:
+At the time of writing the FEniCSx 0.11 Spack packages are not merged, so I
+used the [FEniCS Spack packages overlay
+repository](https://github.com/FEniCS/spack-fenics) to get the latest packages.
+
+I created a Spack environment in `~/fenicsx-0.11-flags` from the following
+`spack.yaml` file:
 
 ```
 spack:
   specs:
   - >-
     fenics-dolfinx@0.11+adios2+superlu-dist+petsc
-    partitioners=parmetis %petsc+mumps+hypre+superlu-dist+int64
+    partitioners=parmetis
+    %petsc+mumps+hypre+superlu-dist+int64~fotran-bindings
     %boost+program_options
   - py-fenics-ffcx@0.11
+  packages:
+    petsc:
+      require:
+        - cflags="-O3 -march=native -mtune=native"
+        - cxxflags="-O3 -march=native -mtune=native"
+        - fflags="-O3 -march=native -mtune=native"
   view: true
   concretizer:
     unify: true
 ```
 
-it is possible to build the DOLFINx performance tests:
+PETSc has rather conservative default compiler flags so it is worth making them
+more aggressive manually.
+
+Once the Spack environment is built it should be possible to build the DOLFINx
+performance tests:
 
 ```bash
+module load compiler/GCC
+module load mpi/OpenMPI
+spack load cmake
+
 git clone https://github.com/fenics/performance-test
 cd performance-test
 cmake -B build-dir/ -S src/
 cmake --build build-dir/
 ```
 
-which will produce a binary `build-dir/dolfinx-scaling-test` that can be executed using:
+which will produce a binary `build-dir/dolfinx-scaling-test` that can be
+executed using e.g.:
 
 ```bash
 srun -n 8 ./build-dir/dolfinx-scaling-test \
@@ -995,15 +1016,18 @@ sbatch -N 8 poisson.sh
 # etc., or in a bash loop
 ```
 
-which executes an inner script `poisson.sh`:
+which executes an inner SLURM batch script `poisson.sh`:
 
 ```bash
 #!/bin/bash -l
 #SBATCH -J poisson-weak-scaling
 #SBATCH -p batch
 #SBATCH --qos=normal
-#SBATCH --time=0-00:10:00
+#SBATCH --time=0-00:03:00
+#SBATCH --ntasks-per-socket=8
 #SBATCH --ntasks-per-node=64
+#SBATCH --mem=0
+#SBATCH -c 1
 #SBATCH --exclusive
 
 echo "== Starting run at $(date)"
@@ -1013,10 +1037,11 @@ echo "== Node list: ${SLURM_NODELIST}"
 echo "== Submit dir: ${SLURM_SUBMIT_DIR}"
 echo "== Number of tasks: ${SLURM_NTASKS}"
 
-# Setup FEniCSx (module load, spack activate etc.)
+source ~/spack/share/spack/setup-env.sh
+spack env activate ~/fenicsx-0.11-flags
 
 cd $SLURM_SUBMIT_DIR
-srun -v ./build-dir/dolfinx-scaling-test \
+srun --cpu-bind=socket -v ./build-dir/dolfinx-scaling-test \
   --problem_type poisson \
   --scaling_type weak \
   --ndofs 500000 \
@@ -1047,36 +1072,36 @@ freedom:
 [MPI_MAX] Summary of timings (s)                                            |  reps        avg        tot
 ---------------------------------------------------------------------------------------------------------
 ...
-ZZZ Assemble                                                                |     1   7.953762   7.953762
-ZZZ Assemble matrix                                                         |     1   2.804849   2.804849
-ZZZ Assemble vector                                                         |     1   0.604345   0.604345
-ZZZ Create Mesh                                                             |     1  51.775194  51.775194
-ZZZ Create RHS function                                                     |     1   2.287077   2.287077
-ZZZ Create boundary conditions                                              |     1   0.269884   0.269884
-ZZZ Create facets and facet->cell connectivity                              |     1   7.984695   7.984695
-ZZZ FunctionSpace                                                           |     1   0.812768   0.812768
-ZZZ Solve                                                                   |     1  20.749977  20.749977
+ZZZ Assemble                                                                |     1   5.599968   5.599968
+ZZZ Assemble matrix                                                         |     1   2.323605   2.323605
+ZZZ Assemble vector                                                         |     1   0.354125   0.354125
+ZZZ Create Mesh                                                             |     1  30.379810  30.379810
+ZZZ Create RHS function                                                     |     1   1.148998   1.148998
+ZZZ Create boundary conditions                                              |     1   0.094545   0.094545
+ZZZ Create facets and facet->cell connectivity                              |     1   6.248711   6.248711
+ZZZ FunctionSpace                                                           |     1   0.396796   0.396796
+ZZZ Solve                                                                   |     1  10.316947  10.316947
 ```
 
-and 32 nodes with around 1 billion degrees of freedom:
+and 64 nodes with around 2 billion degrees of freedom:
 
 ```
 [MPI_MAX] Summary of timings (s)                                            |  reps        avg        tot
 ---------------------------------------------------------------------------------------------------------
 ...
-ZZZ Assemble                                                                |     1   8.878067   8.878067
-ZZZ Assemble matrix                                                         |     1   2.874386   2.874386
-ZZZ Assemble vector                                                         |     1   0.637582   0.637582
-ZZZ Create Mesh                                                             |     1  61.881765  61.881765
-ZZZ Create RHS function                                                     |     1   2.828008   2.828008
-ZZZ Create boundary conditions                                              |     1   0.336124   0.336124
-ZZZ Create facets and facet->cell connectivity                              |     1   8.825502   8.825502
-ZZZ FunctionSpace                                                           |     1   0.920955   0.920955
-ZZZ Solve                                                                   |     1  25.791648  25.791648
+ZZZ Assemble                                                                |     1   6.007643   6.007643
+ZZZ Assemble matrix                                                         |     1   2.567641   2.567641
+ZZZ Assemble vector                                                         |     1   0.363851   0.363851
+ZZZ Create Mesh                                                             |     1  35.942877  35.942877
+ZZZ Create RHS function                                                     |     1   1.148408   1.148408
+ZZZ Create boundary conditions                                              |     1   0.105831   0.105831
+ZZZ Create facets and facet->cell connectivity                              |     1   6.566935   6.566935
+ZZZ FunctionSpace                                                           |     1   0.478330   0.478330
+ZZZ Solve                                                                   |     1  12.945407  12.945407
 ```
 
-The raw job outputs for various numbers of nodes are available in this
-repository in `session2/weak-scaling`.
+The raw job outputs for varying numbers of nodes up to 160 are available in
+this repository in `session2/weak-scaling`.
 
 On a reasonably modern cluster you should see comparable (same order of
 magnitude) absolute timings. You should be looking for approximately constant
@@ -1084,6 +1109,10 @@ times for the DOLFINx assembly and PETSc solve stages with increasing node
 count (weak scaling). It is common to see a slight deterioration in scaling
 going from 1 node to 2 nodes due to the move from shared memory to
 interconnect-based MPI communication.
+
+My results show a sudden drop in scalability in the Hypre/BoomerAMG
+preconditioner application at 96 nodes (`slurm-13009006.out`). Switching to
+Intel MPI fixed this issue.
 
 ## Closing thoughts
 

@@ -1,0 +1,555 @@
+== Starting run at Fri Jun 12 22:41:25 CEST 2026
+== Job name: poisson-weak-scaling
+== Job ID: 13009005
+== Node list: aion-[0027,0030,0037,0040,0043,0046,0049-0084,0127,0130,0133-0146,0319-0324]
+== Submit dir: /mnt/aiongpfs/users/jhale/performance-test-flags
+== Number of tasks: 4096
+srun: defined options
+srun: -------------------- --------------------
+srun: (null)              : aion-[0027,0030,0037,0040,0043,0046,0049-0084,0127,0130,0133-0146,0319-0324]
+srun: cpu-bind            : socket
+srun: cpus-per-task       : 2
+srun: jobid               : 13009005
+srun: job-name            : poisson-weak-scaling
+srun: nodes               : 64
+srun: ntasks              : 4096
+srun: ntasks-per-node     : 64
+srun: oom-kill-step       : 0
+srun: tres-per-task       : cpu=2
+srun: verbose             : 1
+srun: -------------------- --------------------
+srun: end of defined options
+srun: jobid 13009005: nodes(64):`aion-[0027,0030,0037,0040,0043,0046,0049-0084,0127,0130,0133-0146,0319-0324]', cpu counts: 128(x64)
+srun: Implicitly setting --exact, because -c/--cpus-per-task given.
+srun: CpuBindType=sockets
+srun: launching StepId=13009005.0 on host aion-0027, 64 tasks: [0-63]
+srun: launching StepId=13009005.0 on host aion-0030, 64 tasks: [64-127]
+srun: launching StepId=13009005.0 on host aion-0037, 64 tasks: [128-191]
+srun: launching StepId=13009005.0 on host aion-0040, 64 tasks: [192-255]
+srun: launching StepId=13009005.0 on host aion-0043, 64 tasks: [256-319]
+srun: launching StepId=13009005.0 on host aion-0046, 64 tasks: [320-383]
+srun: launching StepId=13009005.0 on host aion-0049, 64 tasks: [384-447]
+srun: launching StepId=13009005.0 on host aion-0050, 64 tasks: [448-511]
+srun: launching StepId=13009005.0 on host aion-0051, 64 tasks: [512-575]
+srun: launching StepId=13009005.0 on host aion-0052, 64 tasks: [576-639]
+srun: launching StepId=13009005.0 on host aion-0053, 64 tasks: [640-703]
+srun: launching StepId=13009005.0 on host aion-0054, 64 tasks: [704-767]
+srun: launching StepId=13009005.0 on host aion-0055, 64 tasks: [768-831]
+srun: launching StepId=13009005.0 on host aion-0056, 64 tasks: [832-895]
+srun: launching StepId=13009005.0 on host aion-0057, 64 tasks: [896-959]
+srun: launching StepId=13009005.0 on host aion-0058, 64 tasks: [960-1023]
+srun: launching StepId=13009005.0 on host aion-0059, 64 tasks: [1024-1087]
+srun: launching StepId=13009005.0 on host aion-0060, 64 tasks: [1088-1151]
+srun: launching StepId=13009005.0 on host aion-0061, 64 tasks: [1152-1215]
+srun: launching StepId=13009005.0 on host aion-0062, 64 tasks: [1216-1279]
+srun: launching StepId=13009005.0 on host aion-0063, 64 tasks: [1280-1343]
+srun: launching StepId=13009005.0 on host aion-0064, 64 tasks: [1344-1407]
+srun: launching StepId=13009005.0 on host aion-0065, 64 tasks: [1408-1471]
+srun: launching StepId=13009005.0 on host aion-0066, 64 tasks: [1472-1535]
+srun: launching StepId=13009005.0 on host aion-0067, 64 tasks: [1536-1599]
+srun: launching StepId=13009005.0 on host aion-0068, 64 tasks: [1600-1663]
+srun: launching StepId=13009005.0 on host aion-0069, 64 tasks: [1664-1727]
+srun: launching StepId=13009005.0 on host aion-0070, 64 tasks: [1728-1791]
+srun: launching StepId=13009005.0 on host aion-0071, 64 tasks: [1792-1855]
+srun: launching StepId=13009005.0 on host aion-0072, 64 tasks: [1856-1919]
+srun: launching StepId=13009005.0 on host aion-0073, 64 tasks: [1920-1983]
+srun: launching StepId=13009005.0 on host aion-0074, 64 tasks: [1984-2047]
+srun: launching StepId=13009005.0 on host aion-0075, 64 tasks: [2048-2111]
+srun: launching StepId=13009005.0 on host aion-0076, 64 tasks: [2112-2175]
+srun: launching StepId=13009005.0 on host aion-0077, 64 tasks: [2176-2239]
+srun: launching StepId=13009005.0 on host aion-0078, 64 tasks: [2240-2303]
+srun: launching StepId=13009005.0 on host aion-0079, 64 tasks: [2304-2367]
+srun: launching StepId=13009005.0 on host aion-0080, 64 tasks: [2368-2431]
+srun: launching StepId=13009005.0 on host aion-0081, 64 tasks: [2432-2495]
+srun: launching StepId=13009005.0 on host aion-0082, 64 tasks: [2496-2559]
+srun: launching StepId=13009005.0 on host aion-0083, 64 tasks: [2560-2623]
+srun: launching StepId=13009005.0 on host aion-0084, 64 tasks: [2624-2687]
+srun: launching StepId=13009005.0 on host aion-0127, 64 tasks: [2688-2751]
+srun: launching StepId=13009005.0 on host aion-0130, 64 tasks: [2752-2815]
+srun: launching StepId=13009005.0 on host aion-0133, 64 tasks: [2816-2879]
+srun: launching StepId=13009005.0 on host aion-0134, 64 tasks: [2880-2943]
+srun: launching StepId=13009005.0 on host aion-0135, 64 tasks: [2944-3007]
+srun: launching StepId=13009005.0 on host aion-0136, 64 tasks: [3008-3071]
+srun: launching StepId=13009005.0 on host aion-0137, 64 tasks: [3072-3135]
+srun: launching StepId=13009005.0 on host aion-0138, 64 tasks: [3136-3199]
+srun: launching StepId=13009005.0 on host aion-0139, 64 tasks: [3200-3263]
+srun: launching StepId=13009005.0 on host aion-0140, 64 tasks: [3264-3327]
+srun: launching StepId=13009005.0 on host aion-0141, 64 tasks: [3328-3391]
+srun: launching StepId=13009005.0 on host aion-0142, 64 tasks: [3392-3455]
+srun: launching StepId=13009005.0 on host aion-0143, 64 tasks: [3456-3519]
+srun: launching StepId=13009005.0 on host aion-0144, 64 tasks: [3520-3583]
+srun: launching StepId=13009005.0 on host aion-0145, 64 tasks: [3584-3647]
+srun: launching StepId=13009005.0 on host aion-0146, 64 tasks: [3648-3711]
+srun: launching StepId=13009005.0 on host aion-0319, 64 tasks: [3712-3775]
+srun: launching StepId=13009005.0 on host aion-0320, 64 tasks: [3776-3839]
+srun: launching StepId=13009005.0 on host aion-0321, 64 tasks: [3840-3903]
+srun: launching StepId=13009005.0 on host aion-0322, 64 tasks: [3904-3967]
+srun: launching StepId=13009005.0 on host aion-0323, 64 tasks: [3968-4031]
+srun: launching StepId=13009005.0 on host aion-0324, 64 tasks: [4032-4095]
+srun: topology/tree: init: topology tree plugin loaded
+srun: Node aion-0134, 64 tasks started
+srun: Node aion-0050, 64 tasks started
+srun: Node aion-0052, 64 tasks started
+srun: Node aion-0137, 64 tasks started
+srun: Node aion-0130, 64 tasks started
+srun: Node aion-0321, 64 tasks started
+srun: Node aion-0037, 64 tasks started
+srun: Node aion-0146, 64 tasks started
+srun: Node aion-0053, 64 tasks started
+srun: Node aion-0040, 64 tasks started
+srun: Node aion-0142, 64 tasks started
+srun: Node aion-0068, 64 tasks started
+srun: Node aion-0141, 64 tasks started
+srun: Node aion-0133, 64 tasks started
+srun: Node aion-0057, 64 tasks started
+srun: Node aion-0074, 64 tasks started
+srun: Node aion-0083, 64 tasks started
+srun: Node aion-0058, 64 tasks started
+srun: Node aion-0055, 64 tasks started
+srun: Node aion-0322, 64 tasks started
+srun: Node aion-0063, 64 tasks started
+srun: Node aion-0140, 64 tasks started
+srun: Node aion-0073, 64 tasks started
+srun: Node aion-0046, 64 tasks started
+srun: Node aion-0143, 64 tasks started
+srun: Node aion-0084, 64 tasks started
+srun: Node aion-0075, 64 tasks started
+srun: Node aion-0319, 64 tasks started
+srun: Node aion-0072, 64 tasks started
+srun: Node aion-0135, 64 tasks started
+srun: Node aion-0138, 64 tasks started
+srun: Node aion-0051, 64 tasks started
+srun: Node aion-0145, 64 tasks started
+srun: Node aion-0320, 64 tasks started
+srun: Node aion-0059, 64 tasks started
+srun: Node aion-0060, 64 tasks started
+srun: Node aion-0139, 64 tasks started
+srun: Node aion-0069, 64 tasks started
+srun: Node aion-0127, 64 tasks started
+srun: Node aion-0144, 64 tasks started
+srun: Node aion-0081, 64 tasks started
+srun: Node aion-0077, 64 tasks started
+srun: Node aion-0136, 64 tasks started
+srun: Node aion-0323, 64 tasks started
+srun: Node aion-0030, 64 tasks started
+srun: Node aion-0066, 64 tasks started
+srun: Node aion-0082, 64 tasks started
+srun: Node aion-0079, 64 tasks started
+srun: Node aion-0062, 64 tasks started
+srun: Node aion-0078, 64 tasks started
+srun: Node aion-0065, 64 tasks started
+srun: Node aion-0027, 64 tasks started
+srun: Node aion-0054, 64 tasks started
+srun: Node aion-0061, 64 tasks started
+srun: Node aion-0324, 64 tasks started
+srun: Node aion-0043, 64 tasks started
+srun: Node aion-0070, 64 tasks started
+srun: Node aion-0067, 64 tasks started
+srun: Node aion-0080, 64 tasks started
+srun: Node aion-0071, 64 tasks started
+srun: Node aion-0076, 64 tasks started
+srun: Node aion-0049, 64 tasks started
+srun: Node aion-0056, 64 tasks started
+srun: Node aion-0064, 64 tasks started
+UnitCube (159x154x163) to be refined 3 times
+----------------------------------------------------------------
+Test problem summary
+  dolfinx version: 0.11.0
+  dolfinx hash:    
+  ufl hash:        b0ecf558a831e95a689410a968d4dcb1188416f7
+  petsc version:   PETSc Release Version 3.25.2, Jun 01, 2026
+  Problem type:    poisson
+  Scaling type:    weak
+  Num processes:   4096
+  Num cells:       12261021696 (12.3 billion)
+  Total degrees of freedom:               2048339745 (2.05 billion)
+  Average degrees of freedom per process: 500082
+----------------------------------------------------------------
+KSP Object: 4096 MPI processes
+  type: cg
+  maximum iterations=10000, initial guess is zero
+  tolerances: relative=1e-08, absolute=1e-50, divergence=10000.
+  left preconditioning
+  using PRECONDITIONED norm type for convergence test
+PC Object: 4096 MPI processes
+  type: hypre
+    HYPRE BoomerAMG preconditioning
+      Cycle type V
+      Maximum number of levels 25
+      Maximum number of iterations PER hypre call 1
+      Convergence tolerance PER hypre call 0.
+      Threshold for strong coupling 0.7
+      Interpolation truncation factor 0.
+      Interpolation: max elements per row 0
+      Number of levels of aggressive coarsening 4
+      Number of paths for aggressive coarsening 2
+      Maximum row sums 0.9
+      Sweeps down         1
+      Sweeps up           1
+      Sweeps on coarse    1
+      Relax down          symmetric-SOR/Jacobi
+      Relax up            symmetric-SOR/Jacobi
+      Relax on coarse     Gaussian-elimination
+      Relax weight  (all)      1.
+      Outer relax weight (all) 1.
+      Maximum size of coarsest grid 9
+      Minimum size of coarsest grid 1
+      Using CF-relaxation
+      Not using more complex smoothers.
+      Measure type        local
+      Coarsen type        Falgout
+      Interpolation type  classical
+      SpGEMM type         hypre
+  linear system matrix, which is also used to construct the preconditioner:
+  Mat Object: 4096 MPI processes
+    type: mpiaij
+    rows=2048339745, cols=2048339745
+    total: nonzeros=30686391905, allocated nonzeros=30686391905
+    total number of mallocs used during MatSetValues calls=0
+      not using I-node (on process 0) routines
+
+[MPI_MAX] Summary of timings (s)                                            |  reps        avg        tot
+---------------------------------------------------------------------------------------------------------
+Build BoxMesh (tetrahedra)                                                  |     1   1.063715   1.063715
+Compute connectivity 1-0                                                    |     3   0.008286   0.024859
+Compute connectivity 2-0                                                    |     4   0.121971   0.487885
+Compute entities by key matching: number entities                           |     7   0.371862   2.603036
+Compute entities of dim = 1                                                 |     3   0.761534   2.284603
+Compute entities of dim = 2                                                 |     4   1.978562   7.914247
+Compute ghost indices                                                       |     4   0.181695   0.726782
+Compute graph partition (ParMETIS)                                          |     4   3.383760  13.535041
+Compute local part of mesh dual graph (mixed)                               |     8   0.889006   7.112049
+Compute local-to-local map                                                  |     4   0.023380   0.093519
+Compute non-local part of mesh dual graph                                   |     4   0.344096   1.376386
+Compute-local-to-global links for global/local adjacency list               |     4   0.019572   0.078287
+Distribute fixed-degree adjacency list to destination ranks                 |     4   0.471828   1.887314
+Distribute row-wise data (scalable)                                         |     4   0.086512   0.346048
+Dofmap builder: build dofmap data                                           |     5   0.186411   0.932056
+Dofmap builder: compute dof reordering map                                  |     5   0.009069   0.045344
+Dofmap builder: get dofmap global indices                                   |     5   0.113309   0.566547
+Dofmap builder: init dofmap from element dofmap                             |     5   0.055526   0.277631
+Extend graph destination ranks for halo                                     |     3   1.170343   3.511030
+GPS: create_level_structure                                                 |    14   0.063613   1.664196
+Gibbs-Poole-Stockmeyer ordering                                             |     4   0.519673   2.078692
+Init MPI                                                                    |     1  21.347160  21.347160
+Init PETSc                                                                  |     1   0.035337   0.035337
+Init logging                                                                |     1   0.000046   0.000046
+PETSc Krylov solver                                                         |     1  12.883863  12.883863
+PLAZA: Enforce rules                                                        |     3   0.043634   0.130901
+PLAZA: refine                                                               |     3   1.075839   3.227516
+ParMETIS: call ParMETIS_V3_PartKway                                         |     4   2.463523   9.854093
+SparsityPattern::finalize                                                   |     1   1.592409   1.592409
+Threaded part                                                               |     7   0.095868   0.671077
+Topology: 0                                                                 |     4   0.000010   0.000042
+Topology: 1                                                                 |     4   0.771993   3.087974
+Topology: 2                                                                 |     4   0.003621   0.014486
+Topology: 3                                                                 |     4   0.271488   1.085954
+Topology: 4                                                                 |     4   0.303718   1.214874
+Topology: 5                                                                 |     4   0.009906   0.039624
+Topology: 6                                                                 |     4   0.048646   0.194582
+Topology: 7                                                                 |     4   0.283683   1.134733
+Topology: create                                                            |     4   1.588939   6.355757
+Topology: determine shared index ownership                                  |     4   0.703485   2.813938
+Topology: determine vertex ownership groups (owned, undetermined, unowned)  |     4   0.138684   0.554736
+ZZZ Assemble                                                                |     1   6.007643   6.007643
+ZZZ Assemble matrix                                                         |     1   2.567641   2.567641
+ZZZ Assemble vector                                                         |     1   0.363851   0.363851
+ZZZ Create Mesh                                                             |     1  35.942877  35.942877
+ZZZ Create RHS function                                                     |     1   1.148408   1.148408
+ZZZ Create boundary conditions                                              |     1   0.105831   0.105831
+ZZZ Create facets and facet->cell connectivity                              |     1   6.566935   6.566935
+ZZZ FunctionSpace                                                           |     1   0.478330   0.478330
+ZZZ Solve                                                                   |     1  12.945407  12.945407
+[Apply lifting]                                                             |     1   0.037804   0.037804
+[Assemble Matrix]                                                           |     2   1.193402   2.386805
+*** Number of Krylov iterations: 25
+*** Solution norm:  9629.08
+****************************************************************************************************************************************************************
+***                                WIDEN YOUR WINDOW TO 160 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document                                 ***
+****************************************************************************************************************************************************************
+
+------------------------------------------------------------------ PETSc Performance Summary: ------------------------------------------------------------------
+
+/mnt/aiongpfs/users/jhale/performance-test-flags/./build-dir/dolfinx-scaling-test on a  named aion-0027 with 4096 processes, by jhale on Fri Jun 12 22:42:53 2026
+Using PETSc Release Version 3.25.2, Jun 01, 2026
+
+                         Max       Max/Min     Avg       Total
+Time (sec):           6.187e+01     1.000   6.186e+01
+Objects:              0.000e+00     0.000   0.000e+00
+Flops:                5.669e+08     1.583   5.536e+08  2.267e+12
+Flops/sec:            9.165e+06     1.582   8.950e+06  3.666e+10
+MPI Msg Count:        8.060e+02     6.500   4.446e+02  1.821e+06
+MPI Msg Len (bytes):  2.828e+07     2.854   4.785e+04  8.715e+10
+MPI Reductions:       1.190e+02     1.000
+
+Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
+                            e.g., VecAXPY() for real vectors of length N --> 2N flops
+                            and VecAXPY() for complex vectors of length N --> 8N flops
+
+Summary of Stages:   ----- Time ------  ----- Flop ------  --- Messages ---  -- Message Lengths --  -- Reductions --
+                        Avg     %Total     Avg     %Total    Count   %Total     Avg         %Total    Count   %Total
+ 0:      Main Stage: 6.1856e+01 100.0%  2.2675e+12 100.0%  1.821e+06 100.0%  4.785e+04      100.0%  1.010e+02  84.9%
+
+------------------------------------------------------------------------------------------------------------------------
+See the 'Profiling' chapter of the users' manual for details on interpreting output.
+Phase summary info:
+   Count: number of times phase was executed
+   Time and Flop: Max - maximum over all processes
+                  Ratio - ratio of maximum to minimum over all processes
+   Mess: number of messages sent
+   AvgLen: average message length (bytes)
+   Reduct: number of global reductions
+   Global: entire computation
+   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
+      %T - percent time in this phase         %F - percent flop in this phase
+      %M - percent messages in this phase     %L - percent message lengths in this phase
+      %R - percent reductions in this phase
+   Total Mflop/s: 1e-6 * (sum of flop over all processes)/(max time over all processes)
+------------------------------------------------------------------------------------------------------------------------
+Event                Count      Time (sec)     Flop                              --- Global ---  --- Stage ----  Total
+                   Max Ratio  Max     Ratio   Max  Ratio  Mess   AvgLen  Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+------------------------------------------------------------------------------------------------------------------------
+
+--- Event Stage 0: Main Stage
+
+BuildTwoSided          3 1.0 1.0533e-02 20.3 0.00e+00 0.0 8.8e+04 8.0e+00 0.0e+00  0  0  5  0  0   0  0  5  0  0     0
+BuildTwoSidedF         2 1.0 1.1946e+00 72.1 0.00e+00 0.0 8.8e+04 2.7e+05 0.0e+00  1  0  5 28  0   1  0  5 28  0     0
+MatMult               25 1.0 8.0815e-01 1.1 3.70e+08 1.6 1.5e+06 4.0e+04 0.0e+00  1 65 81 67  0   1 65 81 67  0 1835189
+MatConvert             1 1.0 6.2109e-01 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 2.0e+00  1  0  0  0  2   1  0  0  0  2     0
+MatAssemblyBegin       5 1.0 1.2670e+00 12.4 0.00e+00 0.0 8.8e+04 2.7e+05 0.0e+00  1  0  5 28  0   1  0  5 28  0     0
+MatAssemblyEnd         5 1.0 4.3579e-01 1.9 1.76e+05 2.8 8.8e+04 2.6e+04 4.0e+00  0  0  5  3  3   0  0  5  3  4  1269
+MatGetRowIJ            4 1.0 1.9960e-05 8.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatView                1 1.0 6.9765e-04 5.4 0.00e+00 0.0 0.0e+00 0.0e+00 1.0e+00  0  0  0  0  1   0  0  0  0  1     0
+MatSetPreallCOO        2 1.0 2.3084e-01 2.8 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatSetValuesCOO        2 1.0 9.6407e-02 1.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecTDot               52 1.0 1.5670e-01 2.7 5.37e+07 1.6 0.0e+00 0.0e+00 5.2e+01  0  9  0  0 44   0  9  0  0 51 1359418
+VecNorm               26 1.0 4.3768e-01 33.5 2.68e+07 1.6 0.0e+00 0.0e+00 2.6e+01  0  5  0  0 22   0  5  0  0 26 243360
+VecCopy                2 1.0 4.4902e-03 1.9 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecSet                27 1.0 2.4985e-02 6.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecAXPY               50 1.0 1.0862e-01 2.6 5.16e+07 1.6 0.0e+00 0.0e+00 0.0e+00  0  9  0  0  0   0  9  0  0  0 1885740
+VecAYPX               24 1.0 3.5924e-02 2.8 2.48e+07 1.6 0.0e+00 0.0e+00 0.0e+00  0  4  0  0  0   0  4  0  0  0 2736919
+VecScatterBegin       25 1.0 2.1984e-02 3.3 0.00e+00 0.0 1.5e+06 4.0e+04 0.0e+00  0  0 81 67  0   0  0 81 67  0     0
+VecScatterEnd         25 1.0 2.9677e-01 37.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFSetGraph             3 1.0 2.6169e-03 3.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFSetUp                3 1.0 3.4470e-02 2.4 0.00e+00 0.0 2.6e+05 1.9e+04 0.0e+00  0  0 15  6  0   0  0 15  6  0     0
+SFPack                25 1.0 1.9767e-02 4.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFUnpack              25 1.0 3.0990e-05 13.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPSetUp               1 1.0 4.8482e-03 6.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPSolve               1 1.0 8.2967e+00 1.0 5.27e+08 1.6 1.5e+06 4.0e+04 7.8e+01 13 93 81 67 66  13 93 81 67 77 253812
+PCSetUp                1 1.0 4.5855e+00 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 2.0e+00  7  0  0  0  2   7  0  0  0  2     0
+PCApply               26 1.0 7.2996e+00 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00 12  0  0  0  0  12  0  0  0  0     0
+------------------------------------------------------------------------------------------------------------------------
+
+Object Type          Creations   Destructions. Reports information only for process 0.
+
+--- Event Stage 0: Main Stage
+
+           Container     2              2
+              Matrix     7              7
+           Index Set     6              6
+   IS L to G Mapping     2              2
+              Vector    12             12
+   Star Forest Graph     3              3
+       Krylov Solver     1              1
+      Preconditioner     1              1
+              Viewer     1              1
+========================================================================================================================
+Average time to get PetscTime(): 3.3e-08
+Average time for MPI_Barrier(): 2.7492e-05
+Average time for zero size MPI_Send(): 2.30585e-06
+#PETSc Option Table entries:
+--ndofs 500000 # (source: command line)
+--problem_type poisson # (source: command line)
+--scaling_type weak # (source: command line)
+-ksp_rtol 1.0e-8 # (source: command line)
+-ksp_type cg # (source: command line)
+-ksp_view # (source: command line)
+-log_view # (source: command line)
+-options_left # (source: command line)
+-pc_hypre_boomeramg_agg_nl 4 # (source: command line)
+-pc_hypre_boomeramg_agg_num_paths 2 # (source: command line)
+-pc_hypre_boomeramg_strong_threshold 0.7 # (source: command line)
+-pc_hypre_type boomeramg # (source: command line)
+-pc_type hypre # (source: command line)
+#End of PETSc Option Table entries
+Compiled without FORTRAN kernels
+Compiled with 64-bit PetscInt
+Compiled with full precision matrices (default)
+sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 8
+Configure options: --prefix=/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/petsc-3.25.2-lttaikioo7fpsoax4sew5jwvvj5wqzc2 --with-ssl=0 --download-c2html=0 --download-sowing=0 --download-hwloc=0 --with-make-exec=/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/gmake-4.4.1-dy3lr4j3xz7ohrvmznvhy2cnv7qt5wue/bin/make CFLAGS="-O3 -march=native -mtune=native" COPTFLAGS= FFLAGS="-O3 -march=native -mtune=native" FOPTFLAGS= CXXFLAGS="-O3 -march=native -mtune=native" CXXOPTFLAGS= --with-cc=/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/bin/mpicc --with-cxx=/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/bin/mpic++ --with-fc=/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/bin/mpif90 --with-fortran-bindings=0 --with-precision=double --with-scalar-type=real --with-shared-libraries=1 --with-debugging=0 --with-openmp=0 --with-64-bit-indices=1 --with-blaslapack-lib=/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/openblas-0.3.29-5klil5x2yeczk2ulskuwosvogqbikjuf/lib/libopenblas.so --with-x=0 --with-sycl=0 --with-clanguage=C --with-cuda=0 --with-hip=0 --with-metis=0 --with-hypre=1 --with-hypre-include=/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/hypre-3.1.0-umdbbxdhvhmsrhehcygxa6dj7qdxyj3h/include --with-hypre-lib=/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/hypre-3.1.0-umdbbxdhvhmsrhehcygxa6dj7qdxyj3h/lib64/libHYPRE.so --with-parmetis=0 --with-kokkos=0 --with-kokkos-kernels=0 --with-superlu_dist=1 --with-superlu_dist-include=/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/superlu-dist-9.2.1-nonyvz7ppfz24rp6szh3z6wm2cqyseqz/include --with-superlu_dist-lib=/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/superlu-dist-9.2.1-nonyvz7ppfz24rp6szh3z6wm2cqyseqz/lib/libsuperlu_dist.so --with-ptscotch=0 --with-suitesparse=0 --with-hdf5=0 --with-zlib=0 --with-mumps=1 --with-mumps-include=/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/mumps-5.9.0-c5uszlbk4oysjbgdl6u466woj63act32/include --with-mumps-lib="/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/mumps-5.9.0-c5uszlbk4oysjbgdl6u466woj63act32/lib/libcmumps.so /mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/mumps-5.9.0-c5uszlbk4oysjbgdl6u466woj63act32/lib/libdmumps.so /mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/mumps-5.9.0-c5uszlbk4oysjbgdl6u466woj63act32/lib/libsmumps.so /mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/mumps-5.9.0-c5uszlbk4oysjbgdl6u466woj63act32/lib/libzmumps.so /mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/mumps-5.9.0-c5uszlbk4oysjbgdl6u466woj63act32/lib/libmumps_common.so /mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/mumps-5.9.0-c5uszlbk4oysjbgdl6u466woj63act32/lib/libpord.so" --with-fftw=0 --with-valgrind=0 --with-gmp=0 --with-libpng=0 --with-giflib=0 --with-mpfr=0 --with-netcdf=0 --with-pnetcdf=0 --with-moab=0 --with-random123=0 --with-cgns=0 --with-memkind=0 --with-p4est=0 --with-saws=0 --with-yaml=0 --with-hwloc=0 --with-libjpeg=0 --with-scalapack=1 --with-scalapack-lib=/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/netlib-scalapack-2.2.3-qkioui5ffbcv7zmlyjhofw44jmgx32sc/lib64/libscalapack.so --with-strumpack=0 --with-mmg=0 --with-parmmg=0 --with-tetgen=0 --with-trilinos=0 --with-trilinos=0 --with-trilinos=0 --with-cudac=0 --with-hipc=0
+-----------------------------------------
+Libraries compiled on 2026-06-12 18:44:53 on aion-0085
+Machine characteristics: Linux-4.18.0-553.129.1.el8_10.x86_64-x86_64-with-glibc2.28
+Using PETSc directory: /mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/petsc-3.25.2-lttaikioo7fpsoax4sew5jwvvj5wqzc2
+Using PETSc arch: 
+-----------------------------------------
+
+Using C compiler: /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/bin/mpicc -O3 -march=native -mtune=native -fPIC 
+Using Fortran compiler: /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/bin/mpif90 -O3 -march=native -mtune=native -fPIC   
+-----------------------------------------
+
+Using include paths: -I/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/petsc-3.25.2-lttaikioo7fpsoax4sew5jwvvj5wqzc2/include -I/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/hypre-3.1.0-umdbbxdhvhmsrhehcygxa6dj7qdxyj3h/include -I/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/mumps-5.9.0-c5uszlbk4oysjbgdl6u466woj63act32/include -I/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/superlu-dist-9.2.1-nonyvz7ppfz24rp6szh3z6wm2cqyseqz/include
+-----------------------------------------
+
+Using C linker: /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/bin/mpicc
+Using Fortran linker: /opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/bin/mpif90
+Using libraries: -Wl,-rpath,/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/petsc-3.25.2-lttaikioo7fpsoax4sew5jwvvj5wqzc2/lib -L/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/petsc-3.25.2-lttaikioo7fpsoax4sew5jwvvj5wqzc2/lib -lpetsc -Wl,-rpath,/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/hypre-3.1.0-umdbbxdhvhmsrhehcygxa6dj7qdxyj3h/lib64 -L/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/hypre-3.1.0-umdbbxdhvhmsrhehcygxa6dj7qdxyj3h/lib64 -Wl,-rpath,/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/mumps-5.9.0-c5uszlbk4oysjbgdl6u466woj63act32/lib -L/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/mumps-5.9.0-c5uszlbk4oysjbgdl6u466woj63act32/lib -Wl,-rpath,/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/netlib-scalapack-2.2.3-qkioui5ffbcv7zmlyjhofw44jmgx32sc/lib64 -L/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/netlib-scalapack-2.2.3-qkioui5ffbcv7zmlyjhofw44jmgx32sc/lib64 -Wl,-rpath,/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/superlu-dist-9.2.1-nonyvz7ppfz24rp6szh3z6wm2cqyseqz/lib -L/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/superlu-dist-9.2.1-nonyvz7ppfz24rp6szh3z6wm2cqyseqz/lib -Wl,-rpath,/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/openblas-0.3.29-5klil5x2yeczk2ulskuwosvogqbikjuf/lib -L/mnt/aiongpfs/users/jhale/spack/opt/spack/linux-zen2/openblas-0.3.29-5klil5x2yeczk2ulskuwosvogqbikjuf/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/hwloc/2.9.2-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/hwloc/2.9.2-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libevent/2.1.12-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libevent/2.1.12-GCCcore-13.2.0/lib -Wl,-rpath,/mnt/aiongpfs/apps/easybuild/systems/aion/rhel810-20251006/2023b/epyc/software/GCCcore/13.2.0/lib/gcc/x86_64-pc-linux-gnu/13.2.0 -L/mnt/aiongpfs/apps/easybuild/systems/aion/rhel810-20251006/2023b/epyc/software/GCCcore/13.2.0/lib/gcc/x86_64-pc-linux-gnu/13.2.0 -Wl,-rpath,/mnt/aiongpfs/apps/easybuild/systems/aion/rhel810-20251006/2023b/epyc/software/GCCcore/13.2.0/lib/gcc -L/mnt/aiongpfs/apps/easybuild/systems/aion/rhel810-20251006/2023b/epyc/software/GCCcore/13.2.0/lib/gcc -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/binutils/2.40-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/binutils/2.40-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenMPI/4.1.6-GCC-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/UCC/1.2.0-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/UCC/1.2.0-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/PMIx/4.2.6-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/PMIx/4.2.6-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libfabric/1.19.0-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libfabric/1.19.0-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/UCX/1.15.0-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/UCX/1.15.0-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libevent/2.1.12-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libevent/2.1.12-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenSSL/1.1/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/OpenSSL/1.1/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/hwloc/2.9.2-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/hwloc/2.9.2-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libpciaccess/0.17-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libpciaccess/0.17-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/numactl/2.0.16-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/numactl/2.0.16-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/zlib/1.2.13-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/zlib/1.2.13-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libxml2/2.11.5-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libxml2/2.11.5-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/XZ/5.4.4-GCCcore-13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/XZ/5.4.4-GCCcore-13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/GCCcore/13.2.0/lib64 -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/GCCcore/13.2.0/lib64 -Wl,-rpath,/mnt/aiongpfs/apps/easybuild/systems/aion/rhel810-20251006/2023b/epyc/software/GCCcore/13.2.0/lib64 -L/mnt/aiongpfs/apps/easybuild/systems/aion/rhel810-20251006/2023b/epyc/software/GCCcore/13.2.0/lib64 -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/binutils/2.40-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/binutils/2.40-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/UCC/1.2.0-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/UCC/1.2.0-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/PMIx/4.2.6-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/PMIx/4.2.6-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libfabric/1.19.0-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libfabric/1.19.0-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/UCX/1.15.0-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/UCX/1.15.0-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libpciaccess/0.17-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libpciaccess/0.17-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/numactl/2.0.16-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/numactl/2.0.16-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/zlib/1.2.13-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/zlib/1.2.13-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libxml2/2.11.5-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/libxml2/2.11.5-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/XZ/5.4.4-GCCcore-13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/XZ/5.4.4-GCCcore-13.2.0/lib -Wl,-rpath,/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/GCCcore/13.2.0/lib -L/opt/apps/easybuild/systems/aion/rhel810-20250803/2023b/epyc/software/GCCcore/13.2.0/lib -Wl,-rpath,/mnt/aiongpfs/apps/easybuild/systems/aion/rhel810-20251006/2023b/epyc/software/GCCcore/13.2.0/lib -L/mnt/aiongpfs/apps/easybuild/systems/aion/rhel810-20251006/2023b/epyc/software/GCCcore/13.2.0/lib -lHYPRE -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lscalapack -lsuperlu_dist -lopenblas -lpthread -lm -ldl -lmpi_usempif08 -lmpi_usempi_ignore_tkr -lmpi_mpifh -lmpi -lgfortran -lm -lgfortran -lm -lgcc_s -lquadmath -lstdc++ -lquadmath -ldl
+-----------------------------------------
+
+WARNING! There are options you set that were not used!
+WARNING! could be spelling mistake, etc!
+There are 3 unused database options. They are:
+Option left: name:--ndofs value: 500000 source: command line
+Option left: name:--problem_type value: poisson source: command line
+Option left: name:--scaling_type value: weak source: command line
+srun: Received task exit notification for 1 task of StepId=13009005.0 (status=0x0000).
+srun: aion-0141: task 3371: Completed
+srun: Received task exit notification for 2 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0066: tasks 1476,1530: Completed
+srun: Received task exit notification for 6 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0084: tasks 2642,2646,2648,2660,2662,2671: Completed
+srun: Received task exit notification for 11 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0072: tasks 1857,1871,1880,1886,1897,1899,1906-1907,1909,1913,1915: Completed
+srun: Received task exit notification for 14 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0046: tasks 338-339,343,345,351,356,358,360,363,366-367,369,376,379: Completed
+srun: Received task exit notification for 10 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0139: tasks 3219,3223,3237,3240,3245-3249,3263: Completed
+srun: Received task exit notification for 16 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0058: tasks 975-976,978-980,982-983,987,994,998,1002-1003,1005,1008-1009,1016: Completed
+srun: Received task exit notification for 17 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0081: tasks 2435,2437-2438,2441,2450,2459-2460,2462-2463,2465,2469,2473,2477,2479,2487,2489,2494: Completed
+srun: Received task exit notification for 13 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0320: tasks 3790,3793-3794,3797,3812-3814,3818,3820-3821,3828,3830,3834: Completed
+srun: Received task exit notification for 12 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0130: tasks 2763,2765,2771,2773,2789-2792,2801,2803,2809,2814: Completed
+srun: Received task exit notification for 18 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0082: tasks 2504,2506,2511,2513,2517,2522,2533-2534,2539,2543-2545,2547-2548,2550,2553-2555: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0322: tasks 3904-3967: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0079: tasks 2304-2367: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0027: tasks 0-63: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0030: tasks 64-127: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0324: tasks 4032-4095: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0062: tasks 1216-1279: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0078: tasks 2240-2303: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0137: tasks 3072-3135: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0134: tasks 2880-2943: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0050: tasks 448-511: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0076: tasks 2112-2175: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0145: tasks 3584-3647: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0064: tasks 1344-1407: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0037: tasks 128-191: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0319: tasks 3712-3775: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0138: tasks 3136-3199: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0080: tasks 2368-2431: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0040: tasks 192-255: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0060: tasks 1088-1151: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0135: tasks 2944-3007: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0068: tasks 1600-1663: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0065: tasks 1408-1471: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0053: tasks 640-703: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0146: tasks 3648-3711: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0323: tasks 3968-4031: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0051: tasks 512-575: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0069: tasks 1664-1727: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0073: tasks 1920-1983: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0054: tasks 704-767: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0071: tasks 1792-1855: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0075: tasks 2048-2111: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0142: tasks 3392-3455: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0143: tasks 3456-3519: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0055: tasks 768-831: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0083: tasks 2560-2623: Completed
+srun: Received task exit notification for 63 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0141: tasks 3328-3370,3372-3391: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0061: tasks 1152-1215: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0070: tasks 1728-1791: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0133: tasks 2816-2879: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0074: tasks 1984-2047: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0052: tasks 576-639: Completed
+srun: Received task exit notification for 51 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0320: tasks 3776-3789,3791-3792,3795-3796,3798-3811,3815-3817,3819,3822-3827,3829,3831-3833,3835-3839: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0043: tasks 256-319: Completed
+srun: Received task exit notification for 48 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0058: tasks 960-974,977,981,984-986,988-993,995-997,999-1001,1004,1006-1007,1010-1015,1017-1023: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0057: tasks 896-959: Completed
+srun: Received task exit notification for 50 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0046: tasks 320-337,340-342,344,346-350,352-355,357,359,361-362,364-365,368,370-375,377-378,380-383: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0321: tasks 3840-3903: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0144: tasks 3520-3583: Completed
+srun: Received task exit notification for 53 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0072: tasks 1856,1858-1870,1872-1879,1881-1885,1887-1896,1898,1900-1905,1908,1910-1912,1914,1916-1919: Completed
+srun: Received task exit notification for 47 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0081: tasks 2432-2434,2436,2439-2440,2442-2449,2451-2458,2461,2464,2466-2468,2470-2472,2474-2476,2478,2480-2486,2488,2490-2493,2495: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0067: tasks 1536-1599: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0127: tasks 2688-2751: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0059: tasks 1024-1087: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0140: tasks 3264-3327: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0063: tasks 1280-1343: Completed
+srun: Received task exit notification for 46 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0082: tasks 2496-2503,2505,2507-2510,2512,2514-2516,2518-2521,2523-2532,2535-2538,2540-2542,2546,2549,2551-2552,2556-2559: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0056: tasks 832-895: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0049: tasks 384-447: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0077: tasks 2176-2239: Completed
+srun: Received task exit notification for 64 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0136: tasks 3008-3071: Completed
+srun: Received task exit notification for 54 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0139: tasks 3200-3218,3220-3222,3224-3236,3238-3239,3241-3244,3250-3262: Completed
+srun: Received task exit notification for 52 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0130: tasks 2752-2762,2764,2766-2770,2772,2774-2788,2793-2800,2802,2804-2808,2810-2813,2815: Completed
+srun: Received task exit notification for 58 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0084: tasks 2624-2641,2643-2645,2647,2649-2659,2661,2663-2670,2672-2687: Completed
+srun: Received task exit notification for 62 tasks of StepId=13009005.0 (status=0x0000).
+srun: aion-0066: tasks 1472-1475,1477-1529,1531-1535: Completed
+== Finished at Fri Jun 12 22:42:55 CEST 2026
