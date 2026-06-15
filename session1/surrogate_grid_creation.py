@@ -18,13 +18,8 @@
 # ---
 # # Computing the surrogate grid from a higher order surface mesh
 #
-# ## Creating the real boundary $\Gamma$
 #
 # First, we start by defining a simple domain $\Omega$, defined through its boundary $\bar\Gamma=\partial\Omega$.
-#
-# The boundary of our real object will be a [Limacon](https://en.wikipedia.org/wiki/Lima%C3%A7on),
-# which we will define through arbitrary order Lagrange line segments.
-# First we import the required libaries
 
 from mpi4py import MPI
 import dolfinx
@@ -32,27 +27,40 @@ import numpy as np
 import basix.ufl
 import ufl
 
-# Next, we define the characteristics of the line mesh and the number of elements $M$
+domain = ((-0.1, -0.2), (2.1, 2.0))
+nx = ny = 23
+mesh = dolfinx.mesh.create_rectangle(
+    MPI.COMM_WORLD, domain, (nx, ny), cell_type=dolfinx.mesh.CellType.quadrilateral
+)
+
+# ## Creating the real boundary $\Gamma$
+# The boundary of our real object will be a [Limacon](https://en.wikipedia.org/wiki/Lima%C3%A7on),
+# which we will define through arbitrary order Lagrange line segments.
+# The approximation of the object is controlled by the number of elements $M$
 # and the Lagrange degree of the elements.
 
 line_degree = 3
-center = (1.15, 1.4)
-scale = 0.6
 M = 13
 
 # We define the number of nodes in the mesh, which depends on the number of elements and the degree of the Lagrange polynomials.
 # We then define the coordinates of the `nodes`, which are placed equidistantly on the ellipse.
-#  Finally, we define the `connectivity` of the mesh, which describes how the nodes are connected to form elements.
 
 num_nodes = (M - 1) * (line_degree) + line_degree
 nodes = np.zeros((num_nodes, 2), dtype=np.float64)
 theta = np.linspace(0, 2 * np.pi, nodes.shape[0] + 1, endpoint=True)[:-1]
+
+# Rotated Limacon parameters
+
+center = (1.15, 1.4)
+scale = 0.6
 a = 1
 b = 0.9
+psi = -np.pi / 2
+
+# Generate limacon points, apply rotation and scaling
 
 x_p = (a + b * np.cos(theta)) * np.cos(theta)
 y_p = (a + b * np.cos(theta)) * np.sin(theta)
-psi = -np.pi / 2
 rotation = np.array([[np.cos(psi), -np.sin(psi)], [np.sin(psi), np.cos(psi)]])
 x_rot, y_rot = rotation @ np.array([x_p, y_p])
 nodes[:, 0] = center[0] + scale * x_rot
@@ -100,6 +108,7 @@ assert true_surface.topology.index_map(1).size_global == M
 assert true_surface.geometry.index_map().size_global == num_nodes
 
 # ```{admonition} Important input parameters
+# :class: dropdown
 # There are three very important input parameters that we send into the mesh creator:
 # - `surface_comm`: The true boundary $\Gamma$ is represented on every process and is not distributed it across processes,
 # which ensured by using `MPI.COMM_SELF` as the communicator for the mesh.
@@ -108,24 +117,25 @@ assert true_surface.geometry.index_map().size_global == num_nodes
 # this mesh, but not for T-joint grids or graph based meshes.
 # ```
 
-# Furthermore, we create the structured grid we will perform simulations on
-
-domain = ((-0.1, -0.2), (2.1, 2.0))
-nx = ny = 23
-mesh = dolfinx.mesh.create_rectangle(
-    MPI.COMM_WORLD, domain, (nx, ny), cell_type=dolfinx.mesh.CellType.quadrilateral
-)
-
 # To illustrate that the true boundary is curved, we use the function
 # [interpolate_geometry](xref:dolfinx#dolfinx.fem.interpolate_geometry)
-# to interpolate the geometry into a first order space, i.e. remove all nodes that are not vertices
+# to interpolate the geometry into a first order space, i.e. remove all nodes that are not vertices,
+# which gives us a linearized surrogate boundary.
+# ```{admonition} New feature in DOLFINx 0.11
+# :class: hint dropdown
+# The function `interpolate_geometry` is a new function in DOLFINx 0.11 that allows us to interpolate the geometry of a mesh
+# into a different finite element space. This can also be used together with [write_point_data](xref:io4dolfinx#io4dolfinx.write_point_data)
+# and [read_point_data](xref:io4dolfinx#io4dolfinx.read_point_data) from `io4dolfinx` to make visualizable checkpoints with 
+# [io4dolfinx](https://scientificcomputing.github.io/io4dolfinx).
+# ```
 
 linear_cmap = dolfinx.fem.coordinate_element(true_surface.topology.cell_type, 1)
 linear_lines = dolfinx.fem.interpolate_geometry(true_surface, linear_cmap)
 
-# + tags=["hide-input", "hide-output"]
-import pyvista as pv
+# The dropdown below shows how to use pyvista to generate the following plot
 
+# + {"tags": ["hide-input", "remove-output"], "mystnb": {"code_prompt_show": "test"}}
+import pyvista as pv
 pv.global_theme.allow_empty_mesh = True
 topology, cell_types, geometry = dolfinx.plot.vtk_mesh(mesh)
 cell_types[:] = (
@@ -207,7 +217,7 @@ colliding_cells = np.unique(bulk_elements[:, 0])
 OUTSIDE_MARKER = 0
 KEEP_MARKER = 2
 
-# + tags=["hide-input", "hide-output"]
+# + tags=["hide-input"]
 values = np.full(num_cells_local, OUTSIDE_MARKER, dtype=np.int32)
 values[colliding_cells] = KEEP_MARKER
 surrogate_pv.cell_data["colliding"] = values
@@ -257,7 +267,7 @@ q_manifold = basix.ufl.quadrature_element(
 Q = dolfinx.fem.functionspace(true_surface, q_manifold)
 refined_surface_nodes = Q.tabulate_dof_coordinates()
 
-# + tags=["hide-input", "hide-output"]
+# + tags=["hide-input"]
 point_cloud = pv.PolyData(refined_surface_nodes)
 plotter.add_mesh(point_cloud, label="Point cloud", point_size=10.0, color="green")
 plotter.export_html("pyvista_pc_boundary.html")
@@ -284,6 +294,17 @@ INTERFACE_MARKER = 3
 tol = 10 * np.finfo(refined_surface_nodes.dtype).eps
 cell_indicator.array[colliding_cells] = KEEP_MARKER
 
+# ```{admonition} dolfinx.la.Vector
+# :class: tip dropdown
+# The [Vector-class](xref:dolfinx#dolfinx.la.Vector) in DOLFINx is a distributed vector class that can be used to simplify MPI
+# communication. The [index-map](xref:dolfinx#dolfinx.common.IndexMap) can stem from the [mesh geometry](xref:dolfinx#dolfinx.mesh.Geometry),
+# [mesh topology](xref:dolfinx#dolfinx.mesh.Topology), the [dofmap](xref:dolfinx#dolfinx.fem.DofMap) or be custom made through the
+# [constructor](xref:dolfinx#dolfinx.common.IndexMap). It has a [scatter_forward](xref:dolfinx#dolfinx.la.Vector.scatter_forward) method that
+# can be used to move data from the process owning the entity to those that has it as a ghost, and
+# [scatter_reverse](xref:dolfinx#dolfinx.la.Vector.scatter_reverse) that can be used to accumulate data on the process
+# that owns the entity from all processes that has the entity.
+# ```
+
 # For each node in the interface, we find which cells that contains the nodes.
 
 for i, node in enumerate(refined_surface_nodes):
@@ -293,6 +314,14 @@ for i, node in enumerate(refined_surface_nodes):
     close_cells = np.linalg.norm(distance_vector, axis=1) < tol
     cell_indicator.array[colliding_cells[close_cells]] = INTERFACE_MARKER
 cell_indicator.scatter_forward()
+
+# ```{admonition} New feature in DOLFINx 0.11
+# :class: hint dropdown
+# The function [compute_distances_gjk](xref:dolfinx#dolfinx.geometry.compute_distances_gjk) is a new function in DOLFINx 0.11
+# that allows us to compute the distance between a set of convex bodies (in our case convex hulls of mesh cells)
+# and a single convex body (the node on the true boundary). This function can use multiple threads to reduce the
+# time it takes to compute the distances, by suppling the `num_threads` argument.
+# ```
 
 # Once we have the interface, we can create an iterative algorithm that starts with the cells that are outside
 # the initial bounding box tree collision and iteratively mark all cells connected to these
@@ -353,6 +382,15 @@ plotter_refined_collision.export_html("pyvista_refined_collision.html")
 ## Creating the reduced mesh
 # We use [create_submesh](xref:dolfinx#dolfinx.mesh.create_submesh)
 # to restrict the problem to the marked cells only
+
+# ```{admonition} New API since DOLFINx 0.10
+# :class: hint dropdown
+# Prior to version 0.10, the function [create_submesh](xref:dolfinx#dolfinx.mesh.create_submesh) returned numpy arrays
+# for the entity map, vertex map and geometry map. However, starting with DOLFINx 0.10 it instead returns
+# an [EntityMap](xref:dolfinx#dolfinx.mesh.EntityMap) for the `entity_map` and `vertex_map`.
+# These work as two-way maps between the topology and sub-topology, which simplifies how to create
+# [Forms](xref:dolfinx#dolfinx.fem.Form) with quantities from both meshes
+# ```
 
 surrogate_mesh, entity_map, vertex_map, _ = dolfinx.mesh.create_submesh(
     mesh, mesh.topology.dim, cell_tag.find(KEEP_MARKER)

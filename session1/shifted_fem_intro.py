@@ -106,8 +106,8 @@ f = ufl.sin(x[0]) * ufl.cos(x[1])  # Some spatially varying expression
 L = ufl.inner(f, w) * ufl.dx
 # -
 
-# However, we require $\dM$, $\nt$, $\bartau$, $\uG$ and $\duGtau$ to be implemented on the boundary of the domain.
-# For this we will use a surrogate_mesh of the original mesh, which only contain the exterior facets.
+# However, we require $\dM$, $\nb$, $\bartau$, $\uG$ and $\duGtau$ to be implemented on the boundary of the domain.
+# For this we will use a `surrogate_mesh` of the original mesh, which only contain the exterior facets.
 # For now, this can symbolically be defined as
 
 facet = "interval"

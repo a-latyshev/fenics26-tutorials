@@ -19,6 +19,22 @@
 #
 # # Putting it all together
 # We can now use the data from the previous sections to solve the Poisson problem with the shifted boundary method.
+#
+# Find $u^h \in V(\tilde\Omega)$ such that
+#
+# $$
+# \begin{aligned}
+# a(u^h, v^h) &= L(v^h) \quad \forall v^h \in V(\tilde\Omega), \\
+# a(u, v) & = \intO{\nabla u}{\nabla v}
+# - \intG{\nabla u \cdot \nt}{v + \nabla v \cdot \dM}\\
+# &- \intG{u + \nabla u \cdot \dM}{\nabla v \cdot \nt}
+# + \intG{(\nb\cdot \nt)/\vert\vert \dM\vert\vert \nabla u \cdot \dM}{\nabla v \cdot \dM}, \\
+# &+ \intG{\alpha/h u + \nabla u \cdot \dM}{v + \nabla v \cdot \dM}, \\
+# L(v) & = \intO{f}{v} - \intG{\uG}{\nabla v \cdot \nt}
+# - \intG{\duGtau(\bartau \cdot \nt)}{\nabla v \cdot \dM}\\
+# &+ \intG{\alpha/h \uG}{v + \nabla v \cdot \dM}.
+# \end{aligned}
+# $$
 
 from mpi4py import MPI
 from grid_mapping import (
@@ -128,7 +144,7 @@ global_error = np.sqrt(surrogate_mesh.comm.allreduce(local_error, op=MPI.SUM))
 print(f"L2-error: {global_error:.4e}")
 # -
 
-# + tags=["hide-input", "hide-output"]
+# + tags=["hide-input"]
 sg_t, sg_ct, sg_g = dolfinx.plot.vtk_mesh(V)
 sg_ct[:] = (
     pv.CellType.QUAD
@@ -139,11 +155,11 @@ sol_plt = pv.UnstructuredGrid(sg_t, sg_ct, sg_g)
 sol_plt.point_data["u"] = problem.u.x.array
 plotter_sol = pv.Plotter(shape=(1, 2))
 plotter_sol.subplot(0, 0)
-plotter_sol.add_mesh(sol_plt, show_edges=True)
+plotter_sol.add_mesh(sol_plt, show_edges=True, cmap="Reds")
 
 tessellated.point_data["uG"] = u_exact(tessellated.points.T, np)
 tessellated.set_active_scalars("uG")
-plotter_sol.add_mesh(tessellated, line_width=10)
+plotter_sol.add_mesh(tessellated, line_width=10, cmap="Reds")
 plotter_sol.view_xy()
 
 plotter_sol.subplot(0, 1)
@@ -152,7 +168,7 @@ diff.interpolate(dolfinx.fem.Expression(u_ex, V.element.interpolation_points))
 diff.x.array[:] -= problem.u.x.array
 sol_plt.point_data["|error|"] = np.abs(diff.x.array)
 sol_plt.set_active_scalars("|error|")
-plotter_sol.add_mesh(sol_plt, show_edges=True)
+plotter_sol.add_mesh(sol_plt, show_edges=True, cmap="Reds")
 
 plotter_sol.link_views()
 plotter_sol.export_html("pyvista_surrogate_sol.html")

@@ -45,6 +45,7 @@ project:
     dolfinx: https://docs.fenicsproject.org/dolfinx/main/python/
     scifem: https://scientificcomputing.github.io/scifem/
     ufl: https://docs.fenicsproject.org/ufl/2026.1.0/
+    io4dolfinx: https://scientificcomputing.github.io/io4dolfinx/
 site:
   template: book-theme
   options:

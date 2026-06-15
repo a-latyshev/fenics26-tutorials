@@ -20,6 +20,19 @@
 # # Computing the closest point mapping from the surrogate boundary to the true boundary
 # In the previous sections, we have shown how to create the surrogate mesh, and how the variational form would look like on this grid.
 # However, we have not talked about how to transfer data from one grid to the other.
+# Recall that we would like to compute
+#
+# $$
+# \begin{aligned}
+# \nb(\xtilde) & \equiv \mathbf{n}(M(\xtilde)), \\
+# \bartau(\xtilde) & \equiv\boldsymbol{\tau}_i(M(\xtilde)), \\
+# \dM(\xtilde) & = M(\xtilde) - \xtilde, \\
+# \uG(\mathbf{\tilde x}) = u_G(M(\xtilde)),\\
+# \duGtau(\mathbf{\tilde x}) = \nabla \uG(\xtilde) \cdot \bartau(\xtilde).
+# \end{aligned}
+# $$
+#
+# where we require a map $M: \bar\Gamma \to \Gamma$ that maps points on the surrogate boundary $\bar\Gamma$ to the true boundary $\Gamma$.
 # Therefore, in this section we will create the map $M(x)$ from the surrogate boundary to the real boundary.
 
 # + tags=["remove-output"]
@@ -42,11 +55,13 @@ import numpy as np
 
 # -
 
-# In the shifted boundary method, we require a map $M: \bar\Gamma \to \Gamma$ that maps points on the surrogate boundary $\bar\Gamma$ to the true boundary $\Gamma$.
 # As we are working with finite element methods, we actually only need this map at the quadrature points of the surrogate boundary.
-# We therefore create another surrogate_mesh of the restricted mesh, which only contains the exterior facets of the surrogate_mesh, which will be our surrogate boundary $\bar\Gamma$.
+# We therefore create another `surrogate_mesh` of the restricted mesh, which only contains the exterior facets of the `surrogate_mesh`,
+# which will be our surrogate boundary $\bar\Gamma$.
 
-# Create a vector and scalar quadrature space for integration on the surrogate_mesh
+# Create a vector and scalar quadrature space for integration on the `surrogate_mesh`
+
+# +
 
 facet_qdeg = 3
 q_surface = basix.ufl.quadrature_element(
@@ -63,6 +78,8 @@ q_scalar_surface = basix.ufl.quadrature_element(
 )
 Q_scalar_facet = dolfinx.fem.functionspace(surrogate_facetmesh, q_scalar_surface)
 np.testing.assert_allclose(Q_scalar_facet.tabulate_dof_coordinates(), Q_facet_coords)
+
+# -
 
 # For each of the quadrature points on the surrogate boundary, we can now use
 # [compute_closest_entity](xref:dolfinx#dolfinx.geometry.compute_closest_entity) to compute the closest point on the true boundary.
@@ -106,6 +123,7 @@ closest_points, reference_points = closest_point_projection(
 # -
 
 # As we talked about in the previous sections, we can now define $\dM$
+
 dM = dolfinx.fem.Function(Q_facet, name="dM")
 dM.x.array[:] = (
     closest_points
@@ -160,13 +178,14 @@ pl.export_html("pyvista_closest_point.html")
 # We start creating $\uG$, the boundary condition on the true boundary $\Gamma$.
 # Furthermore, we also define the tangential deriviative along the true boundary, which we will require in the variational formulation.
 
-
+# +
 def u_exact(x, mod):
-    return x[0] + mod.sin(x[1])
+    return x[0] + mod.sin(0.5 * mod.pi * x[1])
 
 
 x_s = ufl.SpatialCoordinate(true_surface)
 uG = u_exact(x_s, ufl)
+# -
 
 # Furthermore, as we require $\bartau$ and $\duGtau$ in the variational formulation,
 # we also need to compute the tangent vector along the true boundary,
@@ -185,11 +204,13 @@ duG_dt = ufl.dot(ufl.grad(uG), t)
 # 1. Transfer [ufl-expressions](xref:ufl#ufl.core.expr.Expr) to a [Function](xref:dolfinx#dolfinx.fem.Function) on the true boundary, then use [Function.eval](xref:dolfinx#dolfinx.fem.Function.eval) to evaluate the function at the quadrature points on the surrogate boundary.
 
 # Create functions to store the data in on the true boundary
+
 bar_tangent_func = dolfinx.fem.Function(Q_facet, name="true_tangent")
 bar_duG_t = dolfinx.fem.Function(Q_scalar_facet, name="true_duGt")
 bar_uG = dolfinx.fem.Function(Q_scalar_facet, name="true_uG")
 
 # Create UFL expressions that can be used with [interpolation points](xref:dolfinx#dolfinx.fem.Function.interpolate)
+
 gdim = true_surface.geometry.dim
 grid_cmap = true_surface.geometry.cmaps[0]
 T_tmp = dolfinx.fem.functionspace(true_surface, ("DG", grid_cmap.degree, (gdim,)))
@@ -215,7 +236,9 @@ bar_tangent_func.x.array[:] = (
     t_approx.eval(padded_closest_points, closest_surface_cell)
 ).flatten()
 
-# Rescale tangent to have magnitude 1
+# As we used an intermediate space for the tangent, it doesn't nescessarily have magnitude 1.
+# Therefore we rescale it.
+
 btf = bar_tangent_func.x.array[:].reshape(-1, gdim)
 btf /= np.linalg.norm(bar_tangent_func.x.array.reshape(-1, gdim), axis=1)[:, None]
 
@@ -246,8 +269,17 @@ pl_data.export_html("pyvista_closest_point_data.html")
 # :::
 
 
-# 2. Create a [ufl.Expression](xref:dolfinx#dolfinx.fem.Expression) that can be evaluated at the quadrature points on the surrogate boundary,
+# 2. Create a [dolfinx.fem.Expression](xref:dolfinx#dolfinx.fem.Expression) that can be evaluated at the quadrature points on the surrogate boundary,
 # and directly evaluate the expression at these points.
+
+# If we do not want to go through an intermediate space, we can compile the [UFL-expression](xref:ufl#ufl.core.expr.Expr)
+# directly into a [dolfinx.fem.Expression](xref:dolfinx#dolfinx.fem.Expression) and evaluate it at the quadrature points on the surrogate boundary.
+# However, this procedure is quite costly, as we need to compile a separate expression for each quadrature point stemming from the
+# closest point projection.
+# Furthermore, as each process will require different points, we have to compile unique expressions per process.
+# We therefore use the `MPI.COMM_SELF` communicator when initializing the expression, as well as creating a temporary cache
+# directory for the generated C++ code, that is unique to each process. We use a temporary directory to avoid
+# littering the system with tons of entries, which would reduce the overal performance of form compilation.
 
 bar_tangent_func_expr = dolfinx.fem.Function(Q_facet, name="true_tangent")
 bar_duG_t_expr = dolfinx.fem.Function(Q_scalar_facet, name="true_duGt")
