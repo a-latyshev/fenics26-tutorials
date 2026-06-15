@@ -31,25 +31,44 @@ programme](https://fenicsproject.org/fenics-2026/programme/).
 
 ## How to use
 
-To run the tutorials it is sufficient to download a container with v0.11.0 of
-FEniCSx using docker or podman
-```shell
-docker run -ti -p 8888:8888 -e PORT=8888 --name=workshop2026 -v $(pwd):/root/shared -w /root/shared  --entrypoint=/bin/bash ghcr.io/fenics/dolfinx/lab:v0.11.0
-```
-Here we use a Jupyter Lab environment with pre-installed PyVista.
+### Tutorial session 1
 
-Install dependeces
+To run the scripts from tutorial 1 it is easiest to download a container image
+with FEniCSx v0.11 and JupyterLab using `docker` or `podman`
+
+```shell
+docker run -ti -p 8888:8888 --name=workshop2026 ghcr.io/fenics/dolfinx/lab:v0.11.0
+```
+
+The lab environment can be accessed at `localhost:8888`.
+
+Install the required dependencies in a Terminal:
+
 ```shell
 apt-get update
-pip install scifem>=0.20.0
+pip install scifem>=0.20
 ```
 
-Clone repo
+and then clone this repository
+
 ```shell
 git clone https://github.com/a-latyshev/fenics26-tutorials.git
 ```
 
-(Optional) to build the book via Jupyter Book 2 (MyST), follow instructions: [README_AUTHORS](./README_AUTHORS.md).
+The scripts are in `session1/` and can be run with `python` or opened in the
+JupyterLab environment.
+
+(Optional) to build the book via Jupyter Book 2 (MyST), follow instructions:
+[README_AUTHORS](./README_AUTHORS.md).
+
+### Tutorial session 2
+
+Ensure that you have a container runtime installed (e.g. `docker` or `podman`)
+and pull the following image with Spack pre-installed:
+
+```bash
+docker pull spack/ubuntu-noble:develop
+```
 
 ## Authors
 
