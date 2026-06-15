@@ -24,11 +24,11 @@
 #
 # $$
 # \begin{aligned}
-# \nb(\xtilde) & \equiv \mathbf{n}(M(\xtilde)), \\
-# \bartau(\xtilde) & \equiv\boldsymbol{\tau}_i(M(\xtilde)), \\
-# \dM(\xtilde) & = M(\xtilde) - \xtilde, \\
-# \uG(\mathbf{\tilde x}) = u_G(M(\xtilde)),\\
-# \duGtau(\mathbf{\tilde x}) = \nabla \uG(\xtilde) \cdot \bartau(\xtilde).
+# {\color{#009988}{\bar{\mathbf{n}}}}(\mathbf{\tilde x}) & \equiv \mathbf{n}(M(\mathbf{\tilde x})), \\
+# {\color{#EE3377}\bar{\boldsymbol{\tau}}_i}(\mathbf{\tilde x}) & \equiv\boldsymbol{\tau}_i(M(\mathbf{\tilde x})), \\
+# {\color{#56B4E9}\mathbf{d_M}}(\mathbf{\tilde x}) & = M(\mathbf{\tilde x}) - \mathbf{\tilde x}, \\
+# {\color{#E69F00}\bar{u}_G}(\mathbf{\tilde x}) = u_G(M(\mathbf{\tilde x})),\\
+# {\color{#DDCC77}\bar{u}_{G,\bar{\boldsymbol{\tau}}_i}}(\mathbf{\tilde x}) = \nabla {\color{#E69F00}\bar{u}_G}(\mathbf{\tilde x}) \cdot {\color{#EE3377}\bar{\boldsymbol{\tau}}_i}(\mathbf{\tilde x}).
 # \end{aligned}
 # $$
 #
@@ -122,7 +122,7 @@ closest_points, reference_points = closest_point_projection(
 )
 # -
 
-# As we talked about in the previous sections, we can now define $\dM$
+# As we talked about in the previous sections, we can now define ${\color{#56B4E9}\mathbf{d_M}}$
 
 dM = dolfinx.fem.Function(Q_facet, name="dM")
 dM.x.array[:] = (
@@ -175,7 +175,7 @@ pl.export_html("pyvista_closest_point.html")
 
 # ## Defining data on $\Gamma$
 #
-# We start creating $\uG$, the boundary condition on the true boundary $\Gamma$.
+# We start creating ${\color{#E69F00}\bar{u}_G}$, the boundary condition on the true boundary $\Gamma$.
 # Furthermore, we also define the tangential derivative along the true boundary, which we will require in the variational formulation.
 
 # +
@@ -187,7 +187,7 @@ x_s = ufl.SpatialCoordinate(true_surface)
 uG = u_exact(x_s, ufl)
 # -
 
-# Furthermore, as we require $\bartau$ and $\duGtau$ in the variational formulation,
+# Furthermore, as we require ${\color{#EE3377}\bar{\boldsymbol{\tau}}_i}$ and ${\color{#DDCC77}\bar{u}_{G,\bar{\boldsymbol{\tau}}_i}}$ in the variational formulation,
 # we also need to compute the tangent vector along the true boundary,
 # which we can do with the Jacobian of the surface mesh.
 

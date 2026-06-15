@@ -25,14 +25,14 @@
 # $$
 # \begin{aligned}
 # a(u^h, v^h) &= L(v^h) \quad \forall v^h \in V(\tilde\Omega), \\
-# a(u, v) & = \intO{\nabla u}{\nabla v}
-# - \intG{\nabla u \cdot \nt}{v + \nabla v \cdot \dM}\\
-# &- \intG{u + \nabla u \cdot \dM}{\nabla v \cdot \nt}
-# + \intG{(\nb\cdot \nt)/\vert\vert \dM\vert\vert \nabla u \cdot \dM}{\nabla v \cdot \dM}, \\
-# &+ \intG{\alpha/h u + \nabla u \cdot \dM}{v + \nabla v \cdot \dM}, \\
-# L(v) & = \intO{f}{v} - \intG{\uG}{\nabla v \cdot \nt}
-# - \intG{\duGtau(\bartau \cdot \nt)}{\nabla v \cdot \dM}\\
-# &+ \intG{\alpha/h \uG}{v + \nabla v \cdot \dM}.
+# a(u, v) & = \left(\nabla u, \nabla v\right)_{\tilde\Omega}
+# - \left(\nabla u \cdot \tilde{\mathbf{n}}, v + \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}\\
+# &- \left(u + \nabla u \cdot {\color{#56B4E9}\mathbf{d_M}}, \nabla v \cdot \tilde{\mathbf{n}}\right)_{\bar\Gamma}
+# + \left(({\color{#009988}{\bar{\mathbf{n}}}}\cdot \tilde{\mathbf{n}})/\vert\vert {\color{#56B4E9}\mathbf{d_M}}\vert\vert \nabla u \cdot {\color{#56B4E9}\mathbf{d_M}}, \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}, \\
+# &+ \left(\alpha/h u + \nabla u \cdot {\color{#56B4E9}\mathbf{d_M}}, v + \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}, \\
+# L(v) & = \left(f, v\right)_{\tilde\Omega} - \left({\color{#E69F00}\bar{u}_G}, \nabla v \cdot \tilde{\mathbf{n}}\right)_{\bar\Gamma}
+# - \left({\color{#DDCC77}\bar{u}_{G,\bar{\boldsymbol{\tau}}_i}}({\color{#EE3377}\bar{\boldsymbol{\tau}}_i} \cdot \tilde{\mathbf{n}}), \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}\\
+# &+ \left(\alpha/h {\color{#E69F00}\bar{u}_G}, v + \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}.
 # \end{aligned}
 # $$
 
