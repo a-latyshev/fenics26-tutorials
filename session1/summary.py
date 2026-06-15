@@ -129,7 +129,7 @@ problem = dolfinx.fem.petsc.LinearProblem(
     petsc_options_prefix="surrogate_solver",
     entity_maps=[facet_map],
 )
-problem.solve()
+_ = problem.solve()
 
 # We compute the L2 error within the surrogate domain and visualize it
 
