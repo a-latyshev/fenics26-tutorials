@@ -46,11 +46,11 @@
 #
 # $$
 # \begin{aligned}
-# \nb(\xtilde) & \equiv \mathbf{n}(M(\xtilde)), \\
-# \bartau(\xtilde) & \equiv\boldsymbol{\tau}_i(M(\xtilde)), \\
-# \dM(\xtilde) & = M(\xtilde) - \xtilde, \\
-# \psi_{,\bar z}(\xtilde) = \nabla \psi(\xtilde) \cdot \bar{\mathbf{z}}
-# & = \nabla \psi(\xtilde) \cdot \mathbf{z}(M(\xtilde)),
+# {\color{#009988}{\bar{\mathbf{n}}}}(\mathbf{\tilde x}) & \equiv \mathbf{n}(M(\mathbf{\tilde x})), \\
+# {\color{#EE3377}\bar{\boldsymbol{\tau}}_i}(\mathbf{\tilde x}) & \equiv\boldsymbol{\tau}_i(M(\mathbf{\tilde x})), \\
+# {\color{#56B4E9}\mathbf{d_M}}(\mathbf{\tilde x}) & = M(\mathbf{\tilde x}) - \mathbf{\tilde x}, \\
+# \psi_{,\bar z}(\mathbf{\tilde x}) = \nabla \psi(\mathbf{\tilde x}) \cdot \bar{\mathbf{z}}
+# & = \nabla \psi(\mathbf{\tilde x}) \cdot \mathbf{z}(M(\mathbf{\tilde x})),
 # \quad \text{for } \mathbf{z} = \bar{\mathbf{n}}, \bar{\boldsymbol{\tau}}_i.
 # \end{aligned}
 # $$
@@ -58,13 +58,13 @@
 # where $\mathbf{n}$ is the normal vector and $i$th tangent vector on the true boundary $\Gamma$.
 #
 # The extension operator of a function $\phi$ on $\Gamma$ to $\bar\Gamma$ is defined as
-# $\bar{\phi}(\mathbf{\tilde x}) \equiv \phi(M(\xtilde))$.
+# $\bar{\phi}(\mathbf{\tilde x}) \equiv \phi(M(\mathbf{\tilde x}))$.
 #
 # and therefore for the boundary condition, we can write
 #
 # $$
-# \uG(\mathbf{\tilde x}) = u_G(M(\xtilde)),\\
-# \duGtau(\mathbf{\tilde x}) = \nabla \uG(\xtilde) \cdot \bartau(\xtilde).
+# {\color{#E69F00}\bar{u}_G}(\mathbf{\tilde x}) = u_G(M(\mathbf{\tilde x})),\\
+# {\color{#DDCC77}\bar{u}_{G,\bar{\boldsymbol{\tau}}_i}}(\mathbf{\tilde x}) = \nabla {\color{#E69F00}\bar{u}_G}(\mathbf{\tilde x}) \cdot {\color{#EE3377}\bar{\boldsymbol{\tau}}_i}(\mathbf{\tilde x}).
 # $$
 #
 # The full derivation of the variational formulation can be found in [the original paper](https://doi.org/10.1016/j.jcp.2017.10.026),
@@ -74,14 +74,14 @@
 # $$
 # \begin{aligned}
 # a(u^h, v^h) &= L(v^h) \quad \forall v^h \in V(\tilde\Omega), \\
-# a(u, v) & = \intO{\nabla u}{\nabla v}
-# - \intG{\nabla u \cdot \nt}{v + \nabla v \cdot \dM}\\
-# &- \intG{u + \nabla u \cdot \dM}{\nabla v \cdot \nt}
-# + \intG{(\nb\cdot \nt)/\vert\vert \dM\vert\vert \nabla u \cdot \dM}{\nabla v \cdot \dM}, \\
-# &+ \intG{\alpha/h u + \nabla u \cdot \dM}{v + \nabla v \cdot \dM}, \\
-# L(v) & = \intO{f}{v} - \intG{\uG}{\nabla v \cdot \nt}
-# - \intG{\duGtau(\bartau \cdot \nt)}{\nabla v \cdot \dM}\\
-# &+ \intG{\alpha/h \uG}{v + \nabla v \cdot \dM}.
+# a(u, v) & = \left(\nabla u, \nabla v\right)_{\tilde\Omega}
+# - \left(\nabla u \cdot \tilde{\mathbf{n}}, v + \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}\\
+# &- \left(u + \nabla u \cdot {\color{#56B4E9}\mathbf{d_M}}, \nabla v \cdot \tilde{\mathbf{n}}\right)_{\bar\Gamma}
+# + \left(({\color{#009988}{\bar{\mathbf{n}}}}\cdot \tilde{\mathbf{n}})/\vert\vert {\color{#56B4E9}\mathbf{d_M}}\vert\vert \nabla u \cdot {\color{#56B4E9}\mathbf{d_M}}, \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}, \\
+# &+ \left(\alpha/h u + \nabla u \cdot {\color{#56B4E9}\mathbf{d_M}}, v + \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}, \\
+# L(v) & = \left(f, v\right)_{\tilde\Omega} - \left({\color{#E69F00}\bar{u}_G}, \nabla v \cdot \tilde{\mathbf{n}}\right)_{\bar\Gamma}
+# - \left({\color{#DDCC77}\bar{u}_{G,\bar{\boldsymbol{\tau}}_i}}({\color{#EE3377}\bar{\boldsymbol{\tau}}_i} \cdot \tilde{\mathbf{n}}), \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}\\
+# &+ \left(\alpha/h {\color{#E69F00}\bar{u}_G}, v + \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}.
 # \end{aligned}
 # $$
 
@@ -106,8 +106,8 @@ f = ufl.sin(x[0]) * ufl.cos(x[1])  # Some spatially varying expression
 L = ufl.inner(f, w) * ufl.dx
 # -
 
-# However, we require $\dM$, $\nt$, $\bartau$, $\uG$ and $\duGtau$ to be implemented on the boundary of the domain.
-# For this we will use a surrogate_mesh of the original mesh, which only contain the exterior facets.
+# However, we require ${\color{#56B4E9}\mathbf{d_M}}$, ${\color{#009988}{\bar{\mathbf{n}}}}$, ${\color{#EE3377}\bar{\boldsymbol{\tau}}_i}$, ${\color{#E69F00}\bar{u}_G}$ and ${\color{#DDCC77}\bar{u}_{G,\bar{\boldsymbol{\tau}}_i}}$ to be implemented on the boundary of the domain.
+# For this we will use a `surrogate_mesh` of the original mesh, which only contain the exterior facets.
 # For now, this can symbolically be defined as
 
 facet = "interval"
@@ -177,5 +177,5 @@ L -= ufl.inner(ufl.dot(duG_t * t_bar, nt), ufl.dot(ufl.grad(w), dM)) * dsG
 #    the true boundary $\Gamma_h$?
 # 2. How do we compute the map $M$ mapping each quadrature point on the surrogate boundary to the closest point on
 #    $\Gamma_h$?
-# 3. How do we transfer the associated quantities $\dM$, $\nb$, $\bartau$, $\uG$ and $\duGtau$?
+# 3. How do we transfer the associated quantities ${\color{#56B4E9}\mathbf{d_M}}$, ${\color{#009988}{\bar{\mathbf{n}}}}$, ${\color{#EE3377}\bar{\boldsymbol{\tau}}_i}$, ${\color{#E69F00}\bar{u}_G}$ and ${\color{#DDCC77}\bar{u}_{G,\bar{\boldsymbol{\tau}}_i}}$?
 #    to the facet surrogate_mesh?

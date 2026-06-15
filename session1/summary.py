@@ -19,6 +19,22 @@
 #
 # # Putting it all together
 # We can now use the data from the previous sections to solve the Poisson problem with the shifted boundary method.
+#
+# Find $u^h \in V(\tilde\Omega)$ such that
+#
+# $$
+# \begin{aligned}
+# a(u^h, v^h) &= L(v^h) \quad \forall v^h \in V(\tilde\Omega), \\
+# a(u, v) & = \left(\nabla u, \nabla v\right)_{\tilde\Omega}
+# - \left(\nabla u \cdot \tilde{\mathbf{n}}, v + \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}\\
+# &- \left(u + \nabla u \cdot {\color{#56B4E9}\mathbf{d_M}}, \nabla v \cdot \tilde{\mathbf{n}}\right)_{\bar\Gamma}
+# + \left(({\color{#009988}{\bar{\mathbf{n}}}}\cdot \tilde{\mathbf{n}})/\vert\vert {\color{#56B4E9}\mathbf{d_M}}\vert\vert \nabla u \cdot {\color{#56B4E9}\mathbf{d_M}}, \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}, \\
+# &+ \left(\alpha/h u + \nabla u \cdot {\color{#56B4E9}\mathbf{d_M}}, v + \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}, \\
+# L(v) & = \left(f, v\right)_{\tilde\Omega} - \left({\color{#E69F00}\bar{u}_G}, \nabla v \cdot \tilde{\mathbf{n}}\right)_{\bar\Gamma}
+# - \left({\color{#DDCC77}\bar{u}_{G,\bar{\boldsymbol{\tau}}_i}}({\color{#EE3377}\bar{\boldsymbol{\tau}}_i} \cdot \tilde{\mathbf{n}}), \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}\\
+# &+ \left(\alpha/h {\color{#E69F00}\bar{u}_G}, v + \nabla v \cdot {\color{#56B4E9}\mathbf{d_M}}\right)_{\bar\Gamma}.
+# \end{aligned}
+# $$
 
 from mpi4py import MPI
 from grid_mapping import (
@@ -128,7 +144,7 @@ global_error = np.sqrt(surrogate_mesh.comm.allreduce(local_error, op=MPI.SUM))
 print(f"L2-error: {global_error:.4e}")
 # -
 
-# + tags=["hide-input", "hide-output"]
+# + tags=["hide-input"]
 sg_t, sg_ct, sg_g = dolfinx.plot.vtk_mesh(V)
 sg_ct[:] = (
     pv.CellType.QUAD
@@ -139,11 +155,11 @@ sol_plt = pv.UnstructuredGrid(sg_t, sg_ct, sg_g)
 sol_plt.point_data["u"] = problem.u.x.array
 plotter_sol = pv.Plotter(shape=(1, 2))
 plotter_sol.subplot(0, 0)
-plotter_sol.add_mesh(sol_plt, show_edges=True)
+plotter_sol.add_mesh(sol_plt, show_edges=True, cmap="Reds")
 
 tessellated.point_data["uG"] = u_exact(tessellated.points.T, np)
 tessellated.set_active_scalars("uG")
-plotter_sol.add_mesh(tessellated, line_width=10)
+plotter_sol.add_mesh(tessellated, line_width=10, cmap="Reds")
 plotter_sol.view_xy()
 
 plotter_sol.subplot(0, 1)
@@ -152,7 +168,7 @@ diff.interpolate(dolfinx.fem.Expression(u_ex, V.element.interpolation_points))
 diff.x.array[:] -= problem.u.x.array
 sol_plt.point_data["|error|"] = np.abs(diff.x.array)
 sol_plt.set_active_scalars("|error|")
-plotter_sol.add_mesh(sol_plt, show_edges=True)
+plotter_sol.add_mesh(sol_plt, show_edges=True, cmap="Reds")
 
 plotter_sol.link_views()
 plotter_sol.export_html("pyvista_surrogate_sol.html")
