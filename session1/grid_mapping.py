@@ -84,7 +84,7 @@ np.testing.assert_allclose(Q_scalar_facet.tabulate_dof_coordinates(), Q_facet_co
 # For each of the quadrature points on the surrogate boundary, we can now use
 # [compute_closest_entity](xref:dolfinx#dolfinx.geometry.compute_closest_entity) to compute the closest point on the true boundary.
 # ```{note}
-# Compute closest entity only gives you accurate results for truely convex shapes,
+# Compute closest entity only gives you accurate results for truly convex shapes,
 # as it relies on the [GJK distance algorithm](https://doi.org/10.1109/56.2083).
 # Therefore, this only gives us a good estimation of the closest point on the true boundary, we
 # will use a closest point project method.
@@ -176,7 +176,7 @@ pl.export_html("pyvista_closest_point.html")
 # ## Defining data on $\Gamma$
 #
 # We start creating $\uG$, the boundary condition on the true boundary $\Gamma$.
-# Furthermore, we also define the tangential deriviative along the true boundary, which we will require in the variational formulation.
+# Furthermore, we also define the tangential derivative along the true boundary, which we will require in the variational formulation.
 
 # +
 def u_exact(x, mod):
@@ -236,7 +236,7 @@ bar_tangent_func.x.array[:] = (
     t_approx.eval(padded_closest_points, closest_surface_cell)
 ).flatten()
 
-# As we used an intermediate space for the tangent, it doesn't nescessarily have magnitude 1.
+# As we used an intermediate space for the tangent, it doesn't necessarily have magnitude 1.
 # Therefore we rescale it.
 
 btf = bar_tangent_func.x.array[:].reshape(-1, gdim)
@@ -279,7 +279,7 @@ pl_data.export_html("pyvista_closest_point_data.html")
 # Furthermore, as each process will require different points, we have to compile unique expressions per process.
 # We therefore use the `MPI.COMM_SELF` communicator when initializing the expression, as well as creating a temporary cache
 # directory for the generated C++ code, that is unique to each process. We use a temporary directory to avoid
-# littering the system with tons of entries, which would reduce the overal performance of form compilation.
+# littering the system with tons of entries, which would reduce the overall performance of form compilation.
 
 bar_tangent_func_expr = dolfinx.fem.Function(Q_facet, name="true_tangent")
 bar_duG_t_expr = dolfinx.fem.Function(Q_scalar_facet, name="true_duGt")

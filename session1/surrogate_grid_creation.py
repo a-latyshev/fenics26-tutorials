@@ -320,7 +320,7 @@ cell_indicator.scatter_forward()
 # The function [compute_distances_gjk](xref:dolfinx#dolfinx.geometry.compute_distances_gjk) is a new function in DOLFINx 0.11
 # that allows us to compute the distance between a set of convex bodies (in our case convex hulls of mesh cells)
 # and a single convex body (the node on the true boundary). This function can use multiple threads to reduce the
-# time it takes to compute the distances, by suppling the `num_threads` argument.
+# time it takes to compute the distances, by supplying the `num_threads` argument.
 # ```
 
 # Once we have the interface, we can create an iterative algorithm that starts with the cells that are outside
