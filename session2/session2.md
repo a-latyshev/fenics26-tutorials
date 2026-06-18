@@ -937,8 +937,8 @@ been updated.
 
 #### Building and running
 
-At the time of writing the FEniCSx 0.11 Spack packages are not merged, so I
-used the [FEniCS Spack packages overlay
+At the time of writing the FEniCSx 0.11 Spack packages are not merged into the
+upstream Spack package repo, so I used the [FEniCS Spack packages overlay
 repository](https://github.com/FEniCS/spack-fenics) to get the latest packages.
 
 I created a Spack environment in `~/fenicsx-0.11-flags` from the following
@@ -950,8 +950,8 @@ spack:
   - >-
     fenics-dolfinx@0.11+adios2+superlu-dist+petsc
     partitioners=parmetis
-    %petsc+mumps+hypre+superlu-dist+int64~fortran-bindings
-    %boost+program_options
+    ^petsc+mumps+hypre+superlu-dist+int64~fortran-bindings
+    ^boost+program_options
   - py-fenics-ffcx@0.11
   packages:
     petsc:
@@ -963,6 +963,15 @@ spack:
   concretizer:
     unify: true
 ```
+
+The Spack spec syntax is covered in full
+[here](https://spack.readthedocs.io/en/latest/spec_syntax.html). We build
+`fenics-dolfinx@0.11` with ADIOS2 (`+adios2`), SuperLU-DIST (`+superlu-dist`),
+and PETSc (`+petsc`) support, using ParMETIS as the graph partitioner
+(`partitioners=parmetis`); link it against a PETSc built with MUMPS, Hypre,
+SuperLU-DIST, and 64-bit integers but without Fortran bindings
+(`^petsc+mumps+hypre+superlu-dist+int64~fortran-bindings`), and against a Boost
+built with the program_options component (`^boost+program_options`).
 
 PETSc has rather conservative default compiler flags so it is worth making them
 more aggressive.
