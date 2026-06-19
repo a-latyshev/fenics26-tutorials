@@ -371,11 +371,10 @@ mpiexec python -c "from mpi4py import MPI; import dolfinx"
 :::{important} Some rough edges
 :class: dropdown
 :open: false
-I encountered two rough edges related to MPI in the EESSI 2023.06 set on the aion
-cluster at ULHPC in mid-2026. Both of these points link back to the guidance
-"Always using the system-provided MPI" - as EESSI provides a full binary stack,
+I encountered a known rough edges related to MPI in the EESSI 2023.06 set on
+the aion cluster at ULHPC in mid-2026. This point link back to the guidance
+"always using the system-provided MPI" - as EESSI provides a full binary stack,
 it does not follow this maxim.
-
 
 1. A [known
    issue](https://www.eessi.io/docs/known_issues/eessi-2023.06/#eessi-production-repository-v202306)
@@ -383,37 +382,25 @@ it does not follow this maxim.
 ```bash
 Failed to modify UD QP to INIT on mlx5_0: Operation not permitted
 ```
-  It is possible to fix this by instructing OpenMPI to not use libfabric
-  and turn off UCX's uct transport:
+
+It is possible to fix this by instructing OpenMPI to not use libfabric
+and turn off UCX's uct transport:
 
 ```bash
 mpiexec -mca pml ucx -mca btl '^uct,ofi' -mca mtl '^ofi'
 ```
 
-  Whether libfabric or UCX provides higher performance depends on the
-  interconnect used in your cluster.
+Whether libfabric or UCX provides higher performance depends on the
+interconnect used in your cluster.
 
-2. Inability to use system `srun` to launch jobs. This is perhaps a bigger
-   issue; launching MPI jobs with a scheduler-integrated launcher e.g. `srun`
-   currently fails:
+The same fix can be extended to `srun` with:
 
 ```bash
---------------------------------------------------------------------------
-A requested component was not found, or was unable to be opened.  This
-means that this component is either not installed or is unable to be
-used on your system (e.g., sometimes this means that shared libraries
-that the component requires are unable to be found/loaded).  Note that
-PMIx stopped checking at the first component that it did not find.
-
-Host:      aion-0086
-Framework: psec
-Component: munge
---------------------------------------------------------------------------
+OMPI_MCA_pml=ucx OMPI_MCA_btl='^uct,ofi' OMPI_MCA_mtl='^ofi' PMIX_MCA_psec=native srun
 ```
 
-   Using a scheduler-integrated launcher like `srun` over `mpiexec` improves
-   the HPC experience and many of our workflows are built around `srun`, so
-   this is not ideal.
+The same environment variables can of course be set in a job script using
+`export`.
 :::
 
 :::{seealso} The Future? The MPI ABI Initiative.
