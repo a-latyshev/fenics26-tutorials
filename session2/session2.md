@@ -371,11 +371,10 @@ mpiexec python -c "from mpi4py import MPI; import dolfinx"
 :::{important} Some rough edges
 :class: dropdown
 :open: false
-I encountered two rough edges related to MPI in the EESSI 2023.06 set on the aion
-cluster at ULHPC in mid-2026. Both of these points link back to the guidance
-"Always using the system-provided MPI" - as EESSI provides a full binary stack,
+I encountered a known rough edges related to MPI in the EESSI 2023.06 set on
+the aion cluster at ULHPC in mid-2026. This point link back to the guidance
+"always using the system-provided MPI" - as EESSI provides a full binary stack,
 it does not follow this maxim.
-
 
 1. A [known
    issue](https://www.eessi.io/docs/known_issues/eessi-2023.06/#eessi-production-repository-v202306)
@@ -383,37 +382,25 @@ it does not follow this maxim.
 ```bash
 Failed to modify UD QP to INIT on mlx5_0: Operation not permitted
 ```
-  It is possible to fix this by instructing OpenMPI to not use libfabric
-  and turn off UCX's uct transport:
+
+It is possible to fix this by instructing OpenMPI to not use libfabric
+and turn off UCX's uct transport:
 
 ```bash
 mpiexec -mca pml ucx -mca btl '^uct,ofi' -mca mtl '^ofi'
 ```
 
-  Whether libfabric or UCX provides higher performance depends on the
-  interconnect used in your cluster.
+Whether libfabric or UCX provides higher performance depends on the
+interconnect used in your cluster.
 
-2. Inability to use system `srun` to launch jobs. This is perhaps a bigger
-   issue; launching MPI jobs with a scheduler-integrated launcher e.g. `srun`
-   currently fails:
+The same fix can be extended to `srun` with:
 
 ```bash
---------------------------------------------------------------------------
-A requested component was not found, or was unable to be opened.  This
-means that this component is either not installed or is unable to be
-used on your system (e.g., sometimes this means that shared libraries
-that the component requires are unable to be found/loaded).  Note that
-PMIx stopped checking at the first component that it did not find.
-
-Host:      aion-0086
-Framework: psec
-Component: munge
---------------------------------------------------------------------------
+OMPI_MCA_pml=ucx OMPI_MCA_btl='^uct,ofi' OMPI_MCA_mtl='^ofi' PMIX_MCA_psec=native srun
 ```
 
-   Using a scheduler-integrated launcher like `srun` over `mpiexec` improves
-   the HPC experience and many of our workflows are built around `srun`, so
-   this is not ideal.
+The same environment variables can of course be set in a job script using
+`export`.
 :::
 
 :::{seealso} The Future? The MPI ABI Initiative.
@@ -937,8 +924,8 @@ been updated.
 
 #### Building and running
 
-At the time of writing the FEniCSx 0.11 Spack packages are not merged, so I
-used the [FEniCS Spack packages overlay
+At the time of writing the FEniCSx 0.11 Spack packages are not merged into the
+upstream Spack package repo, so I used the [FEniCS Spack packages overlay
 repository](https://github.com/FEniCS/spack-fenics) to get the latest packages.
 
 I created a Spack environment in `~/fenicsx-0.11-flags` from the following
@@ -950,8 +937,8 @@ spack:
   - >-
     fenics-dolfinx@0.11+adios2+superlu-dist+petsc
     partitioners=parmetis
-    %petsc+mumps+hypre+superlu-dist+int64~fortran-bindings
-    %boost+program_options
+    ^petsc+mumps+hypre+superlu-dist+int64~fortran-bindings
+    ^boost+program_options
   - py-fenics-ffcx@0.11
   packages:
     petsc:
@@ -963,6 +950,15 @@ spack:
   concretizer:
     unify: true
 ```
+
+The Spack spec syntax is covered in full
+[here](https://spack.readthedocs.io/en/latest/spec_syntax.html). We build
+`fenics-dolfinx@0.11` with ADIOS2 (`+adios2`), SuperLU-DIST (`+superlu-dist`),
+and PETSc (`+petsc`) support, using ParMETIS as the graph partitioner
+(`partitioners=parmetis`); link it against a PETSc built with MUMPS, Hypre,
+SuperLU-DIST, and 64-bit integers but without Fortran bindings
+(`^petsc+mumps+hypre+superlu-dist+int64~fortran-bindings`), and against a Boost
+built with the program_options component (`^boost+program_options`).
 
 PETSc has rather conservative default compiler flags so it is worth making them
 more aggressive.
