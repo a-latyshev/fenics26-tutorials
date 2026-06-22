@@ -28,6 +28,21 @@ project:
     - title: FEniCSx on HPC
       children:
         - file: session2/session2.md
+  
+  exports:
+    - format: pdf
+      template: plain_latex
+      articles: 
+        - session2/session2.md
+
+    - format: pdf
+      template: plain_latex
+      output: exports/session1.pdf
+      articles:
+        - file: session1/shifted_fem_intro.ipynb
+        - file: session1/surrogate_grid_creation.ipynb
+        - file: session1/grid_mapping.ipynb
+        - file: session1/summary.ipynb
   math:
    '\nt': '\tilde{\mathbf{n}}'
    '\nb': '{\color{#009988}{\bar{\mathbf{n}}}}'

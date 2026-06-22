@@ -21,7 +21,7 @@ Install extra Python dependencies
 pip install -r requirements.txt
 ```
 
-### Instructions for authors
+## Local build
 
 1. In the appropriate `session` folder add your `.md` or `.py` files.
 2. Add the corresponding page to `myst.yml`. In `myst.yml`, your files with the
@@ -39,4 +39,20 @@ and to serve as a website:
 
 ```shell
 python -m http.server 8888 -d _build/html/ &
+```
+
+## Generate PDF from sources
+
+In the container install minimal `texlive` to support LaTeX
+
+```shell
+apt-get update
+apt-get install -y texlive-xetex texlive-latex-extra texlive-fonts-recommended latexmk
+```
+
+Generate PDF
+
+```shell
+export LANG=C.UTF-8 LC_ALL=C.UTF-8 LC_CTYPE=C.UTF-8
+jupyter-book build --pdf --execute
 ```
